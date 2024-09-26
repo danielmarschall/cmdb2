@@ -196,7 +196,7 @@ begin
   begin
     ttQuotesAMOUNT_LOCAL.AsFloat := 0;
   end
-  else if (VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) and
+  else if ((VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)) and
           (Length(ttQuotesCURRENCY.AsWideString)=3) then
   begin
     LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));

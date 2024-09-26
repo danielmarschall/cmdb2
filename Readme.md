@@ -66,17 +66,6 @@ Please create backups regularly by clicking "File" and then "Backup and Exit".
 
 Restore a backup using the restore command in the main menu. Alternatively, experts can restore a backup using Microsoft SQL Server Management Studio (connect to `(localdb)\MSSQLLocalDB` and restore the BAK file as database `cmdb2`.)
 
-### Integrated currency conversion
-
-When is the currency converted?
-
-In the Commission Form, when all these criteria have been fulfilled:
-- In the commission quote, `IS_FREE` must be False, otherwise Local Amount will be automatically set to 0.
-- You change the field "Amount" and save the row (leave the line).
-- "Currency" must be a valid 3-letter code currency, e.g. `USD`
-- In the configuration you need to have `LOCAL_CURRENCY` filled with a valid 3-letter code currency, e.g. EUR
-- In the configuration you need to have `CURRENCY_LAYER_API_KEY` filled with a valid API key from [CurrencyLayer.com](https://CurrencyLayer.com/)
-
 ### How payment work
 
 CMDB2 works with the "down payment" system. This allows partial payments or payments for multiple commissions at once.
@@ -238,6 +227,13 @@ The database grid has the following columns:
 - Column `PAYPROV`: The pay provider such as PayPal. You can use the picklist `PICKLIST_PAYPROVIDER`.
 - Column `ANNOTATION`: It is recommended to enter the name of the commission(s) here. Maybe also the bank statement number that you have compared with.
 
+When is the currency converted? When all these criteria have been fulfilled:
+- `AMOUNT_VERIFIED` must be "False".
+- You change the field "Amount" or "Currency" and save the row (leave the line).
+- "Currency" must be a valid 3-letter code currency, e.g. `USD`
+- In the configuration you need to have `LOCAL_CURRENCY` filled with a valid 3-letter code currency, e.g. EUR
+- In the configuration you need to have `CURRENCY_LAYER_API_KEY` filled with a valid API key from [CurrencyLayer.com](https://CurrencyLayer.com/)
+
 #### Artist/Client window tab "Events"
 
 The database grid has the following columns:
@@ -300,6 +296,13 @@ The database grid of the Quote tab has the following columns:
 - Column `AMOUNT_LOCAL` contains the amount in the local currency. This value is only correct if `AMOUNT_LOCAL` in the commission events is entered (or automatically converted) correctly.
 - Column `IS_FREE`: A value of "True" marks the line as free, i.e. the client doesn't have to pay for this item.
 - Column `DESCRIPTION` contains a description, e.g. if you want to break down the quote into components such as background, extra character, style, extra shading, free, etc.
+
+When is the currency converted? When all these criteria have been fulfilled:
+- In the commission quote, `IS_FREE` must be False, otherwise Local Amount will be automatically set to 0.
+- You change the field "Amount" or "Currency" and save the row (leave the line).
+- "Currency" must be a valid 3-letter code currency, e.g. `USD`
+- In the configuration you need to have `LOCAL_CURRENCY` filled with a valid 3-letter code currency, e.g. EUR
+- In the configuration you need to have `CURRENCY_LAYER_API_KEY` filled with a valid API key from [CurrencyLayer.com](https://CurrencyLayer.com/)
 
 #### Commission window uploads
 
