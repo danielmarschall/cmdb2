@@ -155,7 +155,10 @@ select
 	NEWID() as ID,
 	art.ID as ARTIST_ID,
 	old_cm.TITLE as NAME,
-	old_cm.ORDNER as FOLER,
+	case
+		when (len(old_cm.ORDNER) < 5 or substring(old_cm.ORDNER, 2, 1) = ':' or left(old_cm.ORDNER, 2) = '\\') then old_cm.ORDNER
+		else N'D:\OneDrive\Commissions\' + old_cm.ORDNER -- ' this apostrophe is to avoid that Notepad++ syntax highlighting is off...
+	end as FOLDER,
 	old_cm.ID as LEGACY_ID
 from
 	cmdb1.dbo.COMMISSIONS old_cm
@@ -214,10 +217,6 @@ with tmp as (
 		when st.STATUS_TEXT = 'aw quote' then N'c aw ack'
 		else st.STATUS_TEXT
 	end as LEGACY_STATUS_NEW,
-	case
-		when (len(old_cm.ORDNER) < 5 or substring(old_cm.ORDNER, 2, 1) = ':' or left(old_cm.ORDNER, 2) = '\\') then old_cm.ORDNER
-		else N'D:\OneDrive\Commissions\' + old_cm.ORDNER -- ' this apostrophe is to avoid that Notepad++ syntax highlighting is off...
-	end as FOLDER,
 	old_cm.ARTIST as LEGACY_ARTIST_ID
 	from cmdb1.dbo.COMMISSIONS old_cm
 	left join cmdb1.dbo.LKP_STATUS st on st.ID = old_cm.STATUS

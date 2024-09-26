@@ -1,6 +1,10 @@
 
 # TODO
 
+ShowStopper:
+- VtsCurConv requires OpenSSL... Can't we use WinAPI?
+- Edit quote or upload gives error: "Annotations for Quotes and Uploads are automatically filled. You must not edit them."
+
 Artist form:
 - Automatically calculate local amount
 
