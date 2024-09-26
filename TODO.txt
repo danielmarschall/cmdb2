@@ -1,0 +1,18 @@
+
+# TODO
+
+Commission form:
+- Allow non upload and non quote events to add an annotation
+- Button to jump back to the artist window
+
+General:
+- Try to copy as many things from the CMDB1 GUI as possible! Step by step until we have everything. (Tables are all checked and ok)
+- Don't forget tools like the upload checker and folder comparison tool
+- Also check all statistics
+- Publish at GitHub, add Setup
+
+Ideas:
+- Mandator dependant text backup
+- Allow connection to a real SQL server, to allow a client/server environment
+- Let users define additional commission event picklist values, and artist event picklist values
+- Allow drag'n'drop to the commission files shell view

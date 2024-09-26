@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="cmdb2" Class="CMDB2DataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Table Name="dbo.ARTIST" Member="ARTIST">
+    <Type Name="ARTIST">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="MANDATOR_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="NAME" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="IS_ARTIST" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="ARTIST_ARTIST_EVENT" Member="ARTIST_EVENT" ThisKey="ID" OtherKey="ARTIST_ID" Type="ARTIST_EVENT" />
+      <Association Name="ARTIST_COMMISSION" Member="COMMISSION" ThisKey="ID" OtherKey="ARTIST_ID" Type="COMMISSION" />
+      <Association Name="ARTIST_COMMUNICATION" Member="COMMUNICATION" ThisKey="ID" OtherKey="ARTIST_ID" Type="COMMUNICATION" />
+      <Association Name="ARTIST_PAYMENT" Member="PAYMENT" ThisKey="ID" OtherKey="ARTIST_ID" Type="PAYMENT" />
+      <Association Name="MANDATOR_ARTIST" Member="MANDATOR" ThisKey="MANDATOR_ID" OtherKey="ID" Type="MANDATOR" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UPLOAD" Member="UPLOAD">
+    <Type Name="UPLOAD">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EVENT_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="NO" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PAGE" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="PROHIBIT" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="COMMISSION_EVENT_UPLOAD" Member="COMMISSION_EVENT" ThisKey="EVENT_ID" OtherKey="ID" Type="COMMISSION_EVENT" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ARTIST_EVENT" Member="ARTIST_EVENT">
+    <Type Name="ARTIST_EVENT">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ARTIST_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="DATE" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="STATE" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="ARTIST_ARTIST_EVENT" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.COMMISSION" Member="COMMISSION">
+    <Type Name="COMMISSION">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ARTIST_ID" Type="System.Guid" DbType="UniqueIdentifier" CanBeNull="true" />
+      <Column Name="NAME" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FOLDER" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Association Name="COMMISSION_COMMISSION_EVENT" Member="COMMISSION_EVENT" ThisKey="ID" OtherKey="COMMISSION_ID" Type="COMMISSION_EVENT" />
+      <Association Name="ARTIST_COMMISSION" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" />
+    </Type>
+  </Table>
+  <Table Name="dbo.COMMISSION_EVENT" Member="COMMISSION_EVENT">
+    <Type Name="COMMISSION_EVENT">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="COMMISSION_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="DATE" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="STATE" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Association Name="COMMISSION_EVENT_UPLOAD" Member="UPLOAD" ThisKey="ID" OtherKey="EVENT_ID" Type="UPLOAD" />
+      <Association Name="COMMISSION_EVENT_QUOTE" Member="QUOTE" ThisKey="ID" OtherKey="EVENT_ID" Type="QUOTE" />
+      <Association Name="COMMISSION_COMMISSION_EVENT" Member="COMMISSION" ThisKey="COMMISSION_ID" OtherKey="ID" Type="COMMISSION" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.COMMUNICATION" Member="COMMUNICATION">
+    <Type Name="COMMUNICATION">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ARTIST_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="CHANNEL" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="ADDRESS" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="ARTIST_COMMUNICATION" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CONFIG" Member="CONFIG">
+    <Type Name="CONFIG">
+      <Column Name="NAME" Type="System.String" DbType="NVarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="VALUE" Type="System.String" DbType="NVarChar(4000) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.MANDATOR" Member="MANDATOR">
+    <Type Name="MANDATOR">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="NAME" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="MANDATOR_ARTIST" Member="ARTIST" ThisKey="ID" OtherKey="MANDATOR_ID" Type="ARTIST" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PAYMENT" Member="PAYMENT">
+    <Type Name="PAYMENT">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ARTIST_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="DATE" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="AMOUNT" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="CURRENCY" Type="System.String" DbType="NVarChar(3) NOT NULL" CanBeNull="false" />
+      <Column Name="AMOUNT_LOCAL" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="AMOUNT_VERIFIED" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="PAYPROV" Type="System.String" DbType="NVarChar(35)" CanBeNull="true" />
+      <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Association Name="ARTIST_PAYMENT" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.QUOTE" Member="QUOTE">
+    <Type Name="QUOTE">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="EVENT_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="NO" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="AMOUNT" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="CURRENCY" Type="System.String" DbType="NVarChar(3) NOT NULL" CanBeNull="false" />
+      <Column Name="AMOUNT_LOCAL" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="IS_FREE" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="DESCRIPTION" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="COMMISSION_EVENT_QUOTE" Member="COMMISSION_EVENT" ThisKey="EVENT_ID" OtherKey="ID" Type="COMMISSION_EVENT" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.[STATISTICS]" Member="STATISTICS">
+    <Type Name="STATISTICS">
+      <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="NO" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="NAME" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="SQL_VIEW" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="SQL_ORDER" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TEXT_BACKUP" Member="TEXT_BACKUP">
+    <Type Name="TEXT_BACKUP">
+      <Column Name="BAK_ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BAK_DATE" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="BAK_DATA" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="BAK_LINES" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>

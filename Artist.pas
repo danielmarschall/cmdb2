@@ -1,0 +1,683 @@
+unit Artist;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.ExtCtrls, Vcl.Buttons,
+  Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Data.Win.ADODB,
+  Vcl.StdCtrls;
+
+type
+  TArtistForm = class(TForm)
+    PageControl1: TPageControl;
+    tsCommissions: TTabSheet;
+    dbgCommission: TDBGrid;
+    navCommission: TDBNavigator;
+    ADOConnection1: TADOConnection;
+    ttCommission: TADOQuery;
+    dsCommission: TDataSource;
+    tsPayment: TTabSheet;
+    Panel1: TPanel;
+    ttPayment: TADOQuery;
+    dsPayment: TDataSource;
+    navPayment: TDBNavigator;
+    dbgPayment: TDBGrid;
+    ttCommissionID: TGuidField;
+    ttCommissionARTIST_ID: TGuidField;
+    ttCommissionNAME: TWideStringField;
+    ttCommissionUPLOAD_A: TWideStringField;
+    ttCommissionUPLOAD_C: TWideStringField;
+    ttPaymentID: TGuidField;
+    ttPaymentARTIST_ID: TGuidField;
+    ttPaymentAMOUNT: TBCDField;
+    ttPaymentCURRENCY: TWideStringField;
+    ttPaymentDATE: TDateTimeField;
+    ttPaymentAMOUNT_LOCAL: TBCDField;
+    ttCommissionSTART_DATE: TDateTimeField;
+    ttCommissionEND_DATE: TDateTimeField;
+    ttCommissionART_STATUS: TWideStringField;
+    ttCommissionPAY_STATUS: TWideStringField;
+    ttPaymentAMOUNT_VERIFIED: TBooleanField;
+    ttPaymentPAYPROV: TWideStringField;
+    ttPaymentANNOTATION: TWideStringField;
+    Edit1: TEdit;
+    Button1: TButton;
+    tsArtistEvent: TTabSheet;
+    ttArtistEvent: TADOQuery;
+    dsArtistEvent: TDataSource;
+    navArtistEvent: TDBNavigator;
+    dbgArtistEvent: TDBGrid;
+    tsCommunication: TTabSheet;
+    dbgCommunication: TDBGrid;
+    navCommunication: TDBNavigator;
+    ttCommunication: TADOQuery;
+    dsCommunication: TDataSource;
+    ttArtistEventID: TGuidField;
+    ttArtistEventARTIST_ID: TGuidField;
+    ttArtistEventDATE: TDateTimeField;
+    ttArtistEventSTATE: TWideStringField;
+    ttArtistEventANNOTATION: TWideStringField;
+    ttCommunicationID: TGuidField;
+    ttCommunicationARTIST_ID: TGuidField;
+    ttCommunicationCHANNEL: TWideStringField;
+    ttCommunicationADDRESS: TWideStringField;
+    ttCommunicationANNOTATION: TWideStringField;
+    ttCommissionAMOUNT_LOCAL: TFloatField;
+    ttCommissionMANDATOR_ID: TGuidField;
+    ttCommissionIS_ARTIST: TBooleanField;
+    ttCommissionARTIST_NAME: TWideStringField;
+    ttCommissionLEGACY_ID: TIntegerField;
+    ttCommissionFOLDER: TWideStringField;
+    ttCommissionPROJECT_NAME: TWideStringField;
+    Timer1: TTimer;
+    sbCommission: TPanel;
+    csvCommission: TButton;
+    sbPayment: TPanel;
+    csvPayment: TButton;
+    sbArtistEvent: TPanel;
+    csvArtistEvent: TButton;
+    sbCommunication: TPanel;
+    csvCommunication: TButton;
+    sdCsvCommission: TSaveDialog;
+    sdCsvPayment: TSaveDialog;
+    sdCsvArtistEvent: TSaveDialog;
+    sdCsvCommunication: TSaveDialog;
+    refreshCommunication: TBitBtn;
+    refreshEvent: TBitBtn;
+    refreshPayment: TBitBtn;
+    refreshCommission: TBitBtn;
+    ttPaymentARTIST_OR_CLIENT_NAME: TWideStringField;
+    ttPaymentMANDATOR_ID: TGuidField;
+    ttPaymentIS_ARTIST: TBooleanField;
+    ttPaymentARTIST_NAME: TWideStringField;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure dbgCommissionDblClick(Sender: TObject);
+    procedure ttCommissionNewRecord(DataSet: TDataSet);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure ttPaymentNewRecord(DataSet: TDataSet);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure Edit1Change(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
+    procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure Button1Click(Sender: TObject);
+    procedure ttCommunicationNewRecord(DataSet: TDataSet);
+    procedure ttArtistEventNewRecord(DataSet: TDataSet);
+    procedure ttCommissionAMOUNT_LOCALGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure Timer1Timer(Sender: TObject);
+    procedure ttCommissionBeforeDelete(DataSet: TDataSet);
+    procedure ttPaymentBeforeDelete(DataSet: TDataSet);
+    procedure ttArtistEventBeforeDelete(DataSet: TDataSet);
+    procedure ttCommunicationBeforeDelete(DataSet: TDataSet);
+    procedure ttCommissionAfterScroll(DataSet: TDataSet);
+    procedure ttPaymentAfterScroll(DataSet: TDataSet);
+    procedure ttArtistEventAfterScroll(DataSet: TDataSet);
+    procedure ttCommunicationAfterScroll(DataSet: TDataSet);
+    procedure dbgCommissionTitleClick(Column: TColumn);
+    procedure dbgPaymentTitleClick(Column: TColumn);
+    procedure dbgArtistEventTitleClick(Column: TColumn);
+    procedure dbgCommunicationTitleClick(Column: TColumn);
+    procedure csvCommissionClick(Sender: TObject);
+    procedure csvPaymentClick(Sender: TObject);
+    procedure csvArtistEventClick(Sender: TObject);
+    procedure csvCommunicationClick(Sender: TObject);
+    procedure refreshCommunicationClick(Sender: TObject);
+    procedure refreshEventClick(Sender: TObject);
+    procedure refreshPaymentClick(Sender: TObject);
+    procedure refreshCommissionClick(Sender: TObject);
+    procedure ttPaymentBeforePost(DataSet: TDataSet);
+  private
+    SqlQueryCommission_Init: boolean;
+    SqlQueryCommission_Order: string;
+    SqlQueryCommission_Asc: boolean;
+    SqlQueryPayment_Init: boolean;
+    SqlQueryPayment_Order: string;
+    SqlQueryPayment_Asc: boolean;
+    SqlQueryArtistEvent_Init: boolean;
+    SqlQueryArtistEvent_Order: string;
+    SqlQueryArtistEvent_Asc: boolean;
+    SqlQueryCommunication_Init: boolean;
+    SqlQueryCommunication_Order: string;
+    SqlQueryCommunication_Asc: boolean;
+    function SqlQueryCommission(const search: string): string;
+    function SqlQueryPayment(const search: string): string;
+    function SqlQueryArtistEvent(const search: string): string;
+    function SqlQueryCommunication(const search: string): string;
+  public
+    ArtistId: TGUID;
+    ArtistName: string;
+    procedure Init;
+  end;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  CmDbMain, Commission, DbGridHelper, AdoConnHelper, CmDbFunctions;
+
+procedure TArtistForm.ttArtistEventAfterScroll(DataSet: TDataSet);
+begin
+  sbArtistEvent.Caption := CmDbShowRows(DataSet);
+end;
+
+procedure TArtistForm.ttArtistEventBeforeDelete(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'ARTIST_EVENT', 'ID');
+end;
+
+procedure TArtistForm.ttArtistEventNewRecord(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
+  DataSet.FieldByName('DATE').AsDateTime := Now;
+end;
+
+var
+  localCur: string;
+
+procedure TArtistForm.ttCommissionAfterScroll(DataSet: TDataSet);
+begin
+  sbCommission.Caption := CmDbShowRows(DataSet);
+end;
+
+procedure TArtistForm.ttCommissionAMOUNT_LOCALGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if localCur = '' then
+    localCur := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
+  Text := FormatFloat('#,##0.00', Sender.AsFloat) + ' ' + localCur;
+end;
+
+procedure TArtistForm.ttCommissionBeforeDelete(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'COMMISSION', 'ID');
+end;
+
+procedure TArtistForm.ttCommissionNewRecord(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
+end;
+
+procedure TArtistForm.ttCommunicationAfterScroll(DataSet: TDataSet);
+begin
+  sbCommunication.Caption := CmDbShowRows(DataSet);
+end;
+
+procedure TArtistForm.ttCommunicationBeforeDelete(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'COMMUNICATION', 'ID');
+end;
+
+procedure TArtistForm.ttCommunicationNewRecord(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
+end;
+
+procedure TArtistForm.ttPaymentAfterScroll(DataSet: TDataSet);
+begin
+  sbPayment.Caption := CmDbShowRows(DataSet);
+end;
+
+procedure TArtistForm.ttPaymentBeforeDelete(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'PAYMENT', 'ID');
+end;
+
+procedure TArtistForm.ttPaymentBeforePost(DataSet: TDataSet);
+begin
+  ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
+end;
+
+procedure TArtistForm.ttPaymentNewRecord(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
+  DataSet.FieldByName('DATE').AsDateTime := Now;
+  DataSet.FieldByName('AMOUNT_VERIFIED').AsBoolean := False;
+end;
+
+procedure TArtistForm.refreshCommissionClick(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    AdoQueryRefresh(ttCommission, 'ID');
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.refreshCommunicationClick(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    AdoQueryRefresh(ttCommunication, 'ID');
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.refreshEventClick(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    AdoQueryRefresh(ttArtistEvent, 'ID');
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.refreshPaymentClick(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    AdoQueryRefresh(ttPayment, 'ID');
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.Button1Click(Sender: TObject);
+begin
+  if Edit1.Text <> '' then
+    Edit1.Clear;
+end;
+
+procedure TArtistForm.csvArtistEventClick(Sender: TObject);
+begin
+  if sdCsvArtistEvent.Execute then
+    SaveGridToCsv(dbgArtistEvent, sdCsvArtistEvent.FileName);
+end;
+
+procedure TArtistForm.csvCommissionClick(Sender: TObject);
+begin
+  if sdCsvCommission.Execute then
+    SaveGridToCsv(dbgCommission, sdCsvCommission.FileName);
+end;
+
+procedure TArtistForm.csvCommunicationClick(Sender: TObject);
+begin
+  if sdCsvCommunication.Execute then
+    SaveGridToCsv(dbgCommunication, sdCsvCommunication.FileName);
+end;
+
+procedure TArtistForm.csvPaymentClick(Sender: TObject);
+begin
+  if sdCsvPayment.Execute then
+    SaveGridToCsv(dbgPayment, sdCsvPayment.FileName);
+end;
+
+procedure TArtistForm.dbgArtistEventTitleClick(Column: TColumn);
+var
+  ds: TAdoQuery;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    SqlQueryArtistEvent_Order := Column.FieldName;
+    SqlQueryArtistEvent_Asc := TitleButtonHelper(Column);
+    ds := Column.Grid.DataSource.DataSet as TAdoQuery;
+    ds.Active := false;
+    ds.SQL.Text := SqlQueryArtistEvent(Edit1.Text);
+    ds.Active := true;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.dbgCommissionDblClick(Sender: TObject);
+var
+  CommissionForm: TCommissionForm;
+resourcestring
+  SCommissionSbyS = 'Commission %s by %s';
+  SCommissionSforS = 'Commission %s for %s';
+begin
+  if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
+  if ttCommission.FieldByName('ID').IsNull then exit;
+
+  CommissionForm := MainForm.FindForm(ttCommission.FieldByName('ID').AsGuid) as TCommissionForm;
+  if Assigned(CommissionForm) then
+  begin
+    MainForm.RestoreMdiChild(CommissionForm);
+  end
+  else
+  begin
+    CommissionForm := TCommissionForm.Create(Application.MainForm);
+    CommissionForm.CommissionId := ttCommission.FieldByName('ID').AsGuid;
+    CommissionForm.CommissionName := ttCommission.FieldByName('NAME').AsWideString;
+    if ttCommission.FieldByName('IS_ARTIST').AsBoolean then
+    begin
+      CommissionForm.Caption :=
+        Format(SCommissionSbyS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
+    end
+    else
+    begin
+      CommissionForm.Caption :=
+        Format(SCommissionSforS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
+    end;
+    CommissionForm.ADOConnection1.Connected := false;
+    CommissionForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
+    CommissionForm.Init;
+  end;
+end;
+
+procedure TArtistForm.dbgCommissionTitleClick(Column: TColumn);
+var
+  ds: TAdoQuery;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    SqlQueryCommission_Order := Column.FieldName;
+    SqlQueryCommission_Asc := TitleButtonHelper(Column);
+    ds := Column.Grid.DataSource.DataSet as TAdoQuery;
+    ds.Active := false;
+    ds.SQL.Text := SqlQueryCommission(Edit1.Text);
+    ds.Active := true;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.dbgCommunicationTitleClick(Column: TColumn);
+var
+  ds: TAdoQuery;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    SqlQueryCommunication_Order := Column.FieldName;
+    SqlQueryCommunication_Asc := TitleButtonHelper(Column);
+    ds := Column.Grid.DataSource.DataSet as TAdoQuery;
+    ds.Active := false;
+    ds.SQL.Text := SqlQueryCommunication(Edit1.Text);
+    ds.Active := true;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.dbgPaymentTitleClick(Column: TColumn);
+var
+  ds: TAdoQuery;
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    SqlQueryPayment_Order := Column.FieldName;
+    SqlQueryPayment_Asc := TitleButtonHelper(Column);
+    ds := Column.Grid.DataSource.DataSet as TAdoQuery;
+    ds.Active := false;
+    ds.SQL.Text := SqlQueryPayment(Edit1.Text);
+    ds.Active := true;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.PageControl1Change(Sender: TObject);
+begin
+  if Edit1.Text <> '' then
+  begin
+    Edit1.Clear;
+    Timer1.Enabled := false;
+  end;
+end;
+
+function TArtistForm.SqlQueryArtistEvent(const search: string): string;
+begin
+  if not SqlQueryArtistEvent_Init then
+  begin
+    SqlQueryArtistEvent_Init := true;
+    SqlQueryArtistEvent_order := '';
+    SqlQueryArtistEvent_asc := true;
+  end;
+  result := 'select * ';
+  result := result + 'from vw_ARTIST_EVENT ';
+  result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
+  if trim(search)<>'' then
+    result := result + 'and ( lower(STATE) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
+                       'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
+                       '    ) ';
+  if SqlQueryArtistEvent_order = '' then
+    result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE=''born'' then 0 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE=''deceased'' then 2 ' +
+                       '              else 1 end '+AscDesc(SqlQueryArtistEvent_asc)+', DATE '+AscDesc(SqlQueryArtistEvent_asc)+', STATE, ANNOTATION'
+  else
+    result := result + 'order by ' + SqlQueryArtistEvent_order + ' ' + AscDesc(SqlQueryArtistEvent_asc);
+end;
+
+function TArtistForm.SqlQueryCommission(const search: string): string;
+begin
+  if not SqlQueryCommission_Init then
+  begin
+    SqlQueryCommission_Init := true;
+    SqlQueryCommission_order := 'START_DATE';
+    SqlQueryCommission_asc := true;
+  end;
+  result := 'select * ';
+  result := result + 'from vw_COMMISSION ';
+  result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
+  if trim(search)<>'' then
+    result := result + 'and lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if SqlQueryCommission_order = 'START_DATE' then
+    result := result + 'order by isnull(START_DATE,CONVERT(DATETIME, ''31.12.2999'', 104)) '+AscDesc(SqlQueryCommission_asc)+', NAME'
+  else
+    result := result + 'order by ' + SqlQueryCommission_order + ' ' + AscDesc(SqlQueryCommission_asc);
+end;
+
+function TArtistForm.SqlQueryCommunication(const search: string): string;
+begin
+  if not SqlQueryCommunication_Init then
+  begin
+    SqlQueryCommunication_Init := true;
+    SqlQueryCommunication_order := 'CHANNEL';
+    SqlQueryCommunication_asc := true;
+  end;
+  result := 'select * ';
+  result := result + 'from vw_COMMUNICATION ';
+  result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
+  if trim(search)<>'' then
+    result := result + 'and ( lower(CHANNEL) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
+                       'or    lower(ADDRESS) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
+                       'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
+                       ' ) ';
+  if SqlQueryCommunication_order = 'CHANNEL' then
+    result := result + 'order by CHANNEL '+AscDesc(SqlQueryCommunication_asc)+', ADDRESS, ANNOTATION'
+  else
+    result := result + 'order by ' + SqlQueryCommunication_order + ' ' + AscDesc(SqlQueryCommunication_asc);
+end;
+
+function TArtistForm.SqlQueryPayment(const search: string): string;
+begin
+  if not SqlQueryPayment_Init then
+  begin
+    SqlQueryPayment_Init := true;
+    SqlQueryPayment_order := 'DATE';
+    SqlQueryPayment_asc := true;
+  end;
+  result := 'select * ';
+  result := result + 'from vw_PAYMENT ';
+  result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
+  if trim(search)<>'' then
+    result := result + 'and lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if SqlQueryPayment_order = 'DATE' then
+    result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', AMOUNT, ANNOTATION desc'
+  else if SqlQueryPayment_order = 'PAYPROV' then
+    result := result + 'order by PAYPROV '+AscDesc(SqlQueryPayment_asc)+', DATE'
+  else
+    result := result + 'order by ' + SqlQueryPayment_order + ' ' + AscDesc(SqlQueryPayment_asc);
+end;
+
+procedure TArtistForm.Timer1Timer(Sender: TObject);
+begin
+  Timer1.Enabled := false;
+  if PageControl1.ActivePage = tsCommissions then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      ttCommission.Active := false;
+      ttCommission.SQL.Text := SqlQueryCommission(Edit1.Text);
+      ttCommission.Active := true;
+    finally
+      Screen.Cursor := crDefault;
+    end;
+  end;
+  if PageControl1.ActivePage = tsPayment then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      ttPayment.Active := false;
+      ttPayment.SQL.Text := SqlQueryPayment(Edit1.Text);
+      ttPayment.Active := true;
+    finally
+      Screen.Cursor := crDefault;
+    end;
+  end;
+  if PageControl1.ActivePage = tsArtistEvent then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      ttArtistEvent.Active := false;
+      ttArtistEvent.SQL.Text := SqlQueryArtistEvent(Edit1.Text);
+      ttArtistEvent.Active := true;
+    finally
+      Screen.Cursor := crDefault;
+    end;
+  end;
+  if PageControl1.ActivePage = tsCommunication then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      ttCommunication.Active := false;
+      ttCommunication.SQL.Text := SqlQueryCommunication(Edit1.Text);
+      ttCommunication.Active := true;
+    finally
+      Screen.Cursor := crDefault;
+    end;
+  end;
+end;
+
+procedure TArtistForm.Edit1Change(Sender: TObject);
+begin
+  Timer1.Enabled := false;
+  Timer1.Enabled := true;
+end;
+
+procedure TArtistForm.Edit1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_LEFT then
+  begin
+    Key := 0;
+    PageControl1.ActivePageIndex := (PageControl1.ActivePageIndex - 1) mod PageControl1.PageCount;
+  end
+  else if Key = VK_RIGHT then
+  begin
+    Key := 0;
+    PageControl1.ActivePageIndex := (PageControl1.ActivePageIndex + 1) mod PageControl1.PageCount;
+  end
+  else if PageControl1.ActivePage = tsCommissions then
+  begin
+    dbgCommission.HandleOtherControlKeyDown(Key, Shift);
+  end
+  else if PageControl1.ActivePage = tsPayment then
+  begin
+    dbgPayment.HandleOtherControlKeyDown(Key, Shift);
+  end
+  else if PageControl1.ActivePage = tsArtistEvent then
+  begin
+    dbgArtistEvent.HandleOtherControlKeyDown(Key, Shift);
+  end
+  else if PageControl1.ActivePage = tsCommunication then
+  begin
+    dbgCommunication.HandleOtherControlKeyDown(Key, Shift);
+  end;
+end;
+
+procedure TArtistForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TArtistForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
+  if ttPayment.State in [dsEdit,dsInsert] then ttPayment.Post;
+  if ttArtistEvent.State in [dsEdit,dsInsert] then ttArtistEvent.Post;
+  if ttCommunication.State in [dsEdit,dsInsert] then ttCommunication.Post;
+end;
+
+procedure TArtistForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  // We must use FormKeyDown AND FormKeyUp. Why?
+  // If we only use FormKeyDown only, then ESC will not only close this window, but also windows below (even if Key:=0 will be performed)
+  // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
+  if (Key = VK_ESCAPE) and not (ttCommission.State in [dsEdit,dsInsert])
+                       and not (ttPayment.State in [dsEdit,dsInsert])
+                       and not (ttArtistEvent.State in [dsEdit,dsInsert])
+                       and not (ttCommunication.State in [dsEdit,dsInsert]) then
+  begin
+    Tag := 1; // tell FormKeyUp that we may close
+    Key := 0;
+  end;
+end;
+
+procedure TArtistForm.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_ESCAPE) and (Tag = 1) then
+  begin
+    Close;
+    Key := 0;
+  end;
+end;
+
+procedure TArtistForm.Init;
+begin
+  // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
+  PageControl1.ActivePageIndex := 0;
+  Panel1.Caption := Caption;
+  Screen.Cursor := crHourGlass;
+  try
+    {$REGION 'ttCommission / dbgCommission'}
+    ttCommission.Active := false;
+    ttCommission.SQL.Text := SqlQueryCommission('');
+    ttCommission.Active := true;
+    ttCommission.Last;
+    dbgCommission.AutoSizeColumns;
+    {$ENDREGION}
+    {$REGION 'ttPayment / dbgPayment'}
+    ttPayment.Active := false;
+    ttPayment.SQL.Text := SqlQueryPayment('');
+    ttPayment.Active := true;
+    ttPayment.Last;
+    dbgPayment.AutoSizeColumns;
+    dbgPayment.Columns[5].PickList.Delimiter := ';';
+    dbgPayment.Columns[5].PickList.StrictDelimiter := True;
+    dbgPayment.Columns[5].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
+    {$ENDREGION}
+    {$REGION 'ttArtistEvent / dbgArtistEvent'}
+    ttArtistEvent.Active := false;
+    ttArtistEvent.SQL.Text := SqlQueryArtistEvent('');
+    ttArtistEvent.Active := true;
+    //ttArtistEvent.Last;
+    dbgArtistEvent.AutoSizeColumns;
+    {$ENDREGION}
+    {$REGION 'ttCommunication / dbgCommunication'}
+    ttCommunication.Active := false;
+    ttCommunication.SQL.Text := SqlQueryCommunication('');
+    ttCommunication.Active := true;
+    //ttCommunication.First;
+    dbgCommunication.AutoSizeColumns;
+    dbgCommunication.Columns[0].PickList.Delimiter := ';';
+    dbgCommunication.Columns[0].PickList.StrictDelimiter := True;
+    dbgCommunication.Columns[0].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_COMMUNICATION'''));
+    {$ENDREGION}
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+end.

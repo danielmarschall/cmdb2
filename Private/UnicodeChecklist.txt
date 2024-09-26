@@ -1,0 +1,11 @@
+
+To make the app fully Unicode compatible, take care that the following things are not in your *.pas;*.dfm;*.SQL files:
+
+Delphi:	TStringField		should be	TWideStringField
+Delphi:	.AsString		should be	.AsWideString
+SQL:	then '			should be	then N'
+SQL:	else '			should be	else N'
+SQL:	as varchar		should be	as nvarchar
+SQL:	[varchar]		should be	[nvarchar]
+
+(Not used in CMDB:  Memo should be WideMemo,  Text should be WideText, ... ?)
