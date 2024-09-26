@@ -130,32 +130,35 @@ end;
 procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
 begin
   if not (ttEvents.State in [dsEdit,dsInsert]) then ttEvents.Edit;
-  ttEventsANNOTATION.ReadOnly := false;
-  ttEventsANNOTATION.AsWideString :=
-    VariantToString(ADOConnection1.GetScalar(
-      'WITH AggregatedAmounts AS ( ' +
-      '    SELECT ' +
-      '        EVENT_ID, ' +
-      '        IS_FREE, ' +
-      '        CURRENCY, ' +
-      '        SUM(AMOUNT) AS TotalAmount ' +
-      '    FROM QUOTE ' +
-      '    GROUP BY EVENT_ID, IS_FREE, CURRENCY ' +
-      ') ' +
-      'SELECT ' +
-      '    isnull(STRING_AGG( ' +
-      '        CASE ' +
-      '            WHEN IS_FREE = 0 THEN N''Price '' + CAST(TotalAmount AS NVARCHAR(10)) + N'' '' + CURRENCY ' +
-      '            WHEN IS_FREE = 1 THEN CAST(TotalAmount AS NVARCHAR(10)) + N'' '' + CURRENCY + N'' Free'' ' +
-      '        END, ' +
-      '        '' + '' ' +
-      '    ),'''') AS AggregatedResult ' +
-      'FROM AggregatedAmounts ' +
-      'WHERE EVENT_ID = ' + ADOConnection1.SQLStringEscape(ttEvents.FieldByName('ID').AsWideString) + ' ' +
-      'GROUP BY EVENT_ID'
-      ));
-  ttEventsANNOTATION.ReadOnly := true;
-  ttEvents.Post;
+  ttEvents.Tag := 1; // disable Annotation change check
+  try
+    ttEventsANNOTATION.AsWideString :=
+      VariantToString(ADOConnection1.GetScalar(
+        'WITH AggregatedAmounts AS ( ' +
+        '    SELECT ' +
+        '        EVENT_ID, ' +
+        '        IS_FREE, ' +
+        '        CURRENCY, ' +
+        '        SUM(AMOUNT) AS TotalAmount ' +
+        '    FROM QUOTE ' +
+        '    GROUP BY EVENT_ID, IS_FREE, CURRENCY ' +
+        ') ' +
+        'SELECT ' +
+        '    isnull(STRING_AGG( ' +
+        '        CASE ' +
+        '            WHEN IS_FREE = 0 THEN N''Price '' + CAST(TotalAmount AS NVARCHAR(10)) + N'' '' + CURRENCY ' +
+        '            WHEN IS_FREE = 1 THEN CAST(TotalAmount AS NVARCHAR(10)) + N'' '' + CURRENCY + N'' Free'' ' +
+        '        END, ' +
+        '        '' + '' ' +
+        '    ),'''') AS AggregatedResult ' +
+        'FROM AggregatedAmounts ' +
+        'WHERE EVENT_ID = ' + ADOConnection1.SQLStringEscape(ttEvents.FieldByName('ID').AsWideString) + ' ' +
+        'GROUP BY EVENT_ID'
+        ));
+    ttEvents.Post;
+  finally
+    ttEvents.Tag := 0; // enable Annotation change check
+  end;
 end;
 
 var
@@ -251,33 +254,36 @@ end;
 procedure TCommissionForm.ttUploadsAfterPost(DataSet: TDataSet);
 begin
   if not (ttEvents.State in [dsEdit,dsInsert]) then ttEvents.Edit;
-  ttEventsANNOTATION.ReadOnly := false;
-  ttEventsANNOTATION.AsWideString :=
-    VariantToString(ADOConnection1.GetScalar(
-      'WITH AggregatedAmounts AS ( ' +
-      '    SELECT ' +
-      '        EVENT_ID, ' +
-      '        PROHIBIT, ' +
-      '        PAGE, ' +
-      '        COUNT(*) AS TotalAmount ' +
-      '    FROM UPLOAD ' +
-      '    GROUP BY EVENT_ID, PROHIBIT, PAGE ' +
-      ') ' +
-      'SELECT ' +
-      '    STRING_AGG( ' +
-      '        CASE ' +
-      '            WHEN PROHIBIT = 0 THEN PAGE + N'' ('' + CAST(TotalAmount AS NVARCHAR(10)) + N'')'' ' +
-      '            WHEN PROHIBIT = 1 and isnull(PAGE,'''')='''' THEN N''PROHIBITED'' ' +
-      '            WHEN PROHIBIT = 1 and isnull(PAGE,'''')<>'''' THEN PAGE + N'' (PROHIBITED)'' ' +
-      '        END, ' +
-      '        '', '' ' +
-      '    ) AS AggregatedResult ' +
-      'FROM AggregatedAmounts ' +
-      'WHERE EVENT_ID = ' + ADOConnection1.SQLStringEscape(ttEvents.FieldByName('ID').AsWideString) + ' ' +
-      'GROUP BY EVENT_ID'
-      ));
-  ttEventsANNOTATION.ReadOnly := true;
-  ttEvents.Post;
+  ttEvents.Tag := 1; // disable Annotation change check
+  try
+    ttEventsANNOTATION.AsWideString :=
+      VariantToString(ADOConnection1.GetScalar(
+        'WITH AggregatedAmounts AS ( ' +
+        '    SELECT ' +
+        '        EVENT_ID, ' +
+        '        PROHIBIT, ' +
+        '        PAGE, ' +
+        '        COUNT(*) AS TotalAmount ' +
+        '    FROM UPLOAD ' +
+        '    GROUP BY EVENT_ID, PROHIBIT, PAGE ' +
+        ') ' +
+        'SELECT ' +
+        '    STRING_AGG( ' +
+        '        CASE ' +
+        '            WHEN PROHIBIT = 0 THEN PAGE + N'' ('' + CAST(TotalAmount AS NVARCHAR(10)) + N'')'' ' +
+        '            WHEN PROHIBIT = 1 and isnull(PAGE,'''')='''' THEN N''PROHIBITED'' ' +
+        '            WHEN PROHIBIT = 1 and isnull(PAGE,'''')<>'''' THEN PAGE + N'' (PROHIBITED)'' ' +
+        '        END, ' +
+        '        '', '' ' +
+        '    ) AS AggregatedResult ' +
+        'FROM AggregatedAmounts ' +
+        'WHERE EVENT_ID = ' + ADOConnection1.SQLStringEscape(ttEvents.FieldByName('ID').AsWideString) + ' ' +
+        'GROUP BY EVENT_ID'
+        ));
+    ttEvents.Post;
+  finally
+    ttEvents.Tag := 0; // enable Annotation change check
+  end;
 end;
 
 procedure TCommissionForm.ttUploadsBeforeDelete(DataSet: TDataSet);
@@ -359,10 +365,10 @@ begin
   if (Dataset.FieldByName('STATE').AsWideString = 'quote') or
      StartsText('upload ', Dataset.FieldByName('STATE').AsWideString) then
   begin
-    if (DataSet.State = dsEdit) and (Dataset.FieldByName('ANNOTATION').OldValue <> Dataset.FieldByName('ANNOTATION').NewValue) then
+    if (ttEvents.Tag <> 1) and (DataSet.State = dsEdit) and (Dataset.FieldByName('ANNOTATION').OldValue <> Dataset.FieldByName('ANNOTATION').NewValue) then
       raise Exception.Create(SAnnotationEditNotAllowed);
 
-    if (DataSet.State = dsInsert) and (Trim(Dataset.FieldByName('ANNOTATION').AsWideString) <> '') then
+    if (ttEvents.Tag <> 1) and (DataSet.State = dsInsert) and (Trim(Dataset.FieldByName('ANNOTATION').AsWideString) <> '') then
       raise Exception.Create(SAnnotationSetNotAllowed);
   end;
 
