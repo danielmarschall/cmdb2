@@ -115,7 +115,7 @@ implementation
 
 uses
   AdoConnHelper, DbGridHelper, VtsCurConvDLLHeader, Math, CmDbFunctions,
-  ShellAPI;
+  ShellAPI, StrUtils;
 
 procedure TCommissionForm.ttQuotesAfterDelete(DataSet: TDataSet);
 begin
@@ -348,13 +348,26 @@ var
 resourcestring
   SInvalidEventType = 'Invalid event type. Please pick one from the list.';
   SEventTypeNotChangeable = 'The event type of that row can only be changed during creation of the row.';
+  SAnnotationSetNotAllowed = 'Annotations for Quotes and Uploads are automatically filled. Please remove the annotation you have entered.';
+  SAnnotationEditNotAllowed = 'Annotations for Quotes and Uploads are automatically filled. You must not edit them.';
 begin
   for i := 0 to dbgEvents.Columns.Count-1 do
     if dbgEvents.Columns.Items[i].Field.FieldName = 'STATE' then
       if dbgEvents.Columns.Items[i].PickList.IndexOf(Dataset.FieldByName('STATE').AsWideString) = -1 then
         raise Exception.Create(SInvalidEventType);
 
-  if (ttEvents.State = dsEdit) and (Dataset.FieldByName('STATE').OldValue <> Dataset.FieldByName('STATE').NewValue) then
+  if (Dataset.FieldByName('STATE').AsWideString = 'quote') or
+     StartsText('upload ', Dataset.FieldByName('STATE').AsWideString) then
+  begin
+    if (DataSet.State = dsEdit) and (Dataset.FieldByName('ANNOTATION').OldValue <> Dataset.FieldByName('ANNOTATION').NewValue) then
+      raise Exception.Create(SAnnotationEditNotAllowed);
+
+    if (DataSet.State = dsInsert) and (Trim(Dataset.FieldByName('ANNOTATION').AsWideString) <> '') then
+      raise Exception.Create(SAnnotationSetNotAllowed);
+  end;
+
+  // Event type is not changeable, because Quotes and Uploads might be attached to it
+  if (Dataset.State = dsEdit) and (Dataset.FieldByName('STATE').OldValue <> Dataset.FieldByName('STATE').NewValue) then
     raise Exception.Create(SEventTypeNotChangeable);
 end;
 

@@ -55,7 +55,7 @@ var
   dateidatum: TDateTime;
   bits: integer;
 resourcestring
-  S_Version = '%s (%d Bit)'+#13#10+'Version %s'+#13#10+'by ViaThinkSoft';
+  S_Version = '%s (%d Bit)'+#13#10+'Version %s'+#13#10+'by Daniel Marschall, ViaThinkSoft';
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   {$IFDEF WIN64}

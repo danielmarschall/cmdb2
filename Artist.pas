@@ -128,6 +128,7 @@ type
     procedure refreshPaymentClick(Sender: TObject);
     procedure refreshCommissionClick(Sender: TObject);
     procedure ttPaymentBeforePost(DataSet: TDataSet);
+    procedure ttArtistEventBeforePost(DataSet: TDataSet);
   private
     SqlQueryCommission_Init: boolean;
     SqlQueryCommission_Order: string;
@@ -166,6 +167,18 @@ end;
 procedure TArtistForm.ttArtistEventBeforeDelete(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'ARTIST_EVENT', 'ID');
+end;
+
+procedure TArtistForm.ttArtistEventBeforePost(DataSet: TDataSet);
+var
+  i: integer;
+resourcestring
+  SInvalidEventType = 'Invalid event type. Please pick one from the list.';
+begin
+  for i := 0 to dbgArtistEvent.Columns.Count-1 do
+    if dbgArtistEvent.Columns.Items[i].Field.FieldName = 'STATE' then
+      if dbgArtistEvent.Columns.Items[i].PickList.IndexOf(Dataset.FieldByName('STATE').AsWideString) = -1 then
+        raise Exception.Create(SInvalidEventType);
 end;
 
 procedure TArtistForm.ttArtistEventNewRecord(DataSet: TDataSet);

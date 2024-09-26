@@ -23,7 +23,7 @@ object CommissionForm: TCommissionForm
     Top = 41
     Width = 758
     Height = 542
-    ActivePage = tsFiles
+    ActivePage = tsEvents
     Align = alClient
     TabOrder = 0
     object tsEvents: TTabSheet
@@ -335,8 +335,8 @@ object CommissionForm: TCommissionForm
   end
   object dsQuotes: TDataSource
     DataSet = ttQuotes
-    Left = 144
-    Top = 488
+    Left = 56
+    Top = 424
   end
   object ttQuotes: TADOQuery
     Connection = ADOConnection1
@@ -350,8 +350,8 @@ object CommissionForm: TCommissionForm
     Parameters = <>
     SQL.Strings = (
       'select * from vw_QUOTE')
-    Left = 80
-    Top = 488
+    Left = 56
+    Top = 360
     object ttQuotesID: TGuidField
       FieldName = 'ID'
       FixedChar = True
@@ -402,8 +402,8 @@ object CommissionForm: TCommissionForm
     Parameters = <>
     SQL.Strings = (
       'select * from vw_COMMISSION_EVENT')
-    Left = 232
-    Top = 280
+    Left = 184
+    Top = 96
     object ttEventsID: TGuidField
       FieldName = 'ID'
       FixedChar = True
@@ -423,14 +423,13 @@ object CommissionForm: TCommissionForm
     object ttEventsANNOTATION: TWideStringField
       DisplayWidth = 50
       FieldName = 'ANNOTATION'
-      ReadOnly = True
       Size = 200
     end
   end
   object dsEvents: TDataSource
     DataSet = ttEvents
-    Left = 320
-    Top = 280
+    Left = 184
+    Top = 152
   end
   object ttUploads: TADOQuery
     Connection = ADOConnection1
@@ -443,8 +442,8 @@ object CommissionForm: TCommissionForm
     Parameters = <>
     SQL.Strings = (
       'select * from vw_UPLOAD')
-    Left = 272
-    Top = 488
+    Left = 120
+    Top = 360
     object ttUploadsID: TGuidField
       FieldName = 'ID'
       FixedChar = True
@@ -479,15 +478,15 @@ object CommissionForm: TCommissionForm
   end
   object dsUploads: TDataSource
     DataSet = ttUploads
-    Left = 336
-    Top = 488
+    Left = 120
+    Top = 424
   end
   object ShellChangeNotifier: TShellChangeNotifier
     NotifyFilters = [nfFileNameChange, nfDirNameChange, nfSizeChange, nfWriteChange]
     Root = 'C:\'
     WatchSubTree = True
     OnChange = ShellChangeNotifierChange
-    Left = 624
-    Top = 168
+    Left = 264
+    Top = 96
   end
 end

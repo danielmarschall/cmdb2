@@ -23,7 +23,7 @@ object ArtistForm: TArtistForm
     Top = 41
     Width = 1100
     Height = 400
-    ActivePage = tsPayment
+    ActivePage = tsArtistEvent
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -615,6 +615,7 @@ object ArtistForm: TArtistForm
   object ttArtistEvent: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforePost = ttArtistEventBeforePost
     BeforeDelete = ttArtistEventBeforeDelete
     AfterScroll = ttArtistEventAfterScroll
     OnNewRecord = ttArtistEventNewRecord
