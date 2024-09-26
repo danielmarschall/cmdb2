@@ -4,8 +4,8 @@
         <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectName Condition="'$(ProjectName)'==''">CmDb2</ProjectName>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -117,6 +117,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>CmDb2.ico</Icon_MainIcon>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <OutputExt>64.exe</OutputExt>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -133,6 +134,7 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>CmDb2.ico</Icon_MainIcon>
+        <OutputExt>64.exe</OutputExt>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
