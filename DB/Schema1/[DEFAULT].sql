@@ -1,6 +1,6 @@
 insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('50', 'Running commissions', 'vw_STAT_RUNNING_COMMISSIONS', '__STATUS_ORDER, ART_STATUS, FOLDER');
-insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('100', 'Local sum over years (commissions outgoing)', 'vw_STAT_SUM_YEARS', 'YEAR desc');
-insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('101', 'Local sum over months (commissions outgoing)', 'vw_STAT_SUM_MONTHS', 'MONTH desc');
+insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('100', 'Local sum over years', 'vw_STAT_SUM_YEARS', 'YEAR desc, DIRECTION');
+insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('101', 'Local sum over months', 'vw_STAT_SUM_MONTHS', 'MONTH desc, DIRECTION');
 insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('200', 'Top artists/clients', 'vw_STAT_TOP_ARTISTS', 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc');
 insert into [STATISTICS] (NO, NAME, SQL_VIEW, SQL_ORDER) values ('900', 'Full Text Export', 'vw_STAT_TEXT_EXPORT', 'DATASET_TYPE, DATASET_ID');
 

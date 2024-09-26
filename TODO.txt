@@ -4,9 +4,6 @@
 Artist form:
 - Automatically calculate local amount
 
-Statistics:
-- Separate "top artists" and "top customers" as two different statistics
-
 General:
 - Try to copy as many things from the CMDB1 GUI as possible! Step by step until we have everything. (Tables are all checked and ok)
 - Don't forget tools like the upload checker and folder comparison tool
