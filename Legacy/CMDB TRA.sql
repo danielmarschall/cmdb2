@@ -172,7 +172,7 @@ select
 	cm.ID as COMMISSION_ID,
 	isnull(old_cm.ERTEILT,CONVERT(DATETIME, '01.01.1900', 104)) as DATE,
 	'ack' as STATE,
-	'Transferred from CMDB1: '+IIF(old_cm.ERTEILT is null,'Start Date unknown','Start Date') as ANNOTATION
+	IIF(old_cm.ERTEILT is null,N'Start Date unknown',N'') as ANNOTATION
 from
 	cmdb1.dbo.COMMISSIONS old_cm
 left join
@@ -236,10 +236,10 @@ select
 		when tmp.LEGACY_STATUS_NEW is null and tmp.LEGACY_END is not null then N'fin'
 		else tmp.LEGACY_STATUS_NEW
 	end as STATE,
-	'Transferred from CMDB1: '+case
+	case
 		when tmp.LEGACY_STATUS_NEW is null and tmp.LEGACY_END is not null then N'Finish Date (but original state missing)'
 		when tmp.LEGACY_STATUS_NEW='fin' and tmp.LEGACY_END is null then N'Finish Date unknown'
-		when tmp.LEGACY_STATUS_NEW='fin' and tmp.LEGACY_END is not null then N'Finish Date'
+		when tmp.LEGACY_STATUS_NEW='fin' and tmp.LEGACY_END is not null then N''
 		when tmp.LEGACY_STATUS_NEW<>'fin' then N'Original State '+tmp.LEGACY_STATUS+N' with unknown date'
 		else null -- should not happen
 	end as ANNOTATION
@@ -323,7 +323,7 @@ select
 	when up.ARTIST=0 and up.COMMISSIONER=1 then N'upload c'
 	else N'upload x' -- Foreign
 	end as STATE,
-	N'Transferred from CMDB1' as ANNOTATION -- TODO: with sum + prohibit flag (But note hardcoded below)
+	null as ANNOTATION
 	from cmdb1.dbo.UPLOADS old
 	left join cmdb2.dbo.COMMISSION cm on cm.LEGACY_ID = old.COMMISSION
 	left join cmdb1.dbo.COMMISSIONS old_cm on old_cm.ID = old.COMMISSION
@@ -349,8 +349,7 @@ select
 	when up.ARTIST=1 and up.COMMISSIONER=0 then N'upload a'
 	when up.ARTIST=0 and up.COMMISSIONER=1 then N'upload c'
 	else N'upload x' -- Foreign
-	end
-	and ev.ANNOTATION = 'Transferred from CMDB1';
+	end;
 
 -- Fill Quote
 -- ... Event Part
@@ -360,7 +359,7 @@ select
 	cm.ID as COMMISSION_ID,
 	isnull(isnull(old.PRICEDATE,old_cm.ERTEILT),CONVERT(DATETIME, '01.01.1900', 104)) as DATE,
 	'quote' as STATE,
-	'Transferred from CMDB1' as ANNOTATION -- TODO: with sum (but note hardcoded below)
+	null as ANNOTATION
 	from cmdb1.dbo.QUOTE old
 	left join cmdb2.dbo.COMMISSION cm on cm.LEGACY_ID = old.COMMISSION_ID
 	left join cmdb1.dbo.COMMISSIONS old_cm on old_cm.ID = old.COMMISSION_ID
@@ -384,7 +383,7 @@ insert into cmdb2.dbo.QUOTE (ID, EVENT_ID, NO, AMOUNT, CURRENCY, AMOUNT_LOCAL, I
 	LEFT join cmdb1.dbo.COMMISSIONS old_cm on old_cm.ID = old.COMMISSION_ID
 	LEFT join cmdb1.dbo.ARTISTS old_art on old_art.ID = old_cm.ARTIST
 	left join cmdb1.dbo.LKP_CURRENCY old_cur on old_cur.ID = isnull(old.CURRENCY,old_art.CURRENCY)
-	left join cmdb2.dbo.COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID and ev.STATE = 'quote' and ev.ANNOTATION = 'Transferred from CMDB1' and ev.DATE = isnull(isnull(old.PRICEDATE,old_cm.ERTEILT),CONVERT(DATETIME, '01.01.1900', 104))
+	left join cmdb2.dbo.COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID and ev.STATE = 'quote' and ev.DATE = isnull(isnull(old.PRICEDATE,old_cm.ERTEILT),CONVERT(DATETIME, '01.01.1900', 104))
 	left join cmdb1.dbo.LKP_BEZAHLSTATUS st on st.ID = old.BEZAHLT
 	where isnull(old.PRICE_NATIVE,0)<>0 or isnull(old.PRICE_LOCAL,0)<>0;
 -- ... Quote Part 2: Regular payments, cancelled commission status
@@ -405,7 +404,7 @@ insert into cmdb2.dbo.QUOTE (ID, EVENT_ID, NO, AMOUNT, CURRENCY, AMOUNT_LOCAL, I
 	left join cmdb1.dbo.LKP_STATUS old_st on old_st.ID = old_cm.STATUS
 	left join cmdb1.dbo.ARTISTS old_art on old_art.ID = old_cm.ARTIST
 	left join cmdb1.dbo.LKP_CURRENCY old_cur on old_cur.ID = isnull(old.CURRENCY,old_art.CURRENCY)
-	left join cmdb2.dbo.COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID and ev.STATE = 'quote' and ev.ANNOTATION = 'Transferred from CMDB1' and ev.DATE = isnull(isnull(old.PRICEDATE,old_cm.ERTEILT),CONVERT(DATETIME, '01.01.1900', 104))
+	left join cmdb2.dbo.COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID and ev.STATE = 'quote' and ev.DATE = isnull(isnull(old.PRICEDATE,old_cm.ERTEILT),CONVERT(DATETIME, '01.01.1900', 104))
 	left join cmdb1.dbo.LKP_BEZAHLSTATUS st on st.ID = old.BEZAHLT
 	where (isnull(old.PRICE_NATIVE,0)<>0 or isnull(old.PRICE_LOCAL,0)<>0) and isnull(old_st.ABBRUCH,0)=1;
 
