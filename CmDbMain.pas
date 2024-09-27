@@ -34,6 +34,7 @@ type
   public
     procedure RestoreMdiChild(frm: TForm);
     function FindForm(guid: TGuid): TForm;
+    procedure ShowHelpWindow(const MDFile: string);
   end;
 
 var
@@ -164,9 +165,9 @@ begin
   Caption := Application.Title;
 end;
 
-procedure TMainForm.Generalhelp1Click(Sender: TObject);
+procedure TMainForm.ShowHelpWindow(const MDFile: string);
 resourcestring
-  SSHelp = '%s Help';
+  SSHelp = '%s Help: %s';
 begin
   if Assigned(HelpForm) then
   begin
@@ -175,14 +176,19 @@ begin
   else
   begin
     HelpForm := THelpForm.Create(self);
-    HelpForm.ShowMarkDownHelp('README.md'); // do not localize
-    HelpForm.Caption := Format(SSHelp, [Caption]);
     HelpForm.Left := Round(Screen.Width * 0.1);
     HelpForm.Top := Round(Screen.Height * 0.1);
     HelpForm.Width := Round(Screen.Width * 0.8);
     HelpForm.Height := Round(Screen.Height * 0.8);
     HelpForm.Show;
   end;
+  HelpForm.ShowMarkDownHelp(MDFile);
+  HelpForm.Caption := Format(SSHelp, [Caption, MDFile.Replace('HELP_', '', [rfIgnoreCase]).Replace('.md', '', [rfIgnoreCase])]);
+end;
+
+procedure TMainForm.Generalhelp1Click(Sender: TObject);
+begin
+  ShowHelpWindow('README.md');
 end;
 
 procedure TMainForm.OpenDatabase1Click(Sender: TObject);

@@ -54,6 +54,7 @@ type
     refreshConfig: TBitBtn;
     refreshTextBackup: TBitBtn;
     refreshMandator: TBitBtn;
+    Button2: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -84,6 +85,7 @@ type
     procedure refreshMandatorClick(Sender: TObject);
     procedure refreshTextBackupClick(Sender: TObject);
     procedure refreshConfigClick(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     SqlQueryMandator_Init: boolean;
     SqlQueryMandator_Order: string;
@@ -159,6 +161,11 @@ procedure TMandatorsForm.Button1Click(Sender: TObject);
 begin
   if Edit1.Text <> '' then
     Edit1.Clear;
+end;
+
+procedure TMandatorsForm.Button2Click(Sender: TObject);
+begin
+  MainForm.ShowHelpWindow('HELP_DatabaseWindow.md');
 end;
 
 procedure TMandatorsForm.csvConfigClick(Sender: TObject);

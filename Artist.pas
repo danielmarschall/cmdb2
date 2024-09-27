@@ -91,6 +91,7 @@ type
     ttPaymentMANDATOR_ID: TGuidField;
     ttPaymentIS_ARTIST: TBooleanField;
     ttPaymentARTIST_NAME: TWideStringField;
+    Button2: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgCommissionDblClick(Sender: TObject);
     procedure ttCommissionNewRecord(DataSet: TDataSet);
@@ -129,6 +130,7 @@ type
     procedure refreshCommissionClick(Sender: TObject);
     procedure ttPaymentBeforePost(DataSet: TDataSet);
     procedure ttArtistEventBeforePost(DataSet: TDataSet);
+    procedure Button2Click(Sender: TObject);
   private
     SqlQueryCommission_Init: boolean;
     SqlQueryCommission_Order: string;
@@ -345,6 +347,11 @@ procedure TArtistForm.Button1Click(Sender: TObject);
 begin
   if Edit1.Text <> '' then
     Edit1.Clear;
+end;
+
+procedure TArtistForm.Button2Click(Sender: TObject);
+begin
+  MainForm.ShowHelpWindow('HELP_ArtistClientWindow.md');
 end;
 
 procedure TArtistForm.csvArtistEventClick(Sender: TObject);

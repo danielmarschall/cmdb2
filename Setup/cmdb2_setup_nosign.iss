@@ -48,15 +48,15 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 ; Die Dinger werden von Delphi kompiliert
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.exe"; DestDir: "{app}"; DestName: "CmDb2.exe"; Flags: ignoreversion signonce
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.64.exe"; DestDir: "{app}"; DestName: "CmDb2.64.exe"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.64.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CurConv.dll"; DestDir: "{app}"; DestName: "CurConv.dll"; Flags: ignoreversion signonce
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CurConv.64.dll"; DestDir: "{app}"; DestName: "CurConv.64.dll"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CurConv.dll"; DestDir: "{app}"; Flags: ignoreversion signonce
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CurConv.64.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
                                            
 Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Readme.md"; DestDir: "{app}"; DestName: "Readme.md"; Flags: ignoreversion
-Source: "..\HelpStyle.css"; DestDir: "{app}"; DestName: "HelpStyle.css"; Flags: ignoreversion
+Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\HelpStyle.css"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\DB\*"; DestDir: "{app}\DB"; Flags: ignoreversion recursesubdirs
 
 [UninstallDelete]

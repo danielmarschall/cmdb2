@@ -561,6 +561,21 @@ object MandatorForm: TMandatorForm
       TabOrder = 1
       OnClick = Button1Click
     end
+    object Button2: TButton
+      Left = 12
+      Top = 10
+      Width = 25
+      Height = 25
+      Caption = '?'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 20
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      OnClick = Button2Click
+    end
   end
   object dsArtists: TDataSource
     DataSet = ttArtists

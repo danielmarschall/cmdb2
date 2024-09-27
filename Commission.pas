@@ -60,6 +60,7 @@ type
     BtnFolderOpen: TButton;
     BtnFolderSave: TButton;
     ShellChangeNotifier: TShellChangeNotifier;
+    Button2: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ttQuotesNewRecord(DataSet: TDataSet);
@@ -89,6 +90,7 @@ type
     procedure BtnFolderOpenClick(Sender: TObject);
     procedure ttQuotesAMOUNT_LOCALGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
+    procedure Button2Click(Sender: TObject);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -115,7 +117,7 @@ implementation
 
 uses
   AdoConnHelper, DbGridHelper, VtsCurConvDLLHeader, Math, CmDbFunctions,
-  ShellAPI, StrUtils;
+  ShellAPI, StrUtils, CmDbMain;
 
 procedure TCommissionForm.ttQuotesAfterDelete(DataSet: TDataSet);
 begin
@@ -430,6 +432,11 @@ begin
       Free;
     end;
   end;
+end;
+
+procedure TCommissionForm.Button2Click(Sender: TObject);
+begin
+  MainForm.ShowHelpWindow('HELP_CommissionWindow.md');
 end;
 
 procedure TCommissionForm.BtnFolderOpenClick(Sender: TObject);
