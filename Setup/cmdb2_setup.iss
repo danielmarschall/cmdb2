@@ -56,8 +56,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
 Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.64.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CurConv.dll"; DestDir: "{app}"; Flags: ignoreversion signonce
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CurConv.64.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "..\CurConv.dll"; DestDir: "{app}"; Flags: ignoreversion signonce
+Source: "..\CurConv.64.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
                                            
 Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion
@@ -73,6 +73,10 @@ Name: "{autoprograms}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"
 
 Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.64.exe"; Tasks: desktopicon; Check: Is64BitInstallMode
 Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"; Tasks: desktopicon; Check: not Is64BitInstallMode
+
+[Run]
+Filename: "{app}\CmDb2.64.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked; Check: Is64BitInstallMode
+Filename: "{app}\CmDb2.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked; Check: not Is64BitInstallMode
 
 [Code]
 
