@@ -21,7 +21,7 @@ type
     ttMandatorID: TGuidField;
     ttMandatorNAME: TWideStringField;
     Edit1: TEdit;
-    Button1: TButton;
+    SearchBtn: TButton;
     ttTextBackup: TADOQuery;
     dsTextBackup: TDataSource;
     tsTextDumps: TTabSheet;
@@ -54,7 +54,7 @@ type
     refreshConfig: TBitBtn;
     refreshTextBackup: TBitBtn;
     refreshMandator: TBitBtn;
-    Button2: TButton;
+    HelpBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -62,7 +62,7 @@ type
     procedure Edit1Change(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Button1Click(Sender: TObject);
+    procedure SearchBtnClick(Sender: TObject);
     procedure dbgTextBackupDblClick(Sender: TObject);
     procedure ttTextBackupBeforeInsert(DataSet: TDataSet);
     procedure dbgConfigDblClick(Sender: TObject);
@@ -85,7 +85,7 @@ type
     procedure refreshMandatorClick(Sender: TObject);
     procedure refreshTextBackupClick(Sender: TObject);
     procedure refreshConfigClick(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure HelpBtnClick(Sender: TObject);
   private
     SqlQueryMandator_Init: boolean;
     SqlQueryMandator_Order: string;
@@ -157,13 +157,13 @@ begin
   Abort;
 end;
 
-procedure TMandatorsForm.Button1Click(Sender: TObject);
+procedure TMandatorsForm.SearchBtnClick(Sender: TObject);
 begin
   if Edit1.Text <> '' then
     Edit1.Clear;
 end;
 
-procedure TMandatorsForm.Button2Click(Sender: TObject);
+procedure TMandatorsForm.HelpBtnClick(Sender: TObject);
 begin
   MainForm.ShowHelpWindow('HELP_DatabaseWindow.md');
 end;

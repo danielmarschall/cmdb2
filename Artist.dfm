@@ -434,7 +434,7 @@ object ArtistForm: TArtistForm
       OnChange = Edit1Change
       OnKeyDown = Edit1KeyDown
     end
-    object Button1: TButton
+    object SearchBtn: TButton
       Left = 1071
       Top = 10
       Width = 25
@@ -448,9 +448,9 @@ object ArtistForm: TArtistForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      OnClick = Button1Click
+      OnClick = SearchBtnClick
     end
-    object Button2: TButton
+    object HelpBtn: TButton
       Left = 12
       Top = 10
       Width = 25
@@ -463,7 +463,7 @@ object ArtistForm: TArtistForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      OnClick = Button2Click
+      OnClick = HelpBtnClick
     end
   end
   object ADOConnection1: TADOConnection

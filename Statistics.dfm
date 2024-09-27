@@ -124,7 +124,7 @@ object StatisticsForm: TStatisticsForm
       OnChange = Edit1Change
       OnKeyDown = Edit1KeyDown
     end
-    object Button1: TButton
+    object SearchBtn: TButton
       Left = 1071
       Top = 10
       Width = 25
@@ -138,7 +138,7 @@ object StatisticsForm: TStatisticsForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      OnClick = Button1Click
+      OnClick = SearchBtnClick
     end
   end
   object ADOConnection1: TADOConnection

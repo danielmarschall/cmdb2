@@ -167,7 +167,7 @@ end;
 
 procedure TMainForm.ShowHelpWindow(const MDFile: string);
 resourcestring
-  SSHelp = '%s Help: %s';
+  SSHelp = '%s Help';
 begin
   if Assigned(HelpForm) then
   begin
@@ -183,7 +183,7 @@ begin
     HelpForm.Show;
   end;
   HelpForm.ShowMarkDownHelp(MDFile);
-  HelpForm.Caption := Format(SSHelp, [Caption, MDFile.Replace('HELP_', '', [rfIgnoreCase]).Replace('.md', '', [rfIgnoreCase])]);
+  HelpForm.Caption := Format(SSHelp, [Caption]);
 end;
 
 procedure TMainForm.Generalhelp1Click(Sender: TObject);

@@ -15,7 +15,7 @@ type
     Panel1: TPanel;
     Edit1: TEdit;
     tsStatistics: TTabSheet;
-    Button1: TButton;
+    SearchBtn: TButton;
 
     tsClients: TTabSheet;
     navClients: TDBNavigator;
@@ -129,7 +129,7 @@ type
     ttPaymentMANDATOR_ID: TGuidField;
     ttPaymentIS_ARTIST: TBooleanField;
     ttPaymentARTIST_NAME2: TWideStringField;
-    Button2: TButton;
+    HelpBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -139,7 +139,7 @@ type
     procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure PageControl1Change(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Button1Click(Sender: TObject);
+    procedure SearchBtnClick(Sender: TObject);
     procedure ttArtistsUPLOAD_AGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure ttArtistsUPLOAD_CGetText(Sender: TField; var Text: string;
@@ -193,7 +193,7 @@ type
     procedure ttPaymentAfterScroll(DataSet: TDataSet);
     procedure ttPaymentBeforeDelete(DataSet: TDataSet);
     procedure ttPaymentBeforeInsert(DataSet: TDataSet);
-    procedure Button2Click(Sender: TObject);
+    procedure HelpBtnClick(Sender: TObject);
   private
     SqlQueryArtistClient_Init: boolean;
     SqlQueryArtistClient_Order: string;
@@ -388,13 +388,13 @@ begin
   Abort;
 end;
 
-procedure TMandatorForm.Button1Click(Sender: TObject);
+procedure TMandatorForm.SearchBtnClick(Sender: TObject);
 begin
   if Edit1.Text <> '' then
     Edit1.Clear;
 end;
 
-procedure TMandatorForm.Button2Click(Sender: TObject);
+procedure TMandatorForm.HelpBtnClick(Sender: TObject);
 begin
   MainForm.ShowHelpWindow('HELP_MandatorWindow.md');
 end;

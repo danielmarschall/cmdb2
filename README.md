@@ -3,7 +3,7 @@ General info | [Database window](HELP_DatabaseWindow.md) | [Mandator window](HEL
 
 # Commission Database 2.0
 
-![Database Desktop](https://raw.githubusercontent.com/hickelsoft/dbtool/main/DBTool/Private/DBTool%20Screenshot.png)
+![Screenshot](CmDb2_Screenshot.png)
 
 ## What is Commission Database 2.0?
 
@@ -29,7 +29,7 @@ The software is free; also for commercial usage. It is licensed under the terms 
 
 CMDB2 software is only available for Microsoft Windows.
 
-The latest version can be downloaded here: github.com/danielmarschall/cmdb2
+The latest version can be downloaded at [GitHub](https://github.com/danielmarschall/cmdb2).
 
 If CMDB2 doesn't start right away when running `CmDb2.exe`, then you might need to install the SQL Server dependencies first:
 - SQL Server Client driver: https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server?view=sql-server-ver16

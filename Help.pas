@@ -54,6 +54,7 @@ var
   md: TMarkdownProcessor;
   slHtml, slCss: TStringList;
   cssFile: string;
+  sHtml: string;
 begin
   FDirectory := ExtractFilePath(AMarkDownFile);
   if FDirectory = '' then FDirectory := '.';
@@ -65,6 +66,8 @@ begin
     if FileExists(cssFile) then
       slCss.LoadFromFile(cssFile);
     md := TMarkdownProcessor.CreateDialect(mdCommonMark);
+    sHtml := md.process(UTF8ToString(RawByteString(slHtml.Text)));
+    sHtml := sHtml.Replace('<p><img src="CmDb2_Screenshot.png" alt="Screenshot" /></p>', ''); // <-- this is only for GitHub, not for the integrated help
     try
       //md.AllowUnsafe := true;
       ShowHTMLHelp(
@@ -74,7 +77,7 @@ begin
         '<style>'+slCss.Text+'</style>'+                                         // do not localize
         '</head>'+                                                               // do not localize
         '<body>'+                                                                // do not localize
-        md.process(UTF8ToString(RawByteString(slHtml.Text)))+
+        sHtml+
         '</body>'+                                                               // do not localize
         '</html>');                                                              // do not localize
     finally

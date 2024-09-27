@@ -332,7 +332,7 @@ object CommissionForm: TCommissionForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
-    object Button2: TButton
+    object HelpBtn: TButton
       Left = 12
       Top = 10
       Width = 25
@@ -345,7 +345,7 @@ object CommissionForm: TCommissionForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      OnClick = Button2Click
+      OnClick = HelpBtnClick
     end
   end
   object dsQuotes: TDataSource

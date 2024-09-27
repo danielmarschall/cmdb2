@@ -19,7 +19,7 @@ type
     dsQuery: TDataSource;
     Panel1: TPanel;
     Edit1: TEdit;
-    Button1: TButton;
+    SearchBtn: TButton;
     Timer1: TTimer;
     sbQuery: TPanel;
     csvQuery: TButton;
@@ -31,7 +31,7 @@ type
     procedure Edit1Change(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Button1Click(Sender: TObject);
+    procedure SearchBtnClick(Sender: TObject);
     procedure dbgQueryDblClick(Sender: TObject);
     procedure ttQueryBeforeInsert(DataSet: TDataSet);
     procedure ttQueryBeforeDelete(DataSet: TDataSet);
@@ -62,7 +62,7 @@ implementation
 uses
   DbGridHelper, CmDbFunctions;
 
-procedure TStatisticsForm.Button1Click(Sender: TObject);
+procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin
   if Edit1.Text <> '' then
     Edit1.Clear;

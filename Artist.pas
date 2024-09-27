@@ -42,7 +42,7 @@ type
     ttPaymentPAYPROV: TWideStringField;
     ttPaymentANNOTATION: TWideStringField;
     Edit1: TEdit;
-    Button1: TButton;
+    SearchBtn: TButton;
     tsArtistEvent: TTabSheet;
     ttArtistEvent: TADOQuery;
     dsArtistEvent: TDataSource;
@@ -91,7 +91,7 @@ type
     ttPaymentMANDATOR_ID: TGuidField;
     ttPaymentIS_ARTIST: TBooleanField;
     ttPaymentARTIST_NAME: TWideStringField;
-    Button2: TButton;
+    HelpBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgCommissionDblClick(Sender: TObject);
     procedure ttCommissionNewRecord(DataSet: TDataSet);
@@ -101,7 +101,7 @@ type
     procedure Edit1Change(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Button1Click(Sender: TObject);
+    procedure SearchBtnClick(Sender: TObject);
     procedure ttCommunicationNewRecord(DataSet: TDataSet);
     procedure ttArtistEventNewRecord(DataSet: TDataSet);
     procedure ttCommissionAMOUNT_LOCALGetText(Sender: TField; var Text: string;
@@ -130,7 +130,7 @@ type
     procedure refreshCommissionClick(Sender: TObject);
     procedure ttPaymentBeforePost(DataSet: TDataSet);
     procedure ttArtistEventBeforePost(DataSet: TDataSet);
-    procedure Button2Click(Sender: TObject);
+    procedure HelpBtnClick(Sender: TObject);
   private
     SqlQueryCommission_Init: boolean;
     SqlQueryCommission_Order: string;
@@ -343,13 +343,13 @@ begin
   end;
 end;
 
-procedure TArtistForm.Button1Click(Sender: TObject);
+procedure TArtistForm.SearchBtnClick(Sender: TObject);
 begin
   if Edit1.Text <> '' then
     Edit1.Clear;
 end;
 
-procedure TArtistForm.Button2Click(Sender: TObject);
+procedure TArtistForm.HelpBtnClick(Sender: TObject);
 begin
   MainForm.ShowHelpWindow('HELP_ArtistClientWindow.md');
 end;

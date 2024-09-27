@@ -60,7 +60,7 @@ type
     BtnFolderOpen: TButton;
     BtnFolderSave: TButton;
     ShellChangeNotifier: TShellChangeNotifier;
-    Button2: TButton;
+    HelpBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ttQuotesNewRecord(DataSet: TDataSet);
@@ -90,7 +90,7 @@ type
     procedure BtnFolderOpenClick(Sender: TObject);
     procedure ttQuotesAMOUNT_LOCALGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
-    procedure Button2Click(Sender: TObject);
+    procedure HelpBtnClick(Sender: TObject);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -434,7 +434,7 @@ begin
   end;
 end;
 
-procedure TCommissionForm.Button2Click(Sender: TObject);
+procedure TCommissionForm.HelpBtnClick(Sender: TObject);
 begin
   MainForm.ShowHelpWindow('HELP_CommissionWindow.md');
 end;
