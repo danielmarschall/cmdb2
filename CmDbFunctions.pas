@@ -3,9 +3,10 @@ unit CmDbFunctions;
 interface
 
 uses
-  Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
+  Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
+function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
@@ -23,7 +24,137 @@ procedure InsteadOfDeleteWorkaround(DataSet: TAdoQuery; const localField, baseTa
 implementation
 
 uses
-  ShlObj, Windows;
+  ShlObj, ShellApi;
+
+// Returns Windows Error Code (i.e. 0=success), NOT the ShellExecute() code (>32 = success)
+function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
+
+  function _ShellExecuteWait(aWnd: HWND; Operation, FileName, Parameters, Directory: string; ShowCmd: Integer; wait: boolean): Integer;
+  var
+    Info: TShellExecuteInfo;
+    pInfo: PShellExecuteInfo;
+    exitCode: DWord; // Achtung: Muss DWORD sein (Ticket 38498)
+    wdir: PChar;
+  begin
+    pInfo := @Info;
+    ZeroMemory(pInfo, SizeOf(Info));
+    if Directory = '' then wdir := nil else wdir := PChar(Directory);
+    with Info do
+    begin
+      cbSize       := SizeOf(Info);
+      fMask        := SEE_MASK_NOCLOSEPROCESS;
+      wnd          := aWnd;
+      lpVerb       := PChar(Operation);
+      lpFile       := PChar(FileName);
+      lpParameters := PChar(Parameters + #0);
+      lpDirectory  := wdir;
+      nShow        := ShowCmd;
+      hInstApp     := 0;
+    end;
+
+    if not ShellExecuteEx(pInfo) then
+    begin
+      result := -GetLastError;
+      exit;
+    end;
+
+    try
+      if not wait then
+      begin
+        result := 0;
+        exit;
+      end;
+
+      repeat
+        exitCode := WaitForSingleObject(Info.hProcess, 100);
+        Sleep(50);
+        if Windows.GetCurrentThreadId = System.MainThreadID then
+          Application.ProcessMessages;
+        if Assigned(Application) and Application.Terminated then Abort;
+      until (exitCode <> WAIT_TIMEOUT);
+
+      if not GetExitCodeProcess(Info.hProcess, exitCode) then
+      begin
+        result := -GetLastError;
+        exit;
+      end;
+
+      result := exitCode;
+    finally
+      if Info.hProcess <> 0 then
+        CloseHandle(Info.hProcess);
+    end;
+  end;
+
+  function _CreateProcess(Operation, FileName, Parameters, Directory: string; ShowCmd: Integer; wait: boolean): Integer;
+  var
+      StartupInfo: TStartupInfo;
+      ProcessInformation: TProcessInformation;
+      Res: Bool;
+      lpExitCode: DWORD;
+      ExeAndParams: string;
+      wdir: PChar;
+  begin
+      FillChar(StartUpInfo, sizeof(tstartupinfo), 0);
+      with StartupInfo do
+      begin
+          cb := SizeOf(TStartupInfo);
+          lpReserved := nil;
+          lpDesktop := nil;
+          lpTitle := nil;
+          dwFlags := STARTF_USESHOWWINDOW;
+          wShowWindow := ncmdShow;
+          cbReserved2 := 0;
+          lpReserved2 := nil;
+      end;
+      ExeAndParams := '"' + ExeName + '" ' + params;
+      if Directory = '' then wdir := nil else wdir := PChar(Directory);
+      Res := CreateProcess(PChar(ExeName), PChar(ExeAndParams), nil, nil, True,
+          CREATE_DEFAULT_ERROR_MODE
+          or NORMAL_PRIORITY_CLASS, nil, wdir, StartupInfo, ProcessInformation);
+      try
+        if not Res then
+        begin
+          result := -GetLastError;
+          exit;
+        end;
+        if not Wait then
+        begin
+          Result := 0;
+          exit;
+        end;
+        while True do
+        begin
+            GetExitCodeProcess(ProcessInformation.hProcess, lpExitCode);
+            if lpExitCode <> STILL_ACTIVE then
+                Break;
+            Sleep(50);
+            if Windows.GetCurrentThreadId = System.MainThreadID then
+              Application.ProcessMessages;
+            if Assigned(Application) and Application.Terminated then Abort;
+        end;
+        Result := Integer(lpExitCode);
+      finally
+        if ProcessInformation.hProcess <> 0 then
+          CloseHandle(ProcessInformation.hProcess);
+        if ProcessInformation.hThread <> 0 then
+          CloseHandle(ProcessInformation.hThread);
+      end;
+  end;
+
+begin
+  if not SameText(Operation, 'open') then
+  begin
+    result := _ShellExecuteWait(awnd, PChar(Operation), PChar(ExeName), PChar(Params), PChar(WorkingDirectory), ncmdShow, wait);
+    exit;
+  end;
+
+  result := _CreateProcess(Operation, ExeName, Params, WorkingDirectory, ncmdshow, wait);
+  if (result = -193) then  // Fehler 193 = Keine zulässige Win32-Anwendung (z.B. "Hallo.txt")
+  begin
+    result := _ShellExecuteWait(awnd, PChar(Operation), PChar(ExeName), PChar(Params), PChar(WorkingDirectory), ncmdShow, wait);
+  end;
+end;
 
 function GetUserDirectory: string;
 var

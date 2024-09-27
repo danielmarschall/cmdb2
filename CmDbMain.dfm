@@ -14,6 +14,20 @@ object MainForm: TMainForm
   WindowState = wsMaximized
   OnCreate = FormCreate
   TextHeight = 15
+  object WaitLabel: TLabel
+    Left = 16
+    Top = 16
+    Width = 167
+    Height = 41
+    Caption = 'Please wait...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -30
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+  end
   object Timer1: TTimer
     Interval = 10
     OnTimer = Timer1Timer

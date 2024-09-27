@@ -48,30 +48,34 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 ; Die Dinger werden von Delphi kompiliert
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.64.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.64.exe"; DestName: "CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.32.exe"; DestName: "CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
 
-Source: "..\CurConv.dll"; DestDir: "{app}"; Flags: ignoreversion signonce
 Source: "..\CurConv.64.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "..\CurConv.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
                                            
 Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\HelpStyle.css"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\DB\*"; DestDir: "{app}\DB"; Flags: ignoreversion recursesubdirs
 
+; sic: 32bit Redist must also be installed on Win64
+Source: "..\Redist\VC_redist.x64.exe"; DestName: "VC_redist.x64.exe"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\Redist\VC_redist.x86.exe"; DestName: "VC_redist.x86.exe"; DestDir: "{app}\Redist"; Flags: ignoreversion
+Source: "..\Redist\SqlLocalDB.x64.msi"; DestName: "SqlLocalDB.x64.msi"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\Redist\SqlLocalDB.x86.msi"; DestName: "SqlLocalDB.x86.msi"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\Redist\msoledbsql19.x64.msi"; DestName: "msoledbsql19.x64.msi"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\Redist\msoledbsql19.x86.msi"; DestName: "msoledbsql19.x86.msi"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: not Is64BitInstallMode
+
 [UninstallDelete]
 Type: files; Name: "{app}\Setup.ini"
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.64.exe"; Check: Is64BitInstallMode
-Name: "{autoprograms}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"; Check: not Is64BitInstallMode
-
-Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.64.exe"; Tasks: desktopicon; Check: Is64BitInstallMode
-Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"; Tasks: desktopicon; Check: not Is64BitInstallMode
+Name: "{autoprograms}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"
+Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\CmDb2.64.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked; Check: Is64BitInstallMode
-Filename: "{app}\CmDb2.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked; Check: not Is64BitInstallMode
+Filename: "{app}\CmDb2.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked
 
 [Code]
 

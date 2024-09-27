@@ -29,11 +29,7 @@ The software is free; also for commercial usage. It is licensed under the terms 
 
 CMDB2 software is only available for Microsoft Windows.
 
-The latest version can be downloaded at [GitHub](https://github.com/danielmarschall/cmdb2).
-
-If CMDB2 doesn't start right away when running `CmDb2.exe`, then you might need to install the SQL Server dependencies first:
-- SQL Server Client driver: https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server?view=sql-server-ver16
-- SQL Server LocalDB: https://dba.stackexchange.com/a/258182/77847
+The latest version can be downloaded at [GitHub](https://github.com/danielmarschall/cmdb2/releases).
 
 ## General information
 

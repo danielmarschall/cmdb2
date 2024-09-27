@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.Menus, Data.DB,
-  Data.Win.ADODB;
+  Data.Win.ADODB, Vcl.StdCtrls;
 
 type
   TMainForm = class(TForm)
@@ -23,6 +23,7 @@ type
     OpenDialog1: TOpenDialog;
     RestoreBackup1: TMenuItem;
     N2: TMenuItem;
+    WaitLabel: TLabel;
     procedure Timer1Timer(Sender: TObject);
     procedure BackupandExit1Click(Sender: TObject);
     procedure Exitwithoutbackup1Click(Sender: TObject);
@@ -46,7 +47,8 @@ implementation
 
 uses
   Mandators, CmDbTextBackup, AdoConnHelper, StrUtils, Help,
-  Artist, Commission, Mandator, Statistics, CmDbFunctions;
+  Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
+  ShellApi, System.UITypes;
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
@@ -77,6 +79,8 @@ var
   LastBackupID: integer;
 begin
   Screen.Cursor := crHourGlass;
+  WaitLabel.Visible := true;
+  Application.ProcessMessages;
   try
     try
       {$REGION '1. Make a Text Dump if something has changed'}
@@ -119,6 +123,8 @@ begin
     end;
   finally
     Screen.Cursor := crDefault;
+    WaitLabel.Visible := false;
+    Application.ProcessMessages;
   end;
 
   // 3. Exit
@@ -219,10 +225,19 @@ begin
   OpenDialog1.InitialDir := GetUserDirectory;
   if OpenDialog1.Execute(Handle) then
   begin
-    while MDIChildCount > 0 do
-      MDIChildren[0].Free;
-    CmDb_RestoreDatabase(AdoConnection1, OpenDialog1.FileName);
-    OpenDatabase1.Click;
+    Screen.Cursor := crHourGlass;
+    WaitLabel.Visible := true;
+    Application.ProcessMessages;
+    try
+      while MDIChildCount > 0 do
+        MDIChildren[0].Free;
+      CmDb_RestoreDatabase(AdoConnection1, OpenDialog1.FileName);
+      OpenDatabase1.Click;
+    finally
+      Screen.Cursor := crDefault;
+      WaitLabel.Visible := false;
+      Application.ProcessMessages;
+    end;
   end;
 end;
 
@@ -240,12 +255,152 @@ begin
 end;
 
 procedure TMainForm.Timer1Timer(Sender: TObject);
+
+  function IsLocalDbInstalled: boolean;
+  var
+    reg: TRegistry;
+  begin
+    result := false;
+    reg := TRegistry.Create;
+    try
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      if reg.OpenKeyReadOnly('SOFTWARE\Microsoft\Microsoft SQL Server Local DB\Installed Versions') then
+      begin
+        result := reg.HasSubKeys;
+        reg.CloseKey;
+      end;
+    finally
+      FreeAndNil(reg);
+    end;
+  end;
+
+  function SqlServerClientDriverInstalled: boolean;
+  var
+    reg: TRegistry;
+  begin
+    reg := TRegistry.Create;
+    try
+      reg.RootKey := HKEY_CLASSES_ROOT;
+      result := reg.KeyExists('CLSID\{EE5DE99A-4453-4C96-861C-F8832A7F59FE}') or  // Generation 3, Version 19+
+                reg.KeyExists('CLSID\{5A23DE84-1D7B-4A16-8DED-B29C09CB648D}') or  // Generation 3
+                reg.KeyExists('CLSID\{397C2819-8272-4532-AD3A-FB5E43BEAA39}') or  // Generation 2
+                reg.KeyExists('CLSID\{0C7FF16C-38E3-11d0-97AB-00C04FC2AD98}');    // Generation 1
+    finally
+      FreeAndNil(reg);
+    end;
+  end;
+
+  procedure DisableAllMenuItems(MainMenu: TMainMenu);
+  var
+    i, j: Integer;
+  begin
+    // Loop through all top-level menu items
+    for i := 0 to MainMenu.Items.Count - 1 do
+    begin
+      // Disable the top-level menu item
+      MainMenu.Items[i].Enabled := False;
+
+      // Loop through all submenu items and disable them as well
+      for j := 0 to MainMenu.Items[i].Count - 1 do
+      begin
+        MainMenu.Items[i].Items[j].Enabled := False;
+      end;
+    end;
+  end;
+
+resourcestring
+  SRequireComponents = 'CMDB2 requires some Microsoft SQL Server components to be installed. Install now?';
+var
+  _IsLocalDbInstalled: boolean;
+  _SqlServerClientDriverInstalled: boolean;
 begin
   Timer1.Enabled := false;
 
+  _IsLocalDbInstalled := IsLocalDbInstalled;
+  _SqlServerClientDriverInstalled := SqlServerClientDriverInstalled;
+
+  if not _IsLocalDbInstalled or not _SqlServerClientDriverInstalled then
+  begin
+    if ParamStr(1) = '/installredist' then
+    begin
+      Screen.Cursor := crHourGlass;
+      WaitLabel.Visible := true;
+      Application.ProcessMessages;
+      try
+        // Avoid that the user clicks something!
+        DisableAllMenuItems(MainMenu1);
+        Application.ProcessMessages;
+
+        // 1. VC++ Runtime (both required according to Microsoft)
+        {$IFDEF Win64}
+        WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
+        Application.ProcessMessages;
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'Redist\VC_redist.x86.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
+        WaitLabel.Caption := 'Installing Visual C++ Redistributable (64 Bit)...';
+        Application.ProcessMessages;
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'Redist\VC_redist.x64.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
+        {$ELSE}
+        WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
+        Application.ProcessMessages;
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'Redist\VC_redist.x86.exe'), '/install /norestart', '', SW_NORMAL, True);
+        {$ENDIF}
+
+        // 2. LocalDB
+        if not _IsLocalDbInstalled then
+        begin
+          {$IFDEF Win64}
+          WaitLabel.Caption := 'Installing SQL Server LocalDB (64 Bit)...';
+          Application.ProcessMessages;
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\SqlLocalDB.x64.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          {$ELSE}
+          WaitLabel.Caption := 'Installing SQL Server LocalDB (32 Bit)...';
+          Application.ProcessMessages;
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\SqlLocalDB.x86.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          {$ENDIF}
+        end;
+
+        // 3. OleDB Driver
+        if not _SqlServerClientDriverInstalled then
+        begin
+          {$IFDEF Win64}
+          WaitLabel.Caption := 'Installing SQL Server OLE DB Provider (64 Bit)...';
+          Application.ProcessMessages;
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\msoledbsql19.x64.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          {$ELSE}
+          WaitLabel.Caption := 'Installing SQL Server OLE DB Provider (32 Bit)...';
+          Application.ProcessMessages;
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\msoledbsql19.x86.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          {$ENDIF}
+        end;
+      finally
+        Screen.Cursor := crDefault;
+        WaitLabel.Visible := false;
+        Application.ProcessMessages;
+      end;
+
+      ShellExecute(Handle, 'open', PChar(ParamStr(0)), '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+    end
+    else if MessageDlg(SRequireComponents, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) = mrYes then
+    begin
+      ShellExecute(Handle, 'runas', PChar(ParamStr(0)), '/installredist', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+    end;
+    Close;
+    Exit;
+  end;
+
   try
-    CmDb_ConnectViaLocalDb(ADOConnection1, CmDbDefaultDatabaseName);
-    CmDb_InstallOrUpdateSchema(ADOConnection1);
+    Screen.Cursor := crHourGlass;
+    WaitLabel.Visible := true;
+    Application.ProcessMessages;
+    try
+      CmDb_ConnectViaLocalDb(ADOConnection1, CmDbDefaultDatabaseName);
+      CmDb_InstallOrUpdateSchema(ADOConnection1);
+      OpenDatabase1.Click;
+    finally
+      Screen.Cursor := crDefault;
+      WaitLabel.Visible := false;
+      Application.ProcessMessages;
+    end;
   except
     on E: Exception do
     begin
@@ -254,8 +409,6 @@ begin
       Exit;
     end;
   end;
-
-  OpenDatabase1.Click;
 end;
 
 end.
