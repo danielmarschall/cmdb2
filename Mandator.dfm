@@ -941,6 +941,7 @@ object MandatorForm: TMandatorForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeInsert = ttPaymentBeforeInsert
+    BeforePost = ttPaymentBeforePost
     BeforeDelete = ttPaymentBeforeDelete
     AfterScroll = ttPaymentAfterScroll
     Parameters = <>

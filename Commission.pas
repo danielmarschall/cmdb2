@@ -189,6 +189,7 @@ const
   CacheMaxAge = 24*60*60;
 begin
   ttQuotesCURRENCY.AsWideString := ttQuotesCURRENCY.AsWideString.ToUpper;
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   if ttQuotesAMOUNT.IsNull then
   begin
@@ -199,9 +200,13 @@ begin
     ttQuotesAMOUNT_LOCAL.AsFloat := 0;
   end
   else if ((VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)) and
+          SameText(ttQuotesCURRENCY.AsWideString, LocalCurrency) then
+  begin
+    ttQuotesAMOUNT_LOCAL.AsFloat := ttQuotesAMOUNT.AsFloat;
+  end
+  else if ((VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)) and
           (Length(ttQuotesCURRENCY.AsWideString)=3) then
   begin
-    LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
     if (Length(LocalCurrency)=3) then
     begin
       CurrencyLayerApiKey := Trim(VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''CURRENCY_LAYER_API_KEY'';')));
@@ -213,7 +218,7 @@ begin
           if Succeeded(VtsCurConvDLLHeader.ConvertEx(ttQuotesAMOUNT.AsFloat,
                                                      PChar(UpperCase(ttQuotesCURRENCY.AsWideString)),
                                                      PChar(UpperCase(LocalCurrency)),
-                                                     CacheMaxAge, CONVERT_FALLBACK_TO_CACHE,
+                                                     CacheMaxAge, CONVERT_FALLBACK_TO_CACHE or CONVERT_DONT_SHOW_ERRORS,
                                                      ttEventsDATE.AsDateTime,
                                                      @convertedValue, @dummyTimestamp))
           // or if failed (date invalid?) then try today

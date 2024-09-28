@@ -194,6 +194,7 @@ type
     procedure ttPaymentBeforeDelete(DataSet: TDataSet);
     procedure ttPaymentBeforeInsert(DataSet: TDataSet);
     procedure HelpBtnClick(Sender: TObject);
+    procedure ttPaymentBeforePost(DataSet: TDataSet);
   private
     SqlQueryArtistClient_Init: boolean;
     SqlQueryArtistClient_Order: string;
@@ -222,7 +223,8 @@ implementation
 {$R *.dfm}
 
 uses
-  CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper, CmDbFunctions;
+  CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper,
+  CmDbFunctions, VtsCurConvDLLHeader;
 
 var
   localCur: string;
@@ -364,6 +366,68 @@ end;
 procedure TMandatorForm.ttPaymentBeforeInsert(DataSet: TDataSet);
 begin
   Abort;
+end;
+
+procedure TMandatorForm.ttPaymentBeforePost(DataSet: TDataSet);
+var
+  CurrencyLayerApiKey: string;
+  LocalCurrency: string;
+  convertedValue: double;
+  dummyTimestamp: TDateTime;
+const
+  CacheMaxAge = 24*60*60;
+begin
+  ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
+
+  if ttPaymentAMOUNT_VERIFIED.IsNull then
+    ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
+
+  if ttPaymentAMOUNT.IsNull then
+  begin
+    ttPaymentAMOUNT_LOCAL.Clear;
+  end
+  else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
+          ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
+          SameText(ttPaymentCURRENCY.AsWideString, LocalCurrency) then
+  begin
+    // Note: do not set AMOUNT_VERIFIED=1, because there might be additional fees beside the conversion
+    ttPaymentAMOUNT_LOCAL.AsFloat := ttPaymentAMOUNT.AsFloat;
+    ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
+  end
+  else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
+          ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
+          (Length(ttPaymentCURRENCY.AsWideString)=3) then
+  begin
+    if (Length(LocalCurrency)=3) then
+    begin
+      CurrencyLayerApiKey := Trim(VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''CURRENCY_LAYER_API_KEY'';')));
+      if CurrencyLayerApiKey <> '' then
+      begin
+        if Succeeded(VtsCurConvDLLHeader.WriteAPIKey(PChar(CurrencyLayerApiKey), CONVERT_KEYSTORE_MEMORY, false)) then
+        begin
+          // Try historic date
+          if Succeeded(VtsCurConvDLLHeader.ConvertEx(ttPaymentAMOUNT.AsFloat,
+                                                     PChar(UpperCase(ttPaymentCURRENCY.AsWideString)),
+                                                     PChar(UpperCase(LocalCurrency)),
+                                                     CacheMaxAge, CONVERT_FALLBACK_TO_CACHE or CONVERT_DONT_SHOW_ERRORS,
+                                                     ttPaymentDATE.AsDateTime,
+                                                     @convertedValue, @dummyTimestamp))
+          // or if failed (date invalid?) then try today
+          or Succeeded(VtsCurConvDLLHeader.ConvertEx(ttPaymentAMOUNT.AsFloat,
+                                                     PChar(UpperCase(ttPaymentCURRENCY.AsWideString)),
+                                                     PChar(UpperCase(LocalCurrency)),
+                                                     CacheMaxAge, CONVERT_FALLBACK_TO_CACHE,
+                                                     0,
+                                                     @convertedValue, @dummyTimestamp)) then
+          begin
+            ttPaymentAMOUNT_LOCAL.AsFloat := convertedValue;
+            ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
+          end;
+        end;
+      end;
+    end;
+  end;
 end;
 
 procedure TMandatorForm.ttStatisticsAfterScroll(DataSet: TDataSet);

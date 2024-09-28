@@ -254,6 +254,10 @@ const
   CacheMaxAge = 24*60*60;
 begin
   ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
+
+  if ttPaymentAMOUNT_VERIFIED.IsNull then
+    ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
 
   if ttPaymentAMOUNT.IsNull then
   begin
@@ -261,9 +265,16 @@ begin
   end
   else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
           ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
+          SameText(ttPaymentCURRENCY.AsWideString, LocalCurrency) then
+  begin
+    // Note: do not set AMOUNT_VERIFIED=1, because there might be additional fees beside the conversion
+    ttPaymentAMOUNT_LOCAL.AsFloat := ttPaymentAMOUNT.AsFloat;
+    ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
+  end
+  else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
+          ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
           (Length(ttPaymentCURRENCY.AsWideString)=3) then
   begin
-    LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
     if (Length(LocalCurrency)=3) then
     begin
       CurrencyLayerApiKey := Trim(VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''CURRENCY_LAYER_API_KEY'';')));
@@ -275,7 +286,7 @@ begin
           if Succeeded(VtsCurConvDLLHeader.ConvertEx(ttPaymentAMOUNT.AsFloat,
                                                      PChar(UpperCase(ttPaymentCURRENCY.AsWideString)),
                                                      PChar(UpperCase(LocalCurrency)),
-                                                     CacheMaxAge, CONVERT_FALLBACK_TO_CACHE,
+                                                     CacheMaxAge, CONVERT_FALLBACK_TO_CACHE or CONVERT_DONT_SHOW_ERRORS,
                                                      ttPaymentDATE.AsDateTime,
                                                      @convertedValue, @dummyTimestamp))
           // or if failed (date invalid?) then try today
@@ -300,7 +311,6 @@ begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
   DataSet.FieldByName('DATE').AsDateTime := Now;
-  DataSet.FieldByName('AMOUNT_VERIFIED').AsBoolean := False;
 end;
 
 procedure TArtistForm.refreshCommissionClick(Sender: TObject);
