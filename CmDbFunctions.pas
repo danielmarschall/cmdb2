@@ -6,6 +6,7 @@ uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
+function TempTableName(guid: TGUID; info: string): string;
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
@@ -25,6 +26,11 @@ implementation
 
 uses
   ShlObj, ShellApi;
+
+function TempTableName(guid: TGUID; info: string): string;
+begin
+  result := 'tmp_'+guid.ToString.Replace('-','').Replace('{','').Replace('}','')+'_'+info;
+end;
 
 // Returns Windows Error Code (i.e. 0=success), NOT the ShellExecute() code (>32 = success)
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
@@ -375,11 +381,22 @@ begin
       if AdoConnection1.TableExists('STATISTICS') then
         AdoConnection1.DropTableOrView('STATISTICS');
 
-      InstallSql(2, 'vw_STAT_TOP_ARTISTS');
-      InstallSql(2, 'vw_STAT_RUNNING_COMMISSIONS');
-      InstallSql(2, 'vw_STAT_TEXT_EXPORT');
-      InstallSql(2, 'vw_STAT_SUM_YEARS');
-      InstallSql(2, 'vw_STAT_SUM_MONTHS');
+
+
+      if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
+        AdoConnection1.DropTableOrView('vw_STAT_RUNNING_COMMISSIONS');
+      if AdoConnection1.TableExists('vw_STAT_SUM_YEARS') then
+        AdoConnection1.DropTableOrView('vw_STAT_SUM_YEARS');
+      if AdoConnection1.TableExists('vw_STAT_SUM_MONTHS') then
+        AdoConnection1.DropTableOrView('vw_STAT_SUM_MONTHS');
+      if AdoConnection1.TableExists('vw_STAT_TOP_ARTISTS') then
+        AdoConnection1.DropTableOrView('vw_STAT_TOP_ARTISTS');
+      if AdoConnection1.TableExists('vw_STAT_TEXT_EXPORT') then
+        AdoConnection1.DropTableOrView('vw_STAT_TEXT_EXPORT');
+
+
+
+      InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
 
 
       // We have reached the highest supported version and can now exit the loop.

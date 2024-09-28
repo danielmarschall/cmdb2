@@ -13,15 +13,15 @@ type
     Handled: boolean;
     Action: TCmDbPluginClickResponseAction;
     // Normal object, for Action=CraObject
-    ObjTable: string[50];
+    ObjTable: string[100];
     ObjId: TGuid;
     // Statistics, for Action=craStatistics
     StatId: TGuid;
     StatName: string[100];
-    SqlTable: string[50];
+    SqlTable: string[100];
     SqlInitialOrder: string[250];
     SqlAdditionalFilter: string[250];
-    BaseTableDelete: string[50];
+    BaseTableDelete: string[100];
   end;
 
 type
@@ -50,7 +50,7 @@ const
 implementation
 
 uses
-  Forms, Statistics, CmDbMain;
+  Forms, Statistics, CmDbMain, CmDbFunctions;
 
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
 var
@@ -96,7 +96,7 @@ const
   GUID_3: TGUID = '{2A7F1225-08A6-4B55-9EF7-75C7933DFBCA}';
   GUID_3A: TGUID = '{804E25DD-5756-47E8-9727-5849DCF63E32}';
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
-  GUID_5: TGUID = '{BEBEE253-6644-4A66-87D1-BB63FFAD57B4}';
+
   GUID_9: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
   GUID_9A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
   GUID_9B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
@@ -116,12 +116,36 @@ begin
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
       begin
-        //InstallSql(..., 'vw_STAT_RUNNING_COMMISSIONS');
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_1, 'RUNNING_COMMISSIONS')+' as ' + #13#10 +
+                          'select man.ID as __MANDATOR_ID, case ' + #13#10 +
+                          '	when cm.ART_STATUS = ''c aw ack'' then 1 ' + #13#10 +
+                          '	when cm.ART_STATUS = ''ack'' then 2 ' + #13#10 +
+                          '	when cm.ART_STATUS = ''c aw sk'' then 3 ' + #13#10 +
+                          '	when cm.ART_STATUS = ''c td feedback'' then 4 ' + #13#10 +
+                          '	when cm.ART_STATUS = ''c aw cont'' then 5 ' + #13#10 +
+                          '	when cm.ART_STATUS = ''c aw hires'' then 6 ' + #13#10 +
+                          '	else 7 ' + #13#10 +
+                          'end as __STATUS_ORDER, cm.ART_STATUS, art.NAME as ARTIST, cm.NAME, cm.ID as __ID, ' + #13#10 +
+                          '    CASE ' + #13#10 +
+                          '        WHEN CHARINDEX(''\'', cm.FOLDER) > 0 THEN RIGHT(cm.FOLDER, CHARINDEX(''\'', REVERSE(cm.FOLDER)) - 1) ' + #13#10 +
+                          '        ELSE cm.FOLDER ' + #13#10 +
+                          '    END AS FOLDER ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
+                          'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''fin'' or cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'')');
+        finally
+          FreeAndNil(AdoConn);
+        end;
         result.Handled := true;
         result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Running commissions';
-        result.SqlTable := 'vw_STAT_RUNNING_COMMISSIONS';
+        result.SqlTable := TempTableName(GUID_1, 'RUNNING_COMMISSIONS');
         result.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         result.BaseTableDelete := 'COMMISSION';
@@ -140,12 +164,34 @@ begin
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
       begin
-        //InstallSql(..., 'vw_STAT_SUM_YEARS');
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_2, 'SUM_YEARS')+' as ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	CONVERT(UNIQUEIDENTIFIER, HASHBYTES(''SHA1'', N'''+TempTableName(GUID_2, 'SUM_YEARS')+'''+cast(man.ID as nvarchar(100))+CAST(year(cm.START_DATE) AS NVARCHAR(30)) + CAST(art.IS_ARTIST AS NVARCHAR(1)))) as __ID, ' + #13#10 +
+                          '	man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '	iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
+                          '	year(cm.START_DATE) as YEAR, ' + #13#10 +
+                          '	count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
+                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
+                          'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
+                          'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
+                          'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
+                          'group by man.ID, year(cm.START_DATE), art.IS_ARTIST');
+        finally
+          FreeAndNil(AdoConn);
+        end;
         result.Handled := true;
         result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Local sum over years';
-        result.SqlTable := 'vw_STAT_SUM_YEARS';
+        result.SqlTable := TempTableName(GUID_2, 'SUM_YEARS');
         result.SqlInitialOrder := 'YEAR desc, DIRECTION';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         result.BaseTableDelete := '';
@@ -156,8 +202,13 @@ begin
         try
           AdoConn.LoginPrompt := false;
           AdoConn.ConnectConnStr(DBConnStr);
-          AdoConn.ExecSQL('create or alter view vw_tmp_COMMISSIONS as select MANDATOR_ID as __MANDATOR_ID, ID as __ID, iif(IS_ARTIST=1,''OUT'',''IN'') as __DIRECTION, PROJECT_NAME, START_DATE, END_DATE, ART_STATUS, PAY_STATUS, UPLOAD_A, UPLOAD_C, AMOUNT_LOCAL from vw_COMMISSION');
-          q := AdoConn.GetTable('select DIRECTION, YEAR from vw_STAT_SUM_YEARS where __ID = '''+ItemGuid.ToString+'''');
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_2A, 'COMMISSIONS')+' as ' + #13#10 +
+                          'select MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '       ID as __ID, ' + #13#10 +
+                          'iif(IS_ARTIST=1,''OUT'',''IN'') as __DIRECTION, ' + #13#10 +
+                          'PROJECT_NAME, START_DATE, END_DATE, ART_STATUS, PAY_STATUS, UPLOAD_A, UPLOAD_C, AMOUNT_LOCAL ' + #13#10 +
+                          'from vw_COMMISSION');
+          q := AdoConn.GetTable('select DIRECTION, YEAR from '+TempTableName(GUID_2, 'SUM_YEARS')+' where __ID = '''+ItemGuid.ToString+'''');
           try
             if not q.Eof then
             begin
@@ -165,7 +216,7 @@ begin
               result.Action := craStatistics;
               result.StatId := GUID_2A;
               result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsString+') for year ' + q.FieldByName('YEAR').AsString;
-              result.SqlTable := 'vw_tmp_COMMISSIONS';
+              result.SqlTable := TempTableName(GUID_2A, 'COMMISSIONS');
               result.SqlInitialOrder := 'START_DATE';
               result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
               result.BaseTableDelete := 'COMMISSION';
@@ -191,12 +242,34 @@ begin
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
       begin
-        //InstallSql(..., 'vw_STAT_SUM_MONTHS');
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_3, 'SUM_MONTHS')+' as ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	CONVERT(UNIQUEIDENTIFIER, HASHBYTES(''SHA1'', N'''+TempTableName(GUID_3, 'SUM_MONTHS')+'''+cast(man.ID as nvarchar(100))+CAST(year(cm.START_DATE) AS NVARCHAR(30))+CAST(month(cm.START_DATE) AS NVARCHAR(30)) + CAST(art.IS_ARTIST AS NVARCHAR(1)))) as __ID, ' + #13#10 +
+                          '	man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '	iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
+                          '	cast(cast(year(cm.START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(cm.START_DATE))) + cast(month(cm.START_DATE) as nvarchar(2)) as nvarchar(7)) as MONTH, ' + #13#10 +
+                          '	count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
+                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
+                          'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
+                          'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
+                          'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
+                          'group by man.ID, year(cm.START_DATE), month(cm.START_DATE), art.IS_ARTIST');
+        finally
+          FreeAndNil(AdoConn);
+        end;
         result.Handled := true;
         result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Local sum over months';
-        result.SqlTable := 'vw_STAT_SUM_MONTHS';
+        result.SqlTable := TempTableName(GUID_3, 'SUM_MONTHS');
         result.SqlInitialOrder := 'MONTH desc, DIRECTION';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         result.BaseTableDelete := '';
@@ -207,8 +280,13 @@ begin
         try
           AdoConn.LoginPrompt := false;
           AdoConn.ConnectConnStr(DBConnStr);
-          AdoConn.ExecSQL('create or alter view vw_tmp_COMMISSIONS as select MANDATOR_ID as __MANDATOR_ID, ID as __ID, iif(IS_ARTIST=1,''OUT'',''IN'') as __DIRECTION, PROJECT_NAME, START_DATE, END_DATE, ART_STATUS, PAY_STATUS, UPLOAD_A, UPLOAD_C, AMOUNT_LOCAL from vw_COMMISSION');
-          q := AdoConn.GetTable('select DIRECTION, MONTH from vw_STAT_SUM_MONTHS where __ID = '''+ItemGuid.ToString+'''');
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_3A, 'COMMISSIONS')+' as ' + #13#10 +
+                          'select MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '       ID as __ID, ' + #13#10 +
+                          'iif(IS_ARTIST=1,''OUT'',''IN'') as __DIRECTION, ' + #13#10 +
+                          'PROJECT_NAME, START_DATE, END_DATE, ART_STATUS, PAY_STATUS, UPLOAD_A, UPLOAD_C, AMOUNT_LOCAL ' + #13#10 +
+                          'from vw_COMMISSION');
+          q := AdoConn.GetTable('select DIRECTION, MONTH from '+TempTableName(GUID_3, 'SUM_MONTHS')+' where __ID = '''+ItemGuid.ToString+'''');
           try
             if not q.Eof then
             begin
@@ -216,7 +294,7 @@ begin
               result.Action := craStatistics;
               result.StatId := GUID_3A;
               result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsString+') for month ' + q.FieldByName('MONTH').AsString;
-              result.SqlTable := 'vw_tmp_COMMISSIONS';
+              result.SqlTable := TempTableName(GUID_3A, 'COMMISSIONS');
               result.SqlInitialOrder := 'START_DATE';
               result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
               result.BaseTableDelete := 'COMMISSION';
@@ -249,12 +327,32 @@ begin
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
       begin
-        //InstallSql(..., 'vw_STAT_TOP_ARTISTS');
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_4, 'SUM_MONTHS')+' as ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	man.ID as __MANDATOR_ID, art.NAME as ARTISTNAME, ' + #13#10 +
+                          '	art.ID as __ID, ' + #13#10 +
+                          '	count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
+                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
+                          'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
+                          'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
+                          'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') ' + #13#10 +
+                          'group by man.ID, art.ID, art.NAME');
+        finally
+          FreeAndNil(AdoConn);
+        end;
         result.Handled := true;
         result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Top artists/clients';
-        result.SqlTable := 'vw_STAT_TOP_ARTISTS';
+        result.SqlTable := TempTableName(GUID_4, 'SUM_MONTHS');
         result.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         result.BaseTableDelete := 'ARTIST';
@@ -265,27 +363,6 @@ begin
         result.Action := craObject;
         result.ObjTable := 'ARTIST';
         result.ObjId := ItemGuid;
-      end;
-    end
-    {$ENDREGION}
-    {$REGION 'Stat: Full Text Export'}
-    else if IsEqualGuid(StatGuid, GUID_5) then
-    begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
-      begin
-        //InstallSql(..., 'vw_STAT_TEXT_EXPORT');
-        result.Handled := true;
-        result.Action := craStatistics;
-        result.StatId := StatGuid;
-        result.StatName := 'Full Text Export';
-        result.SqlTable := 'vw_STAT_TEXT_EXPORT';
-        result.SqlInitialOrder := 'DATASET_TYPE, DATASET_ID';
-        result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-        result.BaseTableDelete := '';
-      end
-      else
-      begin
-        // TODO: We could open the data set here... but we need to query all tables to see which tables has the ItemID
       end;
     end
     {$ENDREGION}
@@ -357,7 +434,6 @@ begin
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_2.ToString+''', ''100'', ''Local sum over years'');');
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_3.ToString+''', ''101'', ''Local sum over months'');');
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_4.ToString+''', ''200'', ''Top artists/clients'');');
-      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_5.ToString+''', ''900'', ''Full Text Export'');');
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_9.ToString+''', ''950'', ''--- About CMDB2 ---'');');
     end;
 

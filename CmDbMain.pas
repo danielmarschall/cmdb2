@@ -145,7 +145,7 @@ begin
   try
     try
       {$REGION '1. Make a Text Dump if something has changed'}
-      q := ADOConnection1.GetTable('select * from vw_STAT_TEXT_EXPORT order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
+      q := ADOConnection1.GetTable('select * from vw_TEXT_BACKUP_GENERATE order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
       sl := TStringList.Create;
       try
         sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');

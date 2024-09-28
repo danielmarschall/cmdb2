@@ -67,4 +67,8 @@ Currently, there are the following statistics in the shipped statistics plugin:
 - Local sum over years (commissions outgoing)
 - Local sum over months (commissions outgoing)
 - Top artists/clients
-- Full Text Export
+
+In the statistic grids you can double click to list more information and/or to jump to the referenced artists, commissions, etc.
+
+Note that deleting from a statistic grid deletes the data in the base table, so be extra careful.
+
