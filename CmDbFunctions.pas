@@ -378,6 +378,8 @@ begin
       InstallSql(2, 'vw_STAT_TOP_ARTISTS');
       InstallSql(2, 'vw_STAT_RUNNING_COMMISSIONS');
       InstallSql(2, 'vw_STAT_TEXT_EXPORT');
+      InstallSql(2, 'vw_STAT_SUM_YEARS');
+      InstallSql(2, 'vw_STAT_SUM_MONTHS');
 
 
       // We have reached the highest supported version and can now exit the loop.

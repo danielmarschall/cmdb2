@@ -13,15 +13,15 @@ type
     Handled: boolean;
     Action: TCmDbPluginClickResponseAction;
     // Normal object, for Action=CraObject
-    ObjTable: string;
+    ObjTable: string[50];
     ObjId: TGuid;
     // Statistics, for Action=craStatistics
     StatId: TGuid;
-    StatName: string;
-    SqlTable: string;
-    SqlInitialOrder: string;
-    SqlAdditionalFilter: string;
-    BaseTableDelete: string;
+    StatName: string[100];
+    SqlTable: string[50];
+    SqlInitialOrder: string[250];
+    SqlAdditionalFilter: string[250];
+    BaseTableDelete: string[50];
   end;
 
 type
@@ -92,7 +92,9 @@ end;
 const
   GUID_1: TGUID = '{6F7E0568-3612-4BD0-BEA6-B23560A5F594}';
   GUID_2: TGUID = '{08F3D4C0-8DBD-4F3E-8891-241858779E49}';
+  GUID_2A: TGUID = '{8B46FC53-21E8-4E8C-AB60-AC9811B8D8B4}';
   GUID_3: TGUID = '{2A7F1225-08A6-4B55-9EF7-75C7933DFBCA}';
+  GUID_3A: TGUID = '{804E25DD-5756-47E8-9727-5849DCF63E32}';
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
   GUID_5: TGUID = '{BEBEE253-6644-4A66-87D1-BB63FFAD57B4}';
   GUID_9: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
@@ -103,11 +105,13 @@ function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
   StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
 var
   AdoConn: TADOConnection;
+  q: TADODataSet;
 begin
   // TODO: Call DLL instead
   Result.Handled := false;
   if FPluginDllFilename = 'PLG_STD_STAT.DLL' then
   begin
+    {$REGION 'Stat: Running commissions'}
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -130,6 +134,8 @@ begin
         result.ObjId := ItemGuid;
       end;
     end
+    {$ENDREGION}
+    {$REGION 'Stat: Local sum over years'}
     else if IsEqualGuid(StatGuid, GUID_2) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -146,9 +152,41 @@ begin
       end
       else
       begin
-        // TODO: Open a list with commissions of that year, and maybe there you can double click to get to the commission?!
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          AdoConn.ExecSQL('create or alter view vw_tmp_COMMISSIONS as select MANDATOR_ID as __MANDATOR_ID, ID as __ID, iif(IS_ARTIST=1,''OUT'',''IN'') as __DIRECTION, PROJECT_NAME, START_DATE, END_DATE, ART_STATUS, PAY_STATUS, UPLOAD_A, UPLOAD_C, AMOUNT_LOCAL from vw_COMMISSION');
+          q := AdoConn.GetTable('select DIRECTION, YEAR from vw_STAT_SUM_YEARS where __ID = '''+ItemGuid.ToString+'''');
+          try
+            if not q.Eof then
+            begin
+              result.Handled := true;
+              result.Action := craStatistics;
+              result.StatId := GUID_2A;
+              result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsString+') for year ' + q.FieldByName('YEAR').AsString;
+              result.SqlTable := 'vw_tmp_COMMISSIONS';
+              result.SqlInitialOrder := 'START_DATE';
+              result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+              result.BaseTableDelete := 'COMMISSION';
+            end;
+          finally
+            FreeAndNil(q);
+          end;
+        finally
+          FreeAndNil(AdoConn);
+        end;
       end;
     end
+    else if IsEqualGuid(StatGuid, GUID_2A) then
+    begin
+      result.Handled := true;
+      result.Action := craObject;
+      result.ObjTable := 'COMMISSION';
+      result.ObjId := ItemGuid;
+    end
+    {$ENDREGION}
+    {$REGION 'Stat: Local sum over months'}
     else if IsEqualGuid(StatGuid, GUID_3) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -165,9 +203,48 @@ begin
       end
       else
       begin
-        // TODO: Open a list with commissions of that month, and maybe there you can double click to get to the commission?!
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          AdoConn.ExecSQL('create or alter view vw_tmp_COMMISSIONS as select MANDATOR_ID as __MANDATOR_ID, ID as __ID, iif(IS_ARTIST=1,''OUT'',''IN'') as __DIRECTION, PROJECT_NAME, START_DATE, END_DATE, ART_STATUS, PAY_STATUS, UPLOAD_A, UPLOAD_C, AMOUNT_LOCAL from vw_COMMISSION');
+          q := AdoConn.GetTable('select DIRECTION, MONTH from vw_STAT_SUM_MONTHS where __ID = '''+ItemGuid.ToString+'''');
+          try
+            if not q.Eof then
+            begin
+              result.Handled := true;
+              result.Action := craStatistics;
+              result.StatId := GUID_3A;
+              result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsString+') for month ' + q.FieldByName('MONTH').AsString;
+              result.SqlTable := 'vw_tmp_COMMISSIONS';
+              result.SqlInitialOrder := 'START_DATE';
+              result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+              result.BaseTableDelete := 'COMMISSION';
+            end;
+          finally
+            FreeAndNil(q);
+          end;
+        finally
+          FreeAndNil(AdoConn);
+        end;
       end;
     end
+    else if IsEqualGuid(StatGuid, GUID_3A) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        // Nothing here.
+      end
+      else
+      begin
+        result.Handled := true;
+        result.Action := craObject;
+        result.ObjTable := 'COMMISSION';
+        result.ObjId := ItemGuid;
+      end;
+    end
+    {$ENDREGION}
+    {$REGION 'Stat: Top artists/clients'}
     else if IsEqualGuid(StatGuid, GUID_4) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -190,6 +267,8 @@ begin
         result.ObjId := ItemGuid;
       end;
     end
+    {$ENDREGION}
+    {$REGION 'Stat: Full Text Export'}
     else if IsEqualGuid(StatGuid, GUID_5) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -209,6 +288,8 @@ begin
         // TODO: We could open the data set here... but we need to query all tables to see which tables has the ItemID
       end;
     end
+    {$ENDREGION}
+    {$REGION 'Test menu plugin'}
     else if IsEqualGuid(StatGuid, GUID_9) then
     begin
       // This is an example for creating a plugin that outputs a "menu" with custom actions (which can be anything!)
@@ -250,6 +331,7 @@ begin
         Application.MessageBox('Hello World 2!', ''); // TODO: test
       end;
     end;
+    {$ENDREGION}
   end;
 end;
 
