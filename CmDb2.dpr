@@ -14,7 +14,8 @@ uses
   VtsCurConvDLLHeader in 'VtsCurConvDLLHeader.pas',
   CmDbFunctions in 'CmDbFunctions.pas',
   Help in 'Help.pas' {HelpForm},
-  CmDbPluginClient in 'CmDbPluginClient.pas';
+  CmDbPluginClient in 'CmDbPluginClient.pas',
+  CmDbPluginShare in 'CmDbPluginShare.pas';
 
 {$R *.res}
 

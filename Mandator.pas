@@ -223,7 +223,7 @@ implementation
 
 uses
   CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper,
-  CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient;
+  CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient, CmDbPluginShare;
 
 var
   localCur: string;

@@ -6,7 +6,6 @@ uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
-function TempTableName(guid: TGUID; info: string): string;
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
@@ -26,11 +25,6 @@ implementation
 
 uses
   ShlObj, ShellApi;
-
-function TempTableName(guid: TGUID; info: string): string;
-begin
-  result := 'tmp_'+guid.ToString.Replace('-','').Replace('{','').Replace('}','')+'_'+info;
-end;
 
 // Returns Windows Error Code (i.e. 0=success), NOT the ShellExecute() code (>32 = success)
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;

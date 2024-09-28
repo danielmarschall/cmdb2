@@ -66,7 +66,7 @@ implementation
 {$R *.dfm}
 
 uses
-  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbMain;
+  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbPluginShare, CmDbMain;
 
 procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin

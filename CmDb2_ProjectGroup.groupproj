@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{D6916F90-255F-4440-9109-EED9422BC59B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CmDb2.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BasicStatsPlugin.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CmDb2">
+        <MSBuild Projects="CmDb2.dproj"/>
+    </Target>
+    <Target Name="CmDb2:Clean">
+        <MSBuild Projects="CmDb2.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CmDb2:Make">
+        <MSBuild Projects="CmDb2.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicStatsPlugin">
+        <MSBuild Projects="BasicStatsPlugin.dproj"/>
+    </Target>
+    <Target Name="BasicStatsPlugin:Clean">
+        <MSBuild Projects="BasicStatsPlugin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicStatsPlugin:Make">
+        <MSBuild Projects="BasicStatsPlugin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CmDb2;BasicStatsPlugin"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CmDb2:Clean;BasicStatsPlugin:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CmDb2:Make;BasicStatsPlugin:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
