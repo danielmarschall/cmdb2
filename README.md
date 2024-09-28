@@ -18,6 +18,7 @@ It manages:
 - Built-in currency converter to convert foreign currencies into your local currency (as a base for the statistics)
 - Shortcut to folders that contain the artworks
 - Collecting various information about commissions and artists, e.g. the contact details
+- Possibility to extend with plugins
 
 Developers can extend the program using the programming language Embarcadero Delphi; the source files are on GitHub.
 

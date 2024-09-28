@@ -155,8 +155,6 @@ object StatisticsForm: TStatisticsForm
     BeforeDelete = ttQueryBeforeDelete
     AfterScroll = ttQueryAfterScroll
     Parameters = <>
-    SQL.Strings = (
-      '')
     Left = 200
     Top = 80
   end

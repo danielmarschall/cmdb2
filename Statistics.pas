@@ -1,5 +1,8 @@
 unit Statistics;
 
+// TODO: DLL should tell plugin if rows may be deleted
+// TODO: For deletions, the DLL should be asked what to do ("InsteadofDelete")
+
 interface
 
 uses
@@ -52,6 +55,8 @@ type
     StatisticsName: string;
     MandatorId: TGUID;
     MandatorName: string;
+    SqlTable: string;
+    SqlInitialOrder: string;
     procedure Init;
   end;
 
@@ -60,7 +65,7 @@ implementation
 {$R *.dfm}
 
 uses
-  DbGridHelper, CmDbFunctions;
+  DbGridHelper, CmDbFunctions, CmDbPluginClient;
 
 procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin
@@ -89,7 +94,6 @@ end;
 
 function TStatisticsForm.SqlQueryStatistics(const search: string): string;
 var
-  ds: TAdoDataSet;
   q: TAdoDataSet;
 begin
   if not SqlQueryStatistics_Init then
@@ -98,19 +102,15 @@ begin
     SqlQueryStatistics_order := '';
     SqlQueryStatistics_asc := true;
   end;
-  ds := ADOConnection1.GetTable(
-    'select SQL_VIEW, SQL_ORDER from [STATISTICS] where ID = ' +
-    ADOConnection1.SQLStringEscape(StatisticsId.ToString)
-  );
   result := 'select * ';
-  result := result + 'from ' + ADOConnection1.SQLObjectNameEscape(ds.Fields[0].AsWideString) + ' ';
+  result := result + 'from ' + ADOConnection1.SQLObjectNameEscape(SqlTable) + ' ';
   result := result + 'where __MANDATOR_ID = ' + ADOConnection1.SQLStringEscape(MandatorId.ToString) + ' ';
   if trim(search)<>'' then
   begin
     result := result + ' and (1=0 ';
     q := AdoConnection1.GetTable('select COLUMN_NAME ' +
                                  'from INFORMATION_SCHEMA.COLUMNS ' +
-                                 'where TABLE_NAME = '+ADOConnection1.SQLStringEscape(ds.Fields[0].AsWideString)+' ' +
+                                 'where TABLE_NAME = '+ADOConnection1.SQLStringEscape(SqlTable)+' ' +
                                  //'and TABLE_SCHEMA = ''dbo'' ' +
                                  'and COLUMN_NAME not like ''\_\_%'' escape ''\'';');
     while not q.EOF do
@@ -121,11 +121,12 @@ begin
     q.Free;
     result := result + ') ';
   end;
-  if SqlQueryStatistics_order = '' then
-    result := result + 'order by ' + ds.Fields[1].AsWideString // {No, because the DB might have asc/desc:} + ' ' + AscDesc(SqlQueryStatistics_asc)
+  if (SqlQueryStatistics_order = '') and (SqlInitialOrder <> '') then
+    result := result + 'order by ' + SqlInitialOrder // {No, because the DB might have asc/desc:} + ' ' + AscDesc(SqlQueryStatistics_asc)
+  else if (SqlQueryStatistics_order = '') and (SqlInitialOrder = '') then
+    result := result + ''
   else
     result := result + 'order by ' + SqlQueryStatistics_order + ' ' + AscDesc(SqlQueryStatistics_asc);
-  ds.Free;
 end;
 
 procedure TStatisticsForm.Timer1Timer(Sender: TObject);
@@ -176,6 +177,9 @@ end;
 procedure TStatisticsForm.dbgQueryDblClick(Sender: TObject);
 begin
   // Nothing here
+
+  // TODO: Ask plugin what to do? (can also be used as "menu")
+  // TODO: It should be possible to open artist, commission, ..., forms here!
 end;
 
 procedure TStatisticsForm.dbgQueryTitleClick(Column: TColumn);

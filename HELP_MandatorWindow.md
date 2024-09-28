@@ -60,9 +60,9 @@ The database grid has the following columns:
 
 ## Mandator window tab "Statistics"
 
-There are various statistics that can be easily extended in the database without changing the program code.
+There are various statistics that are made available with plugins.
 
-Currently, there are the following statistics:
+Currently, there are the following statistics in the shipped statistics plugin:
 - Running commissions
 - Local sum over years (commissions outgoing)
 - Local sum over months (commissions outgoing)

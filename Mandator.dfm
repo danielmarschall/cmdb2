@@ -23,7 +23,7 @@ object MandatorForm: TMandatorForm
     Top = 41
     Width = 1044
     Height = 400
-    ActivePage = tsArtists
+    ActivePage = tsStatistics
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -782,7 +782,7 @@ object MandatorForm: TMandatorForm
     AfterScroll = ttStatisticsAfterScroll
     Parameters = <>
     SQL.Strings = (
-      'select * from vw_STATISTICS')
+      '')
     Left = 544
     Top = 96
     object ttStatisticsID: TGuidField
@@ -796,14 +796,6 @@ object MandatorForm: TMandatorForm
     object ttStatisticsNAME: TWideStringField
       FieldName = 'NAME'
       Size = 100
-    end
-    object ttStatisticsSQL_VIEW: TWideStringField
-      FieldName = 'SQL_VIEW'
-      Size = 100
-    end
-    object ttStatisticsSQL_ORDER: TWideStringField
-      FieldName = 'SQL_ORDER'
-      Size = 150
     end
   end
   object dsStatistics: TDataSource

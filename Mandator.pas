@@ -65,8 +65,6 @@ type
     ttStatisticsID: TGuidField;
     ttStatisticsNO: TIntegerField;
     ttStatisticsNAME: TWideStringField;
-    ttStatisticsSQL_VIEW: TWideStringField;
-    ttStatisticsSQL_ORDER: TWideStringField;
     tsCommissions: TTabSheet;
     ttCommission: TADOQuery;
     dsCommission: TDataSource;
@@ -224,7 +222,7 @@ implementation
 
 uses
   CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper,
-  CmDbFunctions, VtsCurConvDLLHeader;
+  CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient;
 
 var
   localCur: string;
@@ -654,11 +652,16 @@ end;
 procedure TMandatorForm.dbgStatisticsDblClick(Sender: TObject);
 var
   StatisticsForm: TStatisticsForm;
+  resp: TCmDbPluginClickResponse;
 resourcestring
   SSForS = '%s for %s';
 begin
   if ttStatistics.State in [dsEdit,dsInsert] then ttStatistics.Post;
   if ttStatistics.FieldByName('ID').IsNull then exit;
+
+  resp := TCmDbPluginClient.ClickEvent(AdoConnection1, ttStatistics.FieldByName('ID').AsGuid);
+  if not resp.Handled then exit;
+  if resp.SqlTable = '' then exit; // The plugin handled the request by itself, without us needing to show a table  
 
   StatisticsForm := MainForm.FindForm(ttStatistics.FieldByName('ID').AsGuid) as TStatisticsForm;
   if Assigned(StatisticsForm) then
@@ -670,6 +673,10 @@ begin
     StatisticsForm := TStatisticsForm.Create(Application.MainForm);
     StatisticsForm.StatisticsId := ttStatistics.FieldByName('ID').AsGuid;
     StatisticsForm.StatisticsName := ttStatistics.FieldByName('NAME').AsWideString;
+
+    StatisticsForm.SqlTable := resp.SqlTable;
+    StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
+
     StatisticsForm.MandatorId := MandatorId;
     StatisticsForm.MandatorName := MandatorName;
     StatisticsForm.Caption :=
@@ -831,8 +838,7 @@ begin
     SqlQueryStatistics_order := 'NO';
     SqlQueryStatistics_asc := true;
   end;
-  result := 'select * from vw_STATISTICS ';
-  //result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
+  result := 'select * from ##STATISTICS ';
   if trim(search)<>'' then
     result := result + 'where lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryStatistics_order = 'NO' then
@@ -1015,6 +1021,8 @@ begin
     dbgPayment.Columns[6].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
     {$ENDREGION}
     {$REGION 'ttStatistics / dbgStatistics'}
+    TCmDbPluginClient.CreateTables(AdoConnection1); // creates ##STATISTICS
+    TCmDbPluginClient.InitAllPlugins(AdoConnection1); // fills ##STATISTICS from plugins
     ttStatistics.Active := false;
     ttStatistics.SQL.Text := SqlQueryStatistics('');
     ttStatistics.Active := true;

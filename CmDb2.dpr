@@ -13,7 +13,8 @@ uses
   CmDbTextBackup in 'CmDbTextBackup.pas',
   VtsCurConvDLLHeader in 'VtsCurConvDLLHeader.pas',
   CmDbFunctions in 'CmDbFunctions.pas',
-  Help in 'Help.pas' {HelpForm};
+  Help in 'Help.pas' {HelpForm},
+  CmDbPluginClient in 'CmDbPluginClient.pas';
 
 {$R *.res}
 

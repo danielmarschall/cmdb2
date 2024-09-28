@@ -4,7 +4,7 @@
         <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectName Condition="'$(ProjectName)'==''">CmDb2</ProjectName>
         <TargetedPlatforms>3</TargetedPlatforms>
@@ -177,6 +177,7 @@
             <Form>HelpForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="CmDbPluginClient.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -203,13 +204,13 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="CmDb2.64.exe" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="CmDb2.64.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>CmDb2.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="CmDb2.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="CmDb2.64.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>CmDb2.exe</RemoteName>
                         <Overwrite>true</Overwrite>

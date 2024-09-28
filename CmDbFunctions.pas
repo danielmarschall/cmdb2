@@ -215,7 +215,6 @@ begin
     AdoConnection1.ExecSQL('delete from [QUOTE];');
     AdoConnection1.ExecSQL('delete from [UPLOAD];');
     AdoConnection1.ExecSQL('delete from [COMMUNICATION];');
-    AdoConnection1.ExecSQL('delete from [STATISTICS];');
     AdoConnection1.ExecSQL('delete from [CONFIG];');
     //AdoConnection1.ExecSQL('delete from [TEXT_BACKUP];');
 
@@ -228,7 +227,6 @@ begin
     AdoConnection1.ExecSQL('insert into [QUOTE] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[QUOTE];');
     AdoConnection1.ExecSQL('insert into [UPLOAD] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[UPLOAD];');
     AdoConnection1.ExecSQL('insert into [COMMUNICATION] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[COMMUNICATION];');
-    AdoConnection1.ExecSQL('insert into [STATISTICS] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[STATISTICS];');
     AdoConnection1.ExecSQL('insert into [CONFIG] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[CONFIG];');
     //AdoConnection1.ExecSQL('insert into [TEXT_BACKUP] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[TEXT_BACKUP];');
 
@@ -369,6 +367,15 @@ begin
       // Future update code goes here!
       // ...
       //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
+
+
+      // TODO: Once all things are decided, label everything as Schema #2
+      if AdoConnection1.ViewExists('vw_STATISTICS') then
+        AdoConnection1.DropTableOrView('vw_STATISTICS');
+      if AdoConnection1.TableExists('STATISTICS') then
+        AdoConnection1.DropTableOrView('STATISTICS');
+
+
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;
