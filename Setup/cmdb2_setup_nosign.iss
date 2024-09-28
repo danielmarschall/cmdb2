@@ -48,11 +48,13 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 ; Die Dinger werden von Delphi kompiliert
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.64.exe"; DestName: "CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
-Source: "\\Win11Dev\C$\SVN\CMDB\trunk\CmDb2.32.exe"; DestName: "CmDb2.exe"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin64\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin64\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "..\CurConv.64.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 
-Source: "..\CurConv.64.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
-Source: "..\CurConv.dll"; DestDir: "{app}"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin32\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin32\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
+Source: "..\CurConv.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
                                            
 Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion
@@ -71,11 +73,11 @@ Source: "..\Redist\msoledbsql19.x86.msi"; DestName: "msoledbsql19.x86.msi"; Dest
 Type: files; Name: "{app}\Setup.ini"
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"
-Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\CmDb2.exe"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\bin\CmDb2.exe"
+Name: "{autodesktop}\{#MyAppName} {#MyAppVersion}"; Filename: "{app}\bin\CmDb2.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\CmDb2.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked
+Filename: "{app}\bin\CmDb2.exe"; Description: "Run {#MyAppName} {#MyAppVersion}"; Flags: postinstall nowait skipifsilent unchecked
 
 [Code]
 

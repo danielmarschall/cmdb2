@@ -252,7 +252,7 @@ begin
     HelpForm.Height := Round(Screen.Height * 0.8);
     HelpForm.Show;
   end;
-  HelpForm.ShowMarkDownHelp(MDFile);
+  HelpForm.ShowMarkDownHelp(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'..\'+MDFile);
   HelpForm.Caption := Format(SSHelp, [Caption]);
 end;
 
@@ -399,14 +399,14 @@ begin
         {$IFDEF Win64}
         WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
         Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'Redist\VC_redist.x86.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x86.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
         WaitLabel.Caption := 'Installing Visual C++ Redistributable (64 Bit)...';
         Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'Redist\VC_redist.x64.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x64.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
         {$ELSE}
         WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
         Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'Redist\VC_redist.x86.exe'), '/install /norestart', '', SW_NORMAL, True);
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x86.exe'), '/install /norestart', '', SW_NORMAL, True);
         {$ENDIF}
 
         // 2. LocalDB
@@ -415,11 +415,11 @@ begin
           {$IFDEF Win64}
           WaitLabel.Caption := 'Installing SQL Server LocalDB (64 Bit)...';
           Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\SqlLocalDB.x64.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\SqlLocalDB.x64.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
           {$ELSE}
           WaitLabel.Caption := 'Installing SQL Server LocalDB (32 Bit)...';
           Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\SqlLocalDB.x86.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\SqlLocalDB.x86.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
           {$ENDIF}
         end;
 
@@ -429,11 +429,11 @@ begin
           {$IFDEF Win64}
           WaitLabel.Caption := 'Installing SQL Server OLE DB Provider (64 Bit)...';
           Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\msoledbsql19.x64.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\msoledbsql19.x64.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
           {$ELSE}
           WaitLabel.Caption := 'Installing SQL Server OLE DB Provider (32 Bit)...';
           Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'Redist\msoledbsql19.x86.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\msoledbsql19.x86.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
           {$ENDIF}
         end;
       finally

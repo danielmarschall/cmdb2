@@ -288,7 +288,7 @@ resourcestring
     try
       sl := TStringList.Create;
       try
-        sl.LoadFromFile(ExtractFilePath(ParamStr(0))+'\DB\Schema'+IntToStr(targetSchema)+'\'+'['+fil+'].sql');
+        sl.LoadFromFile(ExtractFilePath(ParamStr(0))+'\..\DB\Schema'+IntToStr(targetSchema)+'\'+'['+fil+'].sql');
         AdoConnection1.ExecSQL(sl.Text);
       finally
         sl.Free;
