@@ -55,6 +55,8 @@ type
     refreshTextBackup: TBitBtn;
     refreshMandator: TBitBtn;
     HelpBtn: TButton;
+    ttConfigHIDDEN: TBooleanField;
+    ttConfigREAD_ONLY: TBooleanField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -86,6 +88,7 @@ type
     procedure refreshTextBackupClick(Sender: TObject);
     procedure refreshConfigClick(Sender: TObject);
     procedure HelpBtnClick(Sender: TObject);
+    procedure ttConfigBeforeEdit(DataSet: TDataSet);
   private
     SqlQueryMandator_Init: boolean;
     SqlQueryMandator_Order: string;
@@ -487,6 +490,11 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TMandatorsForm.ttConfigBeforeEdit(DataSet: TDataSet);
+begin
+  if ttConfigREAD_ONLY.AsBoolean then Abort;
 end;
 
 end.

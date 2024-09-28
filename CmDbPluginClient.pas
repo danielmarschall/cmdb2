@@ -215,10 +215,10 @@ begin
               result.Handled := true;
               result.Action := craStatistics;
               result.StatId := GUID_2A;
-              result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsString+') for year ' + q.FieldByName('YEAR').AsString;
+              result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsWideString+') for year ' + q.FieldByName('YEAR').AsWideString;
               result.SqlTable := TempTableName(GUID_2A, 'COMMISSIONS');
               result.SqlInitialOrder := 'START_DATE';
-              result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+              result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsWideString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
               result.BaseTableDelete := 'COMMISSION';
             end;
           finally
@@ -293,10 +293,10 @@ begin
               result.Handled := true;
               result.Action := craStatistics;
               result.StatId := GUID_3A;
-              result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsString+') for month ' + q.FieldByName('MONTH').AsString;
+              result.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsWideString+') for month ' + q.FieldByName('MONTH').AsWideString;
               result.SqlTable := TempTableName(GUID_3A, 'COMMISSIONS');
               result.SqlInitialOrder := 'START_DATE';
-              result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+              result.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsWideString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
               result.BaseTableDelete := 'COMMISSION';
             end;
           finally

@@ -399,6 +399,21 @@ begin
       InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
 
 
+      if not AdoConnection1.ColumnExists('CONFIG', 'READ_ONLY') then
+      begin
+        AdoConnection1.ExecSQL('alter table CONFIG add READ_ONLY bit;');
+        AdoConnection1.ExecSQL('update CONFIG set READ_ONLY = 0');
+        AdoConnection1.ExecSQL('alter table CONFIG alter column READ_ONLY bit NOT NULL');
+      end;
+      if not AdoConnection1.ColumnExists('CONFIG', 'HIDDEN') then
+      begin
+        AdoConnection1.ExecSQL('alter table CONFIG add HIDDEN bit;');
+        AdoConnection1.ExecSQL('update CONFIG set HIDDEN = iif(NAME=''DB_VERSION'' or NAME=''CUSTOMIZATION_ID'' or NAME=''INSTALL_ID'', 1, 0)');
+        AdoConnection1.ExecSQL('alter table CONFIG alter column HIDDEN bit NOT NULL');
+      end;
+      InstallSql(2, 'vw_CONFIG');
+
+
       // We have reached the highest supported version and can now exit the loop.
       Exit;
     end

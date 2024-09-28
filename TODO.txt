@@ -2,7 +2,6 @@
 # TODO
 
 Version 1.1:
-- Config: New fields "read only" and "visible"
 - Statistics plugins! ("TODO" in source)
 
 General:

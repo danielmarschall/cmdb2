@@ -414,6 +414,7 @@ object MandatorsForm: TMandatorsForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeInsert = ttConfigBeforeInsert
+    BeforeEdit = ttConfigBeforeEdit
     BeforeDelete = ttConfigBeforeDelete
     AfterScroll = ttConfigAfterScroll
     OnNewRecord = ttMandatorNewRecord
@@ -435,6 +436,12 @@ object MandatorsForm: TMandatorsForm
       FieldName = 'HELP_TEXT'
       ReadOnly = True
       Size = 4000
+    end
+    object ttConfigHIDDEN: TBooleanField
+      FieldName = 'HIDDEN'
+    end
+    object ttConfigREAD_ONLY: TBooleanField
+      FieldName = 'READ_ONLY'
     end
   end
   object dsConfig: TDataSource
