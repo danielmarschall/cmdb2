@@ -210,9 +210,10 @@ type
     function SqlQueryCommissions(const search: string): string;
     function SqlQueryPayment(const search: string): string;
     function SqlQueryStatistics(const search: string): string;
+  protected
+    MandatorName: string;
   public
     MandatorId: TGUID;
-    MandatorName: string;
     procedure Init;
   end;
 

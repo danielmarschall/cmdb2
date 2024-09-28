@@ -49,9 +49,7 @@ uses
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
 var
   StatisticsForm: TStatisticsForm;
-  MandatorName: string;
-resourcestring
-  SSForS = '%s for %s';
+  addinfo1: string;
 begin
   if not resp.Handled then exit;
   if resp.ObjTable <> '' then
@@ -60,22 +58,20 @@ begin
   end;
   if resp.SqlTable <> '' then
   begin
-    StatisticsForm := MainForm.FindForm(resp.StatId) as TStatisticsForm;
+    addinfo1 := TStatisticsForm.AddInfo(mandatorid, resp.SqlTable, resp.SqlInitialOrder);
+    StatisticsForm := MainForm.FindForm(resp.StatId, addinfo1) as TStatisticsForm;
     if Assigned(StatisticsForm) then
     begin
       MainForm.RestoreMdiChild(StatisticsForm);
     end
     else
     begin
-      MandatorName := AdoConn.GetScalar('select NAME from MANDATOR where ID = ''' + MandatorId.ToString + '''');
       StatisticsForm := TStatisticsForm.Create(Application.MainForm);
       StatisticsForm.StatisticsId := resp.StatId;
       StatisticsForm.StatisticsName := resp.StatName;
       StatisticsForm.SqlTable := resp.SqlTable;
       StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
       StatisticsForm.MandatorId := MandatorId;
-      StatisticsForm.MandatorName := MandatorName;
-      StatisticsForm.Caption := Format(SSForS, [resp.StatName, MandatorName]);
       StatisticsForm.ADOConnection1.Connected := false;
       StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
       StatisticsForm.Init;

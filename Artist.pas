@@ -148,9 +148,10 @@ type
     function SqlQueryPayment(const search: string): string;
     function SqlQueryArtistEvent(const search: string): string;
     function SqlQueryCommunication(const search: string): string;
+  protected
+    ArtistName: string;
   public
     ArtistId: TGUID;
-    ArtistName: string;
     procedure Init;
   end;
 

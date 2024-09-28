@@ -50,13 +50,15 @@ type
     SqlQueryStatistics_Order: string;
     SqlQueryStatistics_Asc: boolean;
     function SqlQueryStatistics(const search: string): string;
+  protected
+    MandatorName: string;
   public
     StatisticsId: TGUID;
     StatisticsName: string;
     MandatorId: TGUID;
-    MandatorName: string;
     SqlTable: string;
     SqlInitialOrder: string;
+    class function AddInfo(mandatorId: TGUID; sqlTable, sqlInitialOrder: string): string;
     procedure Init;
   end;
 
@@ -168,6 +170,12 @@ begin
   Abort;
 end;
 
+class function TStatisticsForm.AddInfo(mandatorId: TGUID; sqlTable,
+  sqlInitialOrder: string): string;
+begin
+  result := mandatorId.ToString + '/' + sqlTable + '/' + sqlInitialOrder;
+end;
+
 procedure TStatisticsForm.csvQueryClick(Sender: TObject);
 begin
   if sdCsvQuery.Execute then
@@ -262,7 +270,19 @@ begin
 end;
 
 procedure TStatisticsForm.Init;
+var
+  ttMandator: TAdoDataSet;
+resourcestring
+  SSForS = '%s for %s';
 begin
+  ttMandator := ADOConnection1.GetTable('select NAME from MANDATOR where ID = ''' + MandatorId.ToString + '''');;
+  try
+    MandatorName := ttMandator.FieldByName('NAME').AsWideString;
+    Caption := Format(SSForS, [StatisticsName, MandatorName]);
+  finally
+    FreeAndNil(ttMandator);
+  end;
+
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   Panel1.Caption := Caption;

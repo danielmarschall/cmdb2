@@ -105,9 +105,10 @@ type
     function SqlQueryQuote(const search: string): string;
     function SqlQueryUpload(const search: string): string;
     procedure TryShowFileList(const AFolder: string='');
+  protected
+    CommissionName: string;
   public
     CommissionId: TGUID;
-    CommissionName: string;
     procedure Init;
   end;
 

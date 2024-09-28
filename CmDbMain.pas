@@ -35,7 +35,7 @@ type
   public
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
-    function FindForm(guid: TGuid): TForm;
+    function FindForm(guid: TGuid; addinfo1: string=''): TForm;
     procedure ShowHelpWindow(const MDFile: string);
   end;
 
@@ -197,7 +197,7 @@ begin
   Close;
 end;
 
-function TMainForm.FindForm(guid: TGuid): TForm;
+function TMainForm.FindForm(guid: TGuid; addinfo1: string=''): TForm;
 var
   i: integer;
 begin
@@ -207,21 +207,24 @@ begin
     begin
       if IsEqualGUID(TArtistForm(MdiChildren[i]).ArtistId, guid) then
         Exit(MdiChildren[i]);
-    end;
-    if MdiChildren[i] is TCommissionForm then
+    end
+    else if MdiChildren[i] is TCommissionForm then
     begin
       if IsEqualGUID(TCommissionForm(MdiChildren[i]).CommissionId, guid) then
         Exit(MdiChildren[i]);
-    end;
-    if MdiChildren[i] is TMandatorForm then
+    end
+    else if MdiChildren[i] is TMandatorForm then
     begin
       if IsEqualGUID(TMandatorForm(MdiChildren[i]).MandatorId, guid) then
         Exit(MdiChildren[i]);
-    end;
-    if MdiChildren[i] is TStatisticsForm then
+    end
+    else if MdiChildren[i] is TStatisticsForm then
     begin
       if IsEqualGUID(TStatisticsForm(MdiChildren[i]).StatisticsId, guid) then
-        Exit(MdiChildren[i]);
+      begin
+        if addinfo1 = TStatisticsForm.AddInfo(TStatisticsForm(MdiChildren[i]).MandatorId, TStatisticsForm(MdiChildren[i]).SqlTable, TStatisticsForm(MdiChildren[i]).SqlInitialOrder) then
+          Exit(MdiChildren[i]);
+      end;
     end;
   end;
   Exit(nil);
