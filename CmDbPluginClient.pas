@@ -50,7 +50,7 @@ const
 implementation
 
 uses
-  Forms, Statistics, CmDbMain, CmDbFunctions;
+  Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi;
 
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
 var
@@ -376,21 +376,20 @@ begin
         try
           AdoConn.LoginPrompt := false;
           AdoConn.ConnectConnStr(DBConnStr);
-          if not AdoConn.TableExists('##xx_about') then
-            AdoConn.ExecSQL('create table ##xx_about ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
-          AdoConn.ExecSQL('delete from ##xx_about');
-          AdoConn.ExecSQL('insert into ##xx_about select '''+GUID_9A.ToString+''', ''View Source Code'';');
-          AdoConn.ExecSQL('insert into ##xx_about select '''+GUID_9B.ToString+''', ''Download latest version'';');
+          if not AdoConn.TableExists(TempTableName(GUID_9, 'TEST')) then
+            AdoConn.ExecSQL('create table '+TempTableName(GUID_9, 'TEST')+' ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
+          AdoConn.ExecSQL('delete from '+TempTableName(GUID_9, 'TEST'));
+          AdoConn.ExecSQL('insert into '+TempTableName(GUID_9, 'TEST')+' select '''+GUID_9A.ToString+''', ''View Source Code'';');
+          AdoConn.ExecSQL('insert into '+TempTableName(GUID_9, 'TEST')+' select '''+GUID_9B.ToString+''', ''Download latest version'';');
         finally
-          // TODO: temp table gets deleted here!
-//          FreeAndNil(AdoConn);
+          FreeAndNil(AdoConn);
         end;
 
         result.Handled := true;
         result.Action := craStatistics;
         result.StatId := StatGuid;
-        result.StatName := 'About CMDB2';
-        result.SqlTable := '##xx_about';
+        result.StatName := 'Web sources';
+        result.SqlTable := TempTableName(GUID_9, 'TEST');
         result.SqlInitialOrder := '';
         result.SqlAdditionalFilter := '';
         result.BaseTableDelete := '';
@@ -399,13 +398,13 @@ begin
       begin
         result.Handled := true;
         result.Action := craNone;
-        Application.MessageBox('Hello World!', ''); // TODO: test
+        ShellExecute(0, 'open', 'https://github.com/danielmarschall/cmdb2', '', '', SW_NORMAL);
       end
       else if IsEqualGUID(ItemGuid, GUID_9B) then
       begin
         result.Handled := true;
         result.Action := craNone;
-        Application.MessageBox('Hello World 2!', ''); // TODO: test
+        ShellExecute(0, 'open', 'https://github.com/danielmarschall/cmdb2/releases', '', '', SW_NORMAL);
       end;
     end;
     {$ENDREGION}
