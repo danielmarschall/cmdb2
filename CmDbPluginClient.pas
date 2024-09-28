@@ -8,8 +8,14 @@ uses
 type
   TCmDbPluginClickResponse = record
     Handled: boolean;
+    // Statistics
+    StatId: TGuid;
+    StatName: string;
     SqlTable: string;
     SqlInitialOrder: string;
+    // Normal object
+    ObjTable: string;
+    ObjId: TGuid;
   end;
 
 type
@@ -17,7 +23,7 @@ type
   public
     class procedure CreateTables(AdoConn: TAdoConnection);
     class procedure InitAllPlugins(AdoConn: TAdoConnection);
-    class function ClickEvent(AdoConn: TAdoConnection; ItemGuid: TGuid): TCmDbPluginClickResponse;
+    class function ClickEvent(AdoConn: TAdoConnection; StatGuid: TGuid; ItemGuid: TGuid): TCmDbPluginClickResponse;
   end;
 
 type
@@ -26,11 +32,56 @@ type
     FPluginDllFilename: string;
   public
     procedure Init(const DBConnStr: string);
-    function ClickEvent(const DBConnStr: string; ItemGuid: TGuid): TCmDbPluginClickResponse;
+    function ClickEvent(const DBConnStr: string; StatGuid: TGuid; ItemGuid: TGuid): TCmDbPluginClickResponse;
     constructor Create(const APluginDllFilename: string);
   end;
 
+procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
+
+const
+  GUID_NIL: TGUID = '{00000000-0000-0000-0000-000000000000}';
+
 implementation
+
+uses
+  Forms, Statistics, CmDbMain;
+
+procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
+var
+  StatisticsForm: TStatisticsForm;
+  MandatorName: string;
+resourcestring
+  SSForS = '%s for %s';
+begin
+  if not resp.Handled then exit;
+  if resp.ObjTable <> '' then
+  begin
+    MainForm.OpenDbObject(resp.ObjTable, resp.ObjId);
+  end;
+  if resp.SqlTable <> '' then
+  begin
+    StatisticsForm := MainForm.FindForm(resp.StatId) as TStatisticsForm;
+    if Assigned(StatisticsForm) then
+    begin
+      MainForm.RestoreMdiChild(StatisticsForm);
+    end
+    else
+    begin
+      MandatorName := AdoConn.GetScalar('select NAME from MANDATOR where ID = ''' + MandatorId.ToString + '''');
+      StatisticsForm := TStatisticsForm.Create(Application.MainForm);
+      StatisticsForm.StatisticsId := resp.StatId;
+      StatisticsForm.StatisticsName := resp.StatName;
+      StatisticsForm.SqlTable := resp.SqlTable;
+      StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
+      StatisticsForm.MandatorId := MandatorId;
+      StatisticsForm.MandatorName := MandatorName;
+      StatisticsForm.Caption := Format(SSForS, [resp.StatName, MandatorName]);
+      StatisticsForm.ADOConnection1.Connected := false;
+      StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
+      StatisticsForm.Init;
+    end;
+  end;
+end;
 
 { TCmDbPlugin }
 
@@ -41,57 +92,104 @@ const
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
   GUID_5: TGUID = '{BEBEE253-6644-4A66-87D1-BB63FFAD57B4}';
 
+function TCmDbPlugin.ClickEvent(const DBConnStr: string; StatGuid,
+  ItemGuid: TGuid): TCmDbPluginClickResponse;
+begin
+  // TODO: Call DLL instead
+  Result.Handled := false;
+  if FPluginDllFilename = 'PLG_STD_STAT.DLL' then
+  begin
+    if IsEqualGuid(StatGuid, GUID_1) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        //InstallSql(..., 'vw_STAT_RUNNING_COMMISSIONS');
+        result.Handled := true;
+        result.StatId := StatGuid;
+        result.StatName := 'Running commissions';
+        result.SqlTable := 'vw_STAT_RUNNING_COMMISSIONS';
+        result.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
+      end
+      else
+      begin
+        result.Handled := true;
+        result.ObjTable := 'COMMISSION';
+        result.ObjId := ItemGuid;
+      end;
+    end
+    else if IsEqualGuid(StatGuid, GUID_2) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        //InstallSql(..., 'vw_STAT_SUM_YEARS');
+        result.Handled := true;
+        result.StatId := StatGuid;
+        result.StatName := 'Local sum over years';
+        result.SqlTable := 'vw_STAT_SUM_YEARS';
+        result.SqlInitialOrder := 'YEAR desc, DIRECTION';
+      end
+      else
+      begin
+        // TODO: Open a list with commissions of that year, and maybe there you can double click to get to the commission?!
+      end;
+    end
+    else if IsEqualGuid(StatGuid, GUID_3) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        //InstallSql(..., 'vw_STAT_SUM_MONTHS');
+        result.Handled := true;
+        result.StatId := StatGuid;
+        result.StatName := 'Local sum over months';
+        result.SqlTable := 'vw_STAT_SUM_MONTHS';
+        result.SqlInitialOrder := 'MONTH desc, DIRECTION';
+      end
+      else
+      begin
+        // TODO: Open a list with commissions of that month, and maybe there you can double click to get to the commission?!
+      end;
+    end
+    else if IsEqualGuid(StatGuid, GUID_4) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        //InstallSql(..., 'vw_STAT_TOP_ARTISTS');
+        result.Handled := true;
+        result.StatId := StatGuid;
+        result.StatName := 'Top artists/clients';
+        result.SqlTable := 'vw_STAT_TOP_ARTISTS';
+        result.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
+      end
+      else
+      begin
+        result.Handled := true;
+        result.ObjTable := 'ARTIST';
+        result.ObjId := ItemGuid;
+      end;
+    end
+    else if IsEqualGuid(StatGuid, GUID_5) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        //InstallSql(..., 'vw_STAT_TEXT_EXPORT');
+        result.Handled := true;
+        result.StatId := StatGuid;
+        result.StatName := 'Full Text Export';
+        result.SqlTable := 'vw_STAT_TEXT_EXPORT';
+        result.SqlInitialOrder := 'DATASET_TYPE, DATASET_ID';
+      end
+      else
+      begin
+        // TODO: We could open the data set here... but we need to query all tables to see which tables has the ItemID
+      end;
+    end;
+  end;
+end;
+
 constructor TCmDbPlugin.Create(const APluginDllFilename: string);
 begin
   inherited Create;
   FPluginDllFilename := APluginDllFilename;
-end;
-
-function TCmDbPlugin.ClickEvent(const DBConnStr: string; ItemGuid: TGuid): TCmDbPluginClickResponse;
-begin
-  // TODO: Call DLL instead
-  if FPluginDllFilename = 'PLG_STD_STAT.DLL' then
-  begin
-    if IsEqualGUID(ItemGuid, GUID_1) then
-    begin
-      //InstallSql(1, 'vw_STAT_RUNNING_COMMISSIONS');
-      result.Handled := true;
-      result.SqlTable := 'vw_STAT_RUNNING_COMMISSIONS';
-      result.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
-    end
-    else if IsEqualGUID(ItemGuid, GUID_2) then
-    begin
-      //InstallSql(1, 'vw_STAT_SUM_YEARS');
-      result.Handled := true;
-      result.SqlTable := 'vw_STAT_SUM_YEARS';
-      result.SqlInitialOrder := 'YEAR desc, DIRECTION';
-    end
-    else if IsEqualGUID(ItemGuid, GUID_3) then
-    begin
-      //InstallSql(1, 'vw_STAT_SUM_MONTHS');
-      result.Handled := true;
-      result.SqlTable := 'vw_STAT_SUM_MONTHS';
-      result.SqlInitialOrder := 'MONTH desc, DIRECTION';
-    end
-    else if IsEqualGUID(ItemGuid, GUID_4) then
-    begin
-      //InstallSql(1, 'vw_STAT_TOP_ARTISTS');
-      result.Handled := true;
-      result.SqlTable := 'vw_STAT_TOP_ARTISTS';
-      result.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
-    end
-    else if IsEqualGUID(ItemGuid, GUID_5) then
-    begin
-      //InstallSql(1, 'vw_STAT_TEXT_EXPORT');
-      result.Handled := true;
-      result.SqlTable := 'vw_STAT_TEXT_EXPORT';
-      result.SqlInitialOrder := 'DATASET_TYPE, DATASET_ID';
-    end
-    else
-    begin
-      result.Handled := false;
-    end;
-  end;
 end;
 
 procedure TCmDbPlugin.Init(const DBConnStr: string);
@@ -121,6 +219,22 @@ end;
 
 { TCmDbPluginClient }
 
+class function TCmDbPluginClient.ClickEvent(AdoConn: TAdoConnection; StatGuid,
+  ItemGuid: TGuid): TCmDbPluginClickResponse;
+var
+  p: TCmDbPlugin;
+begin
+  // TODO: Ask all plugins
+  Result.Handled := false;
+  p := TCmDbPlugin.Create('PLG_STD_STAT.DLL');
+  try
+    result := p.ClickEvent(AdoConn.ConnectionString, StatGuid, ItemGuid);
+    if Result.Handled then Exit;
+  finally
+    p.Free;
+  end;
+end;
+
 class procedure TCmDbPluginClient.CreateTables(AdoConn: TAdoConnection);
 begin
   AdoConn.ExecSQL('IF NOT EXISTS (SELECT * FROM tempdb.sys.tables WHERE name = ''##STATISTICS'') ' +
@@ -146,21 +260,6 @@ begin
   p := TCmDbPlugin.Create('PLG_STD_STAT.DLL');
   try
     p.Init(AdoConn.ConnectionString);
-  finally
-    p.Free;
-  end;
-end;
-
-class function TCmDbPluginClient.ClickEvent(AdoConn: TAdoConnection; ItemGuid: TGuid): TCmDbPluginClickResponse;
-var
-  p: TCmDbPlugin;
-begin
-  // TODO: Ask all plugins
-  Result.Handled := false;
-  p := TCmDbPlugin.Create('PLG_STD_STAT.DLL');
-  try
-    result := p.ClickEvent(AdoConn.ConnectionString, ItemGuid);
-    if Result.Handled then Exit;
   finally
     p.Free;
   end;

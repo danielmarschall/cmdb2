@@ -627,7 +627,28 @@ end;
 procedure TCommissionForm.Init;
 var
   i: integer;
+  ttCommission: TAdoDataset;
+resourcestring
+  SCommissionSbyS = 'Commission %s by %s';
+  SCommissionSforS = 'Commission %s for %s';
 begin
+  ttCommission := ADOConnection1.GetTable('select * from vw_COMMISSION where ID = ''' + CommissionId.ToString + '''');
+  try
+    CommissionName := ttCommission.FieldByName('NAME').AsWideString;
+    if ttCommission.FieldByName('IS_ARTIST').AsBoolean then
+    begin
+      Caption :=
+        Format(SCommissionSbyS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
+    end
+    else
+    begin
+      Caption :=
+        Format(SCommissionSforS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
+    end;
+  finally
+    FreeAndNil(ttCommission);
+  end;
+
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   for i := 0 to PageControl2.PageCount-1 do

@@ -375,6 +375,9 @@ begin
       if AdoConnection1.TableExists('STATISTICS') then
         AdoConnection1.DropTableOrView('STATISTICS');
 
+      InstallSql(2, 'vw_STAT_TOP_ARTISTS');
+      InstallSql(2, 'vw_STAT_RUNNING_COMMISSIONS');
+      InstallSql(2, 'vw_STAT_TEXT_EXPORT');
 
 
       // We have reached the highest supported version and can now exit the loop.

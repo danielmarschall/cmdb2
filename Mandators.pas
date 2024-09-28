@@ -209,29 +209,10 @@ begin
 end;
 
 procedure TMandatorsForm.dbgMandatorDblClick(Sender: TObject);
-var
-  MandatorForm: TMandatorForm;
-resourcestring
-  SMandatorS = 'Mandator %s';
 begin
   if ttMandator.State in [dsEdit,dsInsert] then ttMandator.Post;
   if ttMandator.FieldByName('ID').IsNull then exit;
-
-  MandatorForm := MainForm.FindForm(ttMandator.FieldByName('ID').AsGuid) as TMandatorForm;
-  if Assigned(MandatorForm) then
-  begin
-    MainForm.RestoreMdiChild(MandatorForm);
-  end
-  else
-  begin
-    MandatorForm := TMandatorForm.Create(Application.MainForm);
-    MandatorForm.MandatorId := ttMandator.FieldByName('ID').AsGuid;
-    MandatorForm.MandatorName := ttMandator.FieldByName('NAME').AsWideString;
-    MandatorForm.Caption := Format(SMandatorS, [ttMandator.FieldByName('NAME').AsWideString]);
-    MandatorForm.ADOConnection1.Connected := false;
-    MandatorForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-    MandatorForm.Init;
-  end;
+  MainForm.OpenDbObject('MANDATOR', ttMandator.FieldByName('ID').AsGuid);
 end;
 
 procedure TMandatorsForm.dbgMandatorTitleClick(Column: TColumn);

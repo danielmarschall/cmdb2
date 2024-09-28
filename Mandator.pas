@@ -492,30 +492,10 @@ begin
 end;
 
 procedure TMandatorForm.dbgArtistsDblClick(Sender: TObject);
-var
-  ArtistForm: TArtistForm;
-resourcestring
-  SArtistSforS = 'Artist %s for %s';
 begin
   if ttArtists.State in [dsEdit,dsInsert] then ttArtists.Post;
   if ttArtists.FieldByName('ID').IsNull then exit;
-
-  ArtistForm := MainForm.FindForm(ttArtists.FieldByName('ID').AsGuid) as TArtistForm;
-  if Assigned(ArtistForm) then
-  begin
-    MainForm.RestoreMdiChild(ArtistForm);
-  end
-  else
-  begin
-    ArtistForm := TArtistForm.Create(Application.MainForm);
-    ArtistForm.ArtistId := ttArtists.FieldByName('ID').AsGuid;
-    ArtistForm.ArtistName := ttArtists.FieldByName('NAME').AsWideString;
-    ArtistForm.Caption :=
-      Format(SArtistSforS, [ttArtists.FieldByName('NAME').AsWideString, MandatorName]);
-    ArtistForm.ADOConnection1.Connected := false;
-    ArtistForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-    ArtistForm.Init;
-  end;
+  MainForm.OpenDbObject('ARTIST', ttArtists.FieldByName('ID').AsGuid);
 end;
 
 procedure TMandatorForm.dbgArtistsTitleClick(Column: TColumn);
@@ -536,30 +516,10 @@ begin
 end;
 
 procedure TMandatorForm.dbgClientsDblClick(Sender: TObject);
-var
-  ArtistForm: TArtistForm;
-resourcestring
-  SClientSforS = 'Client %s for %s';
 begin
   if ttClients.State in [dsEdit,dsInsert] then ttClients.Post;
   if ttClients.FieldByName('ID').IsNull then exit;
-
-  ArtistForm := MainForm.FindForm(ttClients.FieldByName('ID').AsGuid) as TArtistForm;
-  if Assigned(ArtistForm) then
-  begin
-    MainForm.RestoreMdiChild(ArtistForm);
-  end
-  else
-  begin
-    ArtistForm := TArtistForm.Create(Application.MainForm);
-    ArtistForm.ArtistId := ttClients.FieldByName('ID').AsGuid;
-    ArtistForm.ArtistName := ttClients.FieldByName('NAME').AsWideString;
-    ArtistForm.Caption :=
-      Format(SClientSforS, [ttClients.FieldByName('NAME').AsWideString, MandatorName]);
-    ArtistForm.ADOConnection1.Connected := false;
-    ArtistForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-    ArtistForm.Init;
-  end;
+  MainForm.OpenDbObject('ARTIST', ttClients.FieldByName('ID').AsGuid);
 end;
 
 procedure TMandatorForm.dbgClientsTitleClick(Column: TColumn);
@@ -580,39 +540,10 @@ begin
 end;
 
 procedure TMandatorForm.dbgCommissionsDblClick(Sender: TObject);
-var
-  CommissionForm: TCommissionForm;
-resourcestring
-  SCommissionSbyS = 'Commission %s by %s';
-  SCommissionSforS = 'Commission %s for %s';
 begin
   if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
   if ttCommission.FieldByName('ID').IsNull then exit;
-
-  CommissionForm := MainForm.FindForm(ttCommission.FieldByName('ID').AsGuid) as TCommissionForm;
-  if Assigned(CommissionForm) then
-  begin
-    MainForm.RestoreMdiChild(CommissionForm);
-  end
-  else
-  begin
-    CommissionForm := TCommissionForm.Create(Application.MainForm);
-    CommissionForm.CommissionId := ttCommission.FieldByName('ID').AsGuid;
-    CommissionForm.CommissionName := ttCommission.FieldByName('NAME').AsWideString;
-    if ttCommission.FieldByName('IS_ARTIST').AsBoolean then
-    begin
-      CommissionForm.Caption :=
-        Format(SCommissionSbyS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
-    end
-    else
-    begin
-      CommissionForm.Caption :=
-        Format(SCommissionSforS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
-    end;
-    CommissionForm.ADOConnection1.Connected := false;
-    CommissionForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-    CommissionForm.Init;
-  end;
+  MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
 procedure TMandatorForm.dbgCommissionsTitleClick(Column: TColumn);
@@ -651,40 +582,13 @@ end;
 
 procedure TMandatorForm.dbgStatisticsDblClick(Sender: TObject);
 var
-  StatisticsForm: TStatisticsForm;
   resp: TCmDbPluginClickResponse;
-resourcestring
-  SSForS = '%s for %s';
 begin
   if ttStatistics.State in [dsEdit,dsInsert] then ttStatistics.Post;
   if ttStatistics.FieldByName('ID').IsNull then exit;
 
-  resp := TCmDbPluginClient.ClickEvent(AdoConnection1, ttStatistics.FieldByName('ID').AsGuid);
-  if not resp.Handled then exit;
-  if resp.SqlTable = '' then exit; // The plugin handled the request by itself, without us needing to show a table  
-
-  StatisticsForm := MainForm.FindForm(ttStatistics.FieldByName('ID').AsGuid) as TStatisticsForm;
-  if Assigned(StatisticsForm) then
-  begin
-    MainForm.RestoreMdiChild(StatisticsForm);
-  end
-  else
-  begin
-    StatisticsForm := TStatisticsForm.Create(Application.MainForm);
-    StatisticsForm.StatisticsId := ttStatistics.FieldByName('ID').AsGuid;
-    StatisticsForm.StatisticsName := ttStatistics.FieldByName('NAME').AsWideString;
-
-    StatisticsForm.SqlTable := resp.SqlTable;
-    StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
-
-    StatisticsForm.MandatorId := MandatorId;
-    StatisticsForm.MandatorName := MandatorName;
-    StatisticsForm.Caption :=
-      Format(SSForS, [ttStatistics.FieldByName('NAME').AsWideString, MandatorName]);
-    StatisticsForm.ADOConnection1.Connected := false;
-    StatisticsForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-    StatisticsForm.Init;
-  end;
+  resp := TCmDbPluginClient.ClickEvent(AdoConnection1, ttStatistics.FieldByName('ID').AsGuid, GUID_NIL);
+  HandleClickResponse(AdoConnection1, MandatorId, resp);
 end;
 
 procedure TMandatorForm.dbgStatisticsTitleClick(Column: TColumn);
@@ -985,7 +889,19 @@ begin
 end;
 
 procedure TMandatorForm.Init;
+resourcestring
+  SMandatorS = 'Mandator %s';
+var
+  ttMandator: TAdoDataSet;
 begin
+  ttMandator := ADOConnection1.GetTable('select * from MANDATOR where ID = ''' + MandatorId.ToString + '''');
+  try
+    MandatorName := ttMandator.FieldByName('NAME').AsWideString;
+    Caption := Format(SMandatorS, [ttMandator.FieldByName('NAME').AsWideString]);
+  finally
+    FreeAndNil(ttMandator);
+  end;
+
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   Panel1.Caption := Caption;

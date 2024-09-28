@@ -23,7 +23,7 @@ object MandatorForm: TMandatorForm
     Top = 41
     Width = 1044
     Height = 400
-    ActivePage = tsStatistics
+    ActivePage = tsArtists
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change

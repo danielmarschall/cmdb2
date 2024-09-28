@@ -34,6 +34,7 @@ type
     procedure RestoreBackup1Click(Sender: TObject);
   public
     procedure RestoreMdiChild(frm: TForm);
+    procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
     function FindForm(guid: TGuid): TForm;
     procedure ShowHelpWindow(const MDFile: string);
   end;
@@ -52,6 +53,66 @@ uses
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
+
+procedure TMainForm.OpenDbObject(const ATableName: string; DsGuid: TGUID);
+var
+  MandatorForm: TMandatorForm;
+  Artistform: TArtistForm;
+  CommissionForm: TCommissionForm;
+begin
+  if ATableName = 'MANDATOR' then
+  begin
+    MandatorForm := MainForm.FindForm(DsGuid) as TMandatorForm;
+    if Assigned(MandatorForm) then
+    begin
+      MainForm.RestoreMdiChild(MandatorForm);
+    end
+    else
+    begin
+      MandatorForm := TMandatorForm.Create(Application.MainForm);
+      MandatorForm.MandatorId := DsGuid;
+      MandatorForm.ADOConnection1.Connected := false;
+      MandatorForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
+      MandatorForm.Init;
+    end;
+  end
+  else if ATableName = 'ARTIST' then
+  begin
+    ArtistForm := MainForm.FindForm(DsGuid) as TArtistForm;
+    if Assigned(ArtistForm) then
+    begin
+      MainForm.RestoreMdiChild(ArtistForm);
+    end
+    else
+    begin
+      ArtistForm := TArtistForm.Create(Application.MainForm);
+      ArtistForm.ArtistId := DsGuid;
+      ArtistForm.ADOConnection1.Connected := false;
+      ArtistForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
+      ArtistForm.Init;
+    end;
+  end
+  else if ATableName = 'COMMISSION' then
+  begin
+    CommissionForm := MainForm.FindForm(DsGuid) as TCommissionForm;
+    if Assigned(CommissionForm) then
+    begin
+      MainForm.RestoreMdiChild(CommissionForm);
+    end
+    else
+    begin
+      CommissionForm := TCommissionForm.Create(Application.MainForm);
+      CommissionForm.CommissionId := DsGuid;
+      CommissionForm.ADOConnection1.Connected := false;
+      CommissionForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
+      CommissionForm.Init;
+    end;
+  end
+  else
+  begin
+    raise Exception.CreateFmt('Unexpected TableName %s', [ATableName]);
+  end;
+end;
 
 procedure TMainForm.About1Click(Sender: TObject);
 var

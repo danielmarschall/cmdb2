@@ -406,39 +406,10 @@ begin
 end;
 
 procedure TArtistForm.dbgCommissionDblClick(Sender: TObject);
-var
-  CommissionForm: TCommissionForm;
-resourcestring
-  SCommissionSbyS = 'Commission %s by %s';
-  SCommissionSforS = 'Commission %s for %s';
 begin
   if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
   if ttCommission.FieldByName('ID').IsNull then exit;
-
-  CommissionForm := MainForm.FindForm(ttCommission.FieldByName('ID').AsGuid) as TCommissionForm;
-  if Assigned(CommissionForm) then
-  begin
-    MainForm.RestoreMdiChild(CommissionForm);
-  end
-  else
-  begin
-    CommissionForm := TCommissionForm.Create(Application.MainForm);
-    CommissionForm.CommissionId := ttCommission.FieldByName('ID').AsGuid;
-    CommissionForm.CommissionName := ttCommission.FieldByName('NAME').AsWideString;
-    if ttCommission.FieldByName('IS_ARTIST').AsBoolean then
-    begin
-      CommissionForm.Caption :=
-        Format(SCommissionSbyS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
-    end
-    else
-    begin
-      CommissionForm.Caption :=
-        Format(SCommissionSforS, [ttCommission.FieldByName('NAME').AsWideString, ttCommission.FieldByName('ARTIST_NAME').AsWideString]);
-    end;
-    CommissionForm.ADOConnection1.Connected := false;
-    CommissionForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-    CommissionForm.Init;
-  end;
+  MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
 procedure TArtistForm.dbgCommissionTitleClick(Column: TColumn);
@@ -712,7 +683,23 @@ begin
 end;
 
 procedure TArtistForm.Init;
+var
+  ttArtist: TAdoDataSet;
+resourcestring
+  SArtistSforS = 'Artist %s for %s';
+  SClientSforS = 'Client %s for %s';
 begin
+  ttArtist := ADOConnection1.GetTable('select art.NAME, art.IS_ARTIST, man.NAME as MANDATOR_NAME from ARTIST art left join MANDATOR man on man.ID = art.MANDATOR_ID where art.ID = ''' + ArtistId.ToString + '''');
+  try
+    ArtistName := ttArtist.FieldByName('NAME').AsWideString;
+    if ttArtist.FieldByName('IS_ARTIST').AsBoolean then
+      Caption := Format(SArtistSforS, [ttArtist.FieldByName('NAME').AsWideString, ttArtist.FieldByName('MANDATOR_NAME').AsWideString])
+    else
+      Caption := Format(SClientSforS, [ttArtist.FieldByName('NAME').AsWideString, ttArtist.FieldByName('MANDATOR_NAME').AsWideString]);
+  finally
+    FreeAndNil(ttArtist);
+  end;
+
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   Panel1.Caption := Caption;

@@ -65,7 +65,7 @@ implementation
 {$R *.dfm}
 
 uses
-  DbGridHelper, CmDbFunctions, CmDbPluginClient;
+  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbMain;
 
 procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin
@@ -175,11 +175,14 @@ begin
 end;
 
 procedure TStatisticsForm.dbgQueryDblClick(Sender: TObject);
+var
+  resp: TCmDbPluginClickResponse;
 begin
-  // Nothing here
-
-  // TODO: Ask plugin what to do? (can also be used as "menu")
-  // TODO: It should be possible to open artist, commission, ..., forms here!
+  if ttQuery.FindField('__ID') <> nil then
+  begin
+    resp := TCmDbPluginClient.ClickEvent(ADOConnection1, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
+    HandleClickResponse(AdoConnection1, MandatorId, resp);
+  end;
 end;
 
 procedure TStatisticsForm.dbgQueryTitleClick(Column: TColumn);
