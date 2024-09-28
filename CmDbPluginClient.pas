@@ -6,16 +6,21 @@ uses
   SysUtils, ADODb, AdoConnHelper;
 
 type
+  TCmDbPluginClickResponseAction = (craNone, craObject, craStatistics);
+
+type
   TCmDbPluginClickResponse = record
     Handled: boolean;
-    // Statistics
+    Action: TCmDbPluginClickResponseAction;
+    // Normal object, for Action=CraObject
+    ObjTable: string;
+    ObjId: TGuid;
+    // Statistics, for Action=craStatistics
     StatId: TGuid;
     StatName: string;
     SqlTable: string;
     SqlInitialOrder: string;
-    // Normal object
-    ObjTable: string;
-    ObjId: TGuid;
+    SqlAdditionalFilter: string;
   end;
 
 type
@@ -23,7 +28,7 @@ type
   public
     class procedure CreateTables(AdoConn: TAdoConnection);
     class procedure InitAllPlugins(AdoConn: TAdoConnection);
-    class function ClickEvent(AdoConn: TAdoConnection; StatGuid: TGuid; ItemGuid: TGuid): TCmDbPluginClickResponse;
+    class function ClickEvent(AdoConn: TAdoConnection; MandatorGuid, StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
   end;
 
 type
@@ -32,7 +37,7 @@ type
     FPluginDllFilename: string;
   public
     procedure Init(const DBConnStr: string);
-    function ClickEvent(const DBConnStr: string; StatGuid: TGuid; ItemGuid: TGuid): TCmDbPluginClickResponse;
+    function ClickEvent(const DBConnStr: string; MandatorGuid, StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
     constructor Create(const APluginDllFilename: string);
   end;
 
@@ -52,13 +57,13 @@ var
   addinfo1: string;
 begin
   if not resp.Handled then exit;
-  if resp.ObjTable <> '' then
+  if resp.Action = craObject then
   begin
     MainForm.OpenDbObject(resp.ObjTable, resp.ObjId);
-  end;
-  if resp.SqlTable <> '' then
+  end
+  else if resp.Action = craStatistics then
   begin
-    addinfo1 := TStatisticsForm.AddInfo(mandatorid, resp.SqlTable, resp.SqlInitialOrder);
+    addinfo1 := TStatisticsForm.AddInfo(mandatorid, resp.SqlTable, resp.SqlInitialOrder, resp.SqlAdditionalFilter);
     StatisticsForm := MainForm.FindForm(resp.StatId, addinfo1) as TStatisticsForm;
     if Assigned(StatisticsForm) then
     begin
@@ -71,6 +76,7 @@ begin
       StatisticsForm.StatisticsName := resp.StatName;
       StatisticsForm.SqlTable := resp.SqlTable;
       StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
+      StatisticsForm.SqlAdditionalFilter := resp.SqlAdditionalFilter;
       StatisticsForm.MandatorId := MandatorId;
       StatisticsForm.ADOConnection1.Connected := false;
       StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
@@ -88,8 +94,8 @@ const
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
   GUID_5: TGUID = '{BEBEE253-6644-4A66-87D1-BB63FFAD57B4}';
 
-function TCmDbPlugin.ClickEvent(const DBConnStr: string; StatGuid,
-  ItemGuid: TGuid): TCmDbPluginClickResponse;
+function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
+  StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
 begin
   // TODO: Call DLL instead
   Result.Handled := false;
@@ -101,14 +107,17 @@ begin
       begin
         //InstallSql(..., 'vw_STAT_RUNNING_COMMISSIONS');
         result.Handled := true;
+        result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Running commissions';
         result.SqlTable := 'vw_STAT_RUNNING_COMMISSIONS';
         result.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
+        result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
       end
       else
       begin
         result.Handled := true;
+        result.Action := craObject;
         result.ObjTable := 'COMMISSION';
         result.ObjId := ItemGuid;
       end;
@@ -119,10 +128,12 @@ begin
       begin
         //InstallSql(..., 'vw_STAT_SUM_YEARS');
         result.Handled := true;
+        result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Local sum over years';
         result.SqlTable := 'vw_STAT_SUM_YEARS';
         result.SqlInitialOrder := 'YEAR desc, DIRECTION';
+        result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
       end
       else
       begin
@@ -135,10 +146,12 @@ begin
       begin
         //InstallSql(..., 'vw_STAT_SUM_MONTHS');
         result.Handled := true;
+        result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Local sum over months';
         result.SqlTable := 'vw_STAT_SUM_MONTHS';
         result.SqlInitialOrder := 'MONTH desc, DIRECTION';
+        result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
       end
       else
       begin
@@ -151,14 +164,17 @@ begin
       begin
         //InstallSql(..., 'vw_STAT_TOP_ARTISTS');
         result.Handled := true;
+        result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Top artists/clients';
         result.SqlTable := 'vw_STAT_TOP_ARTISTS';
         result.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
+        result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
       end
       else
       begin
         result.Handled := true;
+        result.Action := craObject;
         result.ObjTable := 'ARTIST';
         result.ObjId := ItemGuid;
       end;
@@ -169,10 +185,12 @@ begin
       begin
         //InstallSql(..., 'vw_STAT_TEXT_EXPORT');
         result.Handled := true;
+        result.Action := craStatistics;
         result.StatId := StatGuid;
         result.StatName := 'Full Text Export';
         result.SqlTable := 'vw_STAT_TEXT_EXPORT';
         result.SqlInitialOrder := 'DATASET_TYPE, DATASET_ID';
+        result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
       end
       else
       begin
@@ -215,8 +233,8 @@ end;
 
 { TCmDbPluginClient }
 
-class function TCmDbPluginClient.ClickEvent(AdoConn: TAdoConnection; StatGuid,
-  ItemGuid: TGuid): TCmDbPluginClickResponse;
+class function TCmDbPluginClient.ClickEvent(AdoConn: TAdoConnection; MandatorGuid,
+  StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
 var
   p: TCmDbPlugin;
 begin
@@ -224,7 +242,7 @@ begin
   Result.Handled := false;
   p := TCmDbPlugin.Create('PLG_STD_STAT.DLL');
   try
-    result := p.ClickEvent(AdoConn.ConnectionString, StatGuid, ItemGuid);
+    result := p.ClickEvent(AdoConn.ConnectionString, MandatorGuid, StatGuid, ItemGuid);
     if Result.Handled then Exit;
   finally
     p.Free;

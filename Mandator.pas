@@ -588,7 +588,7 @@ begin
   if ttStatistics.State in [dsEdit,dsInsert] then ttStatistics.Post;
   if ttStatistics.FieldByName('ID').IsNull then exit;
 
-  resp := TCmDbPluginClient.ClickEvent(AdoConnection1, ttStatistics.FieldByName('ID').AsGuid, GUID_NIL);
+  resp := TCmDbPluginClient.ClickEvent(AdoConnection1, MandatorId, ttStatistics.FieldByName('ID').AsGuid, GUID_NIL);
   HandleClickResponse(AdoConnection1, MandatorId, resp);
 end;
 

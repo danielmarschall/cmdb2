@@ -58,7 +58,8 @@ type
     MandatorId: TGUID;
     SqlTable: string;
     SqlInitialOrder: string;
-    class function AddInfo(mandatorId: TGUID; sqlTable, sqlInitialOrder: string): string;
+    SqlAdditionalFilter: string;
+    class function AddInfo(mandatorId: TGUID; sqlTable, sqlInitialOrder, sqlAdditionalFilter: string): string;
     procedure Init;
   end;
 
@@ -106,7 +107,9 @@ begin
   end;
   result := 'select * ';
   result := result + 'from ' + ADOConnection1.SQLObjectNameEscape(SqlTable) + ' ';
-  result := result + 'where __MANDATOR_ID = ' + ADOConnection1.SQLStringEscape(MandatorId.ToString) + ' ';
+  result := result + 'where 1=1 ';
+  if SqlAdditionalFilter <> '' then
+    result := result + 'and (' + SqlAdditionalFilter + ') ';
   if trim(search)<>'' then
   begin
     result := result + ' and (1=0 ';
@@ -171,9 +174,9 @@ begin
 end;
 
 class function TStatisticsForm.AddInfo(mandatorId: TGUID; sqlTable,
-  sqlInitialOrder: string): string;
+  sqlInitialOrder, sqlAdditionalFilter: string): string;
 begin
-  result := mandatorId.ToString + '/' + sqlTable + '/' + sqlInitialOrder;
+  result := mandatorId.ToString + '/' + sqlTable + '/' + sqlInitialOrder + '/' + sqlAdditionalFilter;
 end;
 
 procedure TStatisticsForm.csvQueryClick(Sender: TObject);
@@ -188,7 +191,7 @@ var
 begin
   if ttQuery.FindField('__ID') <> nil then
   begin
-    resp := TCmDbPluginClient.ClickEvent(ADOConnection1, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
+    resp := TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
     HandleClickResponse(AdoConnection1, MandatorId, resp);
   end;
 end;

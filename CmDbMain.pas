@@ -222,7 +222,7 @@ begin
     begin
       if IsEqualGUID(TStatisticsForm(MdiChildren[i]).StatisticsId, guid) then
       begin
-        if addinfo1 = TStatisticsForm.AddInfo(TStatisticsForm(MdiChildren[i]).MandatorId, TStatisticsForm(MdiChildren[i]).SqlTable, TStatisticsForm(MdiChildren[i]).SqlInitialOrder) then
+        if addinfo1 = TStatisticsForm.AddInfo(TStatisticsForm(MdiChildren[i]).MandatorId, TStatisticsForm(MdiChildren[i]).SqlTable, TStatisticsForm(MdiChildren[i]).SqlInitialOrder, TStatisticsForm(MdiChildren[i]).SqlAdditionalFilter) then
           Exit(MdiChildren[i]);
       end;
     end;
