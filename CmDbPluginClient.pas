@@ -21,6 +21,7 @@ type
     SqlTable: string;
     SqlInitialOrder: string;
     SqlAdditionalFilter: string;
+    BaseTableDelete: string;
   end;
 
 type
@@ -77,6 +78,7 @@ begin
       StatisticsForm.SqlTable := resp.SqlTable;
       StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
       StatisticsForm.SqlAdditionalFilter := resp.SqlAdditionalFilter;
+      StatisticsForm.BaseTableDelete := resp.BaseTableDelete;
       StatisticsForm.MandatorId := MandatorId;
       StatisticsForm.ADOConnection1.Connected := false;
       StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
@@ -93,9 +95,14 @@ const
   GUID_3: TGUID = '{2A7F1225-08A6-4B55-9EF7-75C7933DFBCA}';
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
   GUID_5: TGUID = '{BEBEE253-6644-4A66-87D1-BB63FFAD57B4}';
+  GUID_9: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
+  GUID_9A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
+  GUID_9B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
 
 function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
   StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
+var
+  AdoConn: TADOConnection;
 begin
   // TODO: Call DLL instead
   Result.Handled := false;
@@ -113,6 +120,7 @@ begin
         result.SqlTable := 'vw_STAT_RUNNING_COMMISSIONS';
         result.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        result.BaseTableDelete := 'COMMISSION';
       end
       else
       begin
@@ -134,6 +142,7 @@ begin
         result.SqlTable := 'vw_STAT_SUM_YEARS';
         result.SqlInitialOrder := 'YEAR desc, DIRECTION';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        result.BaseTableDelete := '';
       end
       else
       begin
@@ -152,6 +161,7 @@ begin
         result.SqlTable := 'vw_STAT_SUM_MONTHS';
         result.SqlInitialOrder := 'MONTH desc, DIRECTION';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        result.BaseTableDelete := '';
       end
       else
       begin
@@ -170,6 +180,7 @@ begin
         result.SqlTable := 'vw_STAT_TOP_ARTISTS';
         result.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        result.BaseTableDelete := 'ARTIST';
       end
       else
       begin
@@ -191,10 +202,52 @@ begin
         result.SqlTable := 'vw_STAT_TEXT_EXPORT';
         result.SqlInitialOrder := 'DATASET_TYPE, DATASET_ID';
         result.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        result.BaseTableDelete := '';
       end
       else
       begin
         // TODO: We could open the data set here... but we need to query all tables to see which tables has the ItemID
+      end;
+    end
+    else if IsEqualGuid(StatGuid, GUID_9) then
+    begin
+      // This is an example for creating a plugin that outputs a "menu" with custom actions (which can be anything!)
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          AdoConn.LoginPrompt := false;
+          AdoConn.ConnectConnStr(DBConnStr);
+          if not AdoConn.TableExists('##xx_about') then
+            AdoConn.ExecSQL('create table ##xx_about ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
+          AdoConn.ExecSQL('delete from ##xx_about');
+          AdoConn.ExecSQL('insert into ##xx_about select '''+GUID_9A.ToString+''', ''View Source Code'';');
+          AdoConn.ExecSQL('insert into ##xx_about select '''+GUID_9B.ToString+''', ''Download latest version'';');
+        finally
+          // TODO: temp table gets deleted here!
+//          FreeAndNil(AdoConn);
+        end;
+
+        result.Handled := true;
+        result.Action := craStatistics;
+        result.StatId := StatGuid;
+        result.StatName := 'About CMDB2';
+        result.SqlTable := '##xx_about';
+        result.SqlInitialOrder := '';
+        result.SqlAdditionalFilter := '';
+        result.BaseTableDelete := '';
+      end
+      else if IsEqualGUID(ItemGuid, GUID_9A) then
+      begin
+        result.Handled := true;
+        result.Action := craNone;
+        Application.MessageBox('Hello World!', ''); // TODO: test
+      end
+      else if IsEqualGUID(ItemGuid, GUID_9B) then
+      begin
+        result.Handled := true;
+        result.Action := craNone;
+        Application.MessageBox('Hello World 2!', ''); // TODO: test
       end;
     end;
   end;
@@ -223,6 +276,7 @@ begin
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_3.ToString+''', ''101'', ''Local sum over months'');');
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_4.ToString+''', ''200'', ''Top artists/clients'');');
       AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_5.ToString+''', ''900'', ''Full Text Export'');');
+      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_9.ToString+''', ''950'', ''--- About CMDB2 ---'');');
     end;
 
     AdoConn.Disconnect;

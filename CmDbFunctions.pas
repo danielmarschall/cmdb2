@@ -568,11 +568,11 @@ begin
   if Dataset.BOF then
     id := ''
   else
-    id := Dataset.FieldByName('ID').AsWideString;
+    id := Dataset.FieldByName(localField).AsWideString;
   try
     Dataset.Requery;
   finally
-    if id <> '' then Dataset.Locate('ID', id, []);
+    if id <> '' then Dataset.Locate(localField, id, []);
   end;
 
   Abort;

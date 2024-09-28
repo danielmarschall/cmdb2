@@ -1,8 +1,5 @@
 unit Statistics;
 
-// TODO: DLL should tell plugin if rows may be deleted
-// TODO: For deletions, the DLL should be asked what to do ("InsteadofDelete")
-
 interface
 
 uses
@@ -59,6 +56,7 @@ type
     SqlTable: string;
     SqlInitialOrder: string;
     SqlAdditionalFilter: string;
+    BaseTableDelete: string;
     class function AddInfo(mandatorId: TGUID; sqlTable, sqlInitialOrder, sqlAdditionalFilter: string): string;
     procedure Init;
   end;
@@ -160,7 +158,10 @@ procedure TStatisticsForm.ttQueryBeforeDelete(DataSet: TDataSet);
 resourcestring
   SDeleteNotPossible = 'Delete not possible';
 begin
-  raise Exception.Create(SDeleteNotPossible);
+  if BaseTableDelete <> '' then
+    InsteadOfDeleteWorkaround(ttQuery, '__ID', BaseTableDelete, 'ID')
+  else
+    raise Exception.Create(SDeleteNotPossible);
 end;
 
 procedure TStatisticsForm.ttQueryBeforeEdit(DataSet: TDataSet);
@@ -284,6 +285,12 @@ begin
     Caption := Format(SSForS, [StatisticsName, MandatorName]);
   finally
     FreeAndNil(ttMandator);
+  end;
+
+  if BaseTableDelete = '' then
+  begin
+    navQuery.VisibleButtons := navQuery.VisibleButtons - [nbDelete];
+    dbgQuery.Options :=dbgQuery.Options - [dgConfirmDelete];
   end;
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False

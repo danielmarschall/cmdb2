@@ -36,7 +36,6 @@ object StatisticsForm: TStatisticsForm
         Height = 339
         Align = alClient
         DataSource = dsQuery
-        Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
         TabOrder = 0
         TitleFont.Charset = DEFAULT_CHARSET
         TitleFont.Color = clWindowText
@@ -52,7 +51,7 @@ object StatisticsForm: TStatisticsForm
         Width = 33
         Height = 339
         DataSource = dsQuery
-        VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbPost, nbCancel]
+        VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbDelete, nbPost, nbCancel]
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1
