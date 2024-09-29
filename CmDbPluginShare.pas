@@ -22,8 +22,8 @@ type
     SqlAdditionalFilter: string;
     BaseTableDelete: string;
     // Read/Write functions
-    procedure WritePluginClickResponse(var Memory: Pointer);
-    procedure ReadPluginClickResponse(Memory: Pointer);
+    procedure WritePluginClickResponse(const Memory: Pointer);
+    procedure ReadPluginClickResponse(const Memory: Pointer);
   end;
 
 
@@ -42,8 +42,7 @@ end;
 
 { TCmDbPluginClickResponse }
 
-procedure TCmDbPluginClickResponse.WritePluginClickResponse(
-  var Memory: Pointer);
+procedure TCmDbPluginClickResponse.WritePluginClickResponse(const Memory: Pointer);
 
   // Hilfsfunktion: Schreibe einen WideString mit einem Byte Präfix für die Länge
   procedure WriteWideString(var Dest: PByte; const Value: string);
@@ -92,7 +91,7 @@ end;
 
 // Schreibe die Daten eines Records in einen Speicherblock
 // Lese die Daten eines Records aus einem Speicherblock
-procedure TCmDbPluginClickResponse.ReadPluginClickResponse(Memory: Pointer);
+procedure TCmDbPluginClickResponse.ReadPluginClickResponse(const Memory: Pointer);
 
   // Hilfsfunktion: Lese einen WideString mit einem Byte Präfix für die Länge
   function ReadWideString(var Src: PByte): string;
