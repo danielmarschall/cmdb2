@@ -45,12 +45,13 @@ begin
 end;
 
 procedure ClickEventW(DBConnStr: PChar; MandatorGuid, StatGuid,
-  ItemGuid: TGuid; Response: PCmDbPluginClickResponse); stdcall;
+  ItemGuid: TGuid; ResponseData: Pointer); stdcall;
 var
   AdoConn: TADOConnection;
   q: TADODataSet;
+  Response: TCmDbPluginClickResponse;
 begin
-  Response^.Handled := false;
+  Response.Handled := false;
 
   {$REGION 'Stat: Running commissions'}
   if IsEqualGuid(StatGuid, GUID_1) then
@@ -82,21 +83,21 @@ begin
       finally
         FreeAndNil(AdoConn);
       end;
-      Response^.Handled := true;
-      Response^.Action := craStatistics;
-      Response^.StatId := StatGuid;
-      Response^.StatName := 'Running commissions';
-      Response^.SqlTable := TempTableName(GUID_1, 'RUNNING_COMMISSIONS');
-      Response^.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
-      Response^.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-      Response^.BaseTableDelete := 'COMMISSION';
+      Response.Handled := true;
+      Response.Action := craStatistics;
+      Response.StatId := StatGuid;
+      Response.StatName := 'Running commissions';
+      Response.SqlTable := TempTableName(GUID_1, 'RUNNING_COMMISSIONS');
+      Response.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
+      Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+      Response.BaseTableDelete := 'COMMISSION';
     end
     else
     begin
-      Response^.Handled := true;
-      Response^.Action := craObject;
-      Response^.ObjTable := 'COMMISSION';
-      Response^.ObjId := ItemGuid;
+      Response.Handled := true;
+      Response.Action := craObject;
+      Response.ObjTable := 'COMMISSION';
+      Response.ObjId := ItemGuid;
     end;
   end
   {$ENDREGION}
@@ -128,14 +129,14 @@ begin
       finally
         FreeAndNil(AdoConn);
       end;
-      Response^.Handled := true;
-      Response^.Action := craStatistics;
-      Response^.StatId := StatGuid;
-      Response^.StatName := 'Local sum over years';
-      Response^.SqlTable := TempTableName(GUID_2, 'SUM_YEARS');
-      Response^.SqlInitialOrder := 'YEAR desc, DIRECTION';
-      Response^.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-      Response^.BaseTableDelete := '';
+      Response.Handled := true;
+      Response.Action := craStatistics;
+      Response.StatId := StatGuid;
+      Response.StatName := 'Local sum over years';
+      Response.SqlTable := TempTableName(GUID_2, 'SUM_YEARS');
+      Response.SqlInitialOrder := 'YEAR desc, DIRECTION';
+      Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+      Response.BaseTableDelete := '';
     end
     else
     begin
@@ -153,14 +154,14 @@ begin
         try
           if not q.Eof then
           begin
-            Response^.Handled := true;
-            Response^.Action := craStatistics;
-            Response^.StatId := GUID_2A;
-            Response^.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsWideString+') for year ' + q.FieldByName('YEAR').AsWideString;
-            Response^.SqlTable := TempTableName(GUID_2A, 'COMMISSIONS');
-            Response^.SqlInitialOrder := 'START_DATE';
-            Response^.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsWideString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-            Response^.BaseTableDelete := 'COMMISSION';
+            Response.Handled := true;
+            Response.Action := craStatistics;
+            Response.StatId := GUID_2A;
+            Response.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsWideString+') for year ' + q.FieldByName('YEAR').AsWideString;
+            Response.SqlTable := TempTableName(GUID_2A, 'COMMISSIONS');
+            Response.SqlInitialOrder := 'START_DATE';
+            Response.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsWideString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+            Response.BaseTableDelete := 'COMMISSION';
           end;
         finally
           FreeAndNil(q);
@@ -172,10 +173,10 @@ begin
   end
   else if IsEqualGuid(StatGuid, GUID_2A) then
   begin
-    Response^.Handled := true;
-    Response^.Action := craObject;
-    Response^.ObjTable := 'COMMISSION';
-    Response^.ObjId := ItemGuid;
+    Response.Handled := true;
+    Response.Action := craObject;
+    Response.ObjTable := 'COMMISSION';
+    Response.ObjId := ItemGuid;
   end
   {$ENDREGION}
   {$REGION 'Stat: Local sum over months'}
@@ -206,14 +207,14 @@ begin
       finally
         FreeAndNil(AdoConn);
       end;
-      Response^.Handled := true;
-      Response^.Action := craStatistics;
-      Response^.StatId := StatGuid;
-      Response^.StatName := 'Local sum over months';
-      Response^.SqlTable := TempTableName(GUID_3, 'SUM_MONTHS');
-      Response^.SqlInitialOrder := 'MONTH desc, DIRECTION';
-      Response^.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-      Response^.BaseTableDelete := '';
+      Response.Handled := true;
+      Response.Action := craStatistics;
+      Response.StatId := StatGuid;
+      Response.StatName := 'Local sum over months';
+      Response.SqlTable := TempTableName(GUID_3, 'SUM_MONTHS');
+      Response.SqlInitialOrder := 'MONTH desc, DIRECTION';
+      Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+      Response.BaseTableDelete := '';
     end
     else
     begin
@@ -231,14 +232,14 @@ begin
         try
           if not q.Eof then
           begin
-            Response^.Handled := true;
-            Response^.Action := craStatistics;
-            Response^.StatId := GUID_3A;
-            Response^.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsWideString+') for month ' + q.FieldByName('MONTH').AsWideString;
-            Response^.SqlTable := TempTableName(GUID_3A, 'COMMISSIONS');
-            Response^.SqlInitialOrder := 'START_DATE';
-            Response^.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsWideString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-            Response^.BaseTableDelete := 'COMMISSION';
+            Response.Handled := true;
+            Response.Action := craStatistics;
+            Response.StatId := GUID_3A;
+            Response.StatName := 'Commissions ('+q.FieldByName('DIRECTION').AsWideString+') for month ' + q.FieldByName('MONTH').AsWideString;
+            Response.SqlTable := TempTableName(GUID_3A, 'COMMISSIONS');
+            Response.SqlInitialOrder := 'START_DATE';
+            Response.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsWideString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+            Response.BaseTableDelete := 'COMMISSION';
           end;
         finally
           FreeAndNil(q);
@@ -256,10 +257,10 @@ begin
     end
     else
     begin
-      Response^.Handled := true;
-      Response^.Action := craObject;
-      Response^.ObjTable := 'COMMISSION';
-      Response^.ObjId := ItemGuid;
+      Response.Handled := true;
+      Response.Action := craObject;
+      Response.ObjTable := 'COMMISSION';
+      Response.ObjId := ItemGuid;
     end;
   end
   {$ENDREGION}
@@ -289,21 +290,21 @@ begin
       finally
         FreeAndNil(AdoConn);
       end;
-      Response^.Handled := true;
-      Response^.Action := craStatistics;
-      Response^.StatId := StatGuid;
-      Response^.StatName := 'Top artists/clients';
-      Response^.SqlTable := TempTableName(GUID_4, 'SUM_MONTHS');
-      Response^.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
-      Response^.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
-      Response^.BaseTableDelete := 'ARTIST';
+      Response.Handled := true;
+      Response.Action := craStatistics;
+      Response.StatId := StatGuid;
+      Response.StatName := 'Top artists/clients';
+      Response.SqlTable := TempTableName(GUID_4, 'SUM_MONTHS');
+      Response.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
+      Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+      Response.BaseTableDelete := 'ARTIST';
     end
     else
     begin
-      Response^.Handled := true;
-      Response^.Action := craObject;
-      Response^.ObjTable := 'ARTIST';
-      Response^.ObjId := ItemGuid;
+      Response.Handled := true;
+      Response.Action := craObject;
+      Response.ObjTable := 'ARTIST';
+      Response.ObjId := ItemGuid;
     end;
   end
   {$ENDREGION}
@@ -326,29 +327,31 @@ begin
         FreeAndNil(AdoConn);
       end;
 
-      Response^.Handled := true;
-      Response^.Action := craStatistics;
-      Response^.StatId := StatGuid;
-      Response^.StatName := 'Web sources';
-      Response^.SqlTable := TempTableName(GUID_9, 'TEST');
-      Response^.SqlInitialOrder := '';
-      Response^.SqlAdditionalFilter := '';
-      Response^.BaseTableDelete := '';
+      Response.Handled := true;
+      Response.Action := craStatistics;
+      Response.StatId := StatGuid;
+      Response.StatName := 'Web sources';
+      Response.SqlTable := TempTableName(GUID_9, 'TEST');
+      Response.SqlInitialOrder := '';
+      Response.SqlAdditionalFilter := '';
+      Response.BaseTableDelete := '';
     end
     else if IsEqualGUID(ItemGuid, GUID_9A) then
     begin
-      Response^.Handled := true;
-      Response^.Action := craNone;
+      Response.Handled := true;
+      Response.Action := craNone;
       ShellExecute(0, 'open', 'https://github.com/danielmarschall/cmdb2', '', '', SW_NORMAL);
     end
     else if IsEqualGUID(ItemGuid, GUID_9B) then
     begin
-      Response^.Handled := true;
-      Response^.Action := craNone;
+      Response.Handled := true;
+      Response.Action := craNone;
       ShellExecute(0, 'open', 'https://github.com/danielmarschall/cmdb2/releases', '', '', SW_NORMAL);
     end;
   end;
   {$ENDREGION}
+
+  Response.WritePluginClickResponse(ResponseData);
 end;
 
 exports

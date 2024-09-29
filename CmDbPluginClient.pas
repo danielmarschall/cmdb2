@@ -104,10 +104,11 @@ function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
   StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
 type
   TInitW = procedure(DBConnStr: PChar); stdcall;
-  TClickEventW = procedure(DBConnStr: PChar; MandatorGuid, StatGuid, ItemGuid: TGuid; Response: PCmDbPluginClickResponse); stdcall;
+  TClickEventW = procedure(DBConnStr: PChar; MandatorGuid, StatGuid, ItemGuid: TGuid; ResponseData: Pointer); stdcall;
 var
   DLLHandle: THandle;
   ClickEventW: TClickEventW;
+  ResponseData: Pointer;
 begin
   DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
   if DLLHandle <> 0 then
@@ -115,7 +116,13 @@ begin
     @ClickEventW := GetProcAddress(DLLHandle, 'ClickEventW');
     if Assigned(ClickEventW) then
     begin
-      ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, @Result);
+      GetMem(ResponseData, 4096);
+      try
+        ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData);
+        Result.ReadPluginClickResponse(ResponseData);
+      finally
+        FreeMem(ResponseData);
+      end;
     end
     else
     begin
