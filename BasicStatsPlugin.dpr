@@ -12,6 +12,8 @@ uses
 {$R *.res}
 
 const
+  // Ctrl+Shift+G to generate new GUIDs
+  GUID_STATS_PLUGIN: TGUID = '{72FFE4A5-2C2F-406B-92DE-D6AD8CD81594}';
   GUID_1: TGUID = '{6F7E0568-3612-4BD0-BEA6-B23560A5F594}';
   GUID_2: TGUID = '{08F3D4C0-8DBD-4F3E-8891-241858779E49}';
   GUID_2A: TGUID = '{8B46FC53-21E8-4E8C-AB60-AC9811B8D8B4}';
@@ -21,6 +23,14 @@ const
   GUID_9: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
   GUID_9A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
   GUID_9B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
+
+function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD): HRESULT; stdcall;
+begin
+  lpTypeOut^ := CMDB2_STATSPLUGIN_V1_TYPE;  // identifies this plugin type and interface version
+  lpIDOut^   := GUID_STATS_PLUGIN;          // identifies this individual plugin (any version)
+  lpVerOut^  := $01000000;                  // this individual plugin version: 1.0.0.0
+  result     := S_OK;
+end;
 
 function InitW(DBConnStr: PChar): HRESULT; stdcall;
 var
@@ -405,7 +415,7 @@ begin
 end;
 
 exports
-  InitW, ClickEventW;
+  VtsPluginID, InitW, ClickEventW;
 
 begin
 end.

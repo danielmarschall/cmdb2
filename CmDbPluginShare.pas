@@ -27,6 +27,9 @@ type
   end;
 
 const
+  CMDB2_STATSPLUGIN_V1_TYPE: TGUID = '{73273740-08BA-4E6E-BAAA-D4676E5B1BFF}';
+
+const
   S_PLUGIN_OK:                HRESULT = HRESULT($20000000); // Success, Customer defined, Facility 0, Code 0
   E_PLUGIN_GENERIC_FAILURE:   HRESULT = HRESULT($A0000000); // Failure, Customer defined, Facility 0, Code 0
   E_PLUGIN_BAD_ARGS:          HRESULT = HRESULT($A0000001); // Failure, Customer defined, Facility 0, Code 1
@@ -48,7 +51,6 @@ end;
 
 procedure TCmDbPluginClickResponse.WritePluginClickResponse(const Memory: Pointer);
 
-  // Hilfsfunktion: Schreibe einen WideString mit einem Byte Präfix für die Länge
   procedure WriteWideString(var Dest: PByte; const Value: string);
   var
     I, LengthByte: Byte;
@@ -93,11 +95,8 @@ begin
   end;
 end;
 
-// Schreibe die Daten eines Records in einen Speicherblock
-// Lese die Daten eines Records aus einem Speicherblock
 procedure TCmDbPluginClickResponse.ReadPluginClickResponse(const Memory: Pointer);
 
-  // Hilfsfunktion: Lese einen WideString mit einem Byte Präfix für die Länge
   function ReadWideString(var Src: PByte): string;
   var
     I, LengthByte: Byte;

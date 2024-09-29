@@ -30,6 +30,9 @@ implementation
 uses
   Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi;
 
+type
+  TVtsPluginID = function(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD): HRESULT; stdcall;
+
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
 var
   StatisticsForm: TStatisticsForm;
@@ -79,15 +82,21 @@ type
 var
   DLLHandle: THandle;
   InitW: TInitW;
+  VtsPluginID: TVtsPluginID;
+  plgType, plgId: TGUID;
+  plgVer: DWORD;
 begin
   DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
   if DLLHandle = 0 then
     raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
   try
+    @VtsPluginID := GetProcAddress(DLLHandle, 'VtsPluginID');
+    if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
+      raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugins', [FPluginDllFilename]);
+
     @InitW := GetProcAddress(DLLHandle, 'InitW');
     if not Assigned(InitW) then
       raise Exception.CreateFmt('Function %s not found in %s', ['InitW', FPluginDllFilename]);
-
     if Failed(InitW(PChar(DBConnStr))) then
       raise Exception.CreateFmt('Call to %s failed in %s', ['InitW', FPluginDllFilename]);
   finally
@@ -104,11 +113,18 @@ var
   DLLHandle: THandle;
   ClickEventW: TClickEventW;
   ResponseData: Pointer;
+  VtsPluginID: TVtsPluginID;
+  plgType, plgId: TGUID;
+  plgVer: DWORD;
 begin
   DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
   if DLLHandle = 0 then
     raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
   try
+    @VtsPluginID := GetProcAddress(DLLHandle, 'VtsPluginID');
+    if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
+      raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugins', [FPluginDllFilename]);
+
     @ClickEventW := GetProcAddress(DLLHandle, 'ClickEventW');
     if not Assigned(ClickEventW) then
       raise Exception.CreateFmt('Function %s not found in %s', ['ClickEventW', FPluginDllFilename]);
