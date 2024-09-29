@@ -55,11 +55,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; Die Dinger werden von Delphi kompiliert
 Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin64\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin64\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
-Source: "..\CurConv.64.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin64\CurConv.64.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 
 Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin32\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
 Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin32\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
-Source: "..\CurConv.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
+Source: "\\Win11Dev\C$\SVN\CMDB\trunk\bin32\CurConv.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
                                            
 Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion

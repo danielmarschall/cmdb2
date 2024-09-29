@@ -75,64 +75,54 @@ end;
 
 procedure TCmDbPlugin.Init(const DBConnStr: string);
 type
-  TInitW = procedure(DBConnStr: PChar); stdcall;
+  TInitW = function(DBConnStr: PChar): HRESULT; stdcall;
 var
   DLLHandle: THandle;
   InitW: TInitW;
 begin
   DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
-  if DLLHandle <> 0 then
-  begin
+  if DLLHandle = 0 then
+    raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
+  try
     @InitW := GetProcAddress(DLLHandle, 'InitW');
-    if Assigned(InitW) then
-    begin
-      InitW(PChar(DBConnStr));
-    end
-    else
-    begin
-      raise Exception.Create('Failed to load functions from the DLL.');
-    end;
+    if not Assigned(InitW) then
+      raise Exception.CreateFmt('Function %s not found in %s', ['InitW', FPluginDllFilename]);
+
+    if Failed(InitW(PChar(DBConnStr))) then
+      raise Exception.CreateFmt('Call to %s failed in %s', ['InitW', FPluginDllFilename]);
+  finally
     FreeLibrary(DLLHandle);
-  end
-  else
-  begin
-    raise Exception.Create('Failed to load DLL.');
   end;
 end;
 
 function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
   StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
 type
-  TInitW = procedure(DBConnStr: PChar); stdcall;
-  TClickEventW = procedure(DBConnStr: PChar; MandatorGuid, StatGuid, ItemGuid: TGuid; ResponseData: Pointer); stdcall;
+  TClickEventW = function(DBConnStr: PChar; MandatorGuid, StatGuid,
+    ItemGuid: TGuid; ResponseData: Pointer): HRESULT; stdcall;
 var
   DLLHandle: THandle;
   ClickEventW: TClickEventW;
   ResponseData: Pointer;
 begin
   DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
-  if DLLHandle <> 0 then
-  begin
+  if DLLHandle = 0 then
+    raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
+  try
     @ClickEventW := GetProcAddress(DLLHandle, 'ClickEventW');
-    if Assigned(ClickEventW) then
-    begin
-      GetMem(ResponseData, 4096);
-      try
-        ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData);
-        Result.ReadPluginClickResponse(ResponseData);
-      finally
-        FreeMem(ResponseData);
-      end;
-    end
-    else
-    begin
-      raise Exception.Create('Failed to load functions from the DLL.');
+    if not Assigned(ClickEventW) then
+      raise Exception.CreateFmt('Function %s not found in %s', ['ClickEventW', FPluginDllFilename]);
+
+    GetMem(ResponseData, 4096);
+    try
+      if Failed(ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData)) then
+        raise Exception.CreateFmt('Call to %s failed in %s', ['ClickEventW', FPluginDllFilename]);
+      Result.ReadPluginClickResponse(ResponseData);
+    finally
+      FreeMem(ResponseData);
     end;
+  finally
     FreeLibrary(DLLHandle);
-  end
-  else
-  begin
-    raise Exception.Create('Failed to load DLL.');
   end;
 end;
 

@@ -26,7 +26,11 @@ type
     procedure ReadPluginClickResponse(const Memory: Pointer);
   end;
 
-
+const
+  S_PLUGIN_OK:                HRESULT = HRESULT($20000000); // Success, Customer defined, Facility 0, Code 0
+  E_PLUGIN_GENERIC_FAILURE:   HRESULT = HRESULT($A0000000); // Failure, Customer defined, Facility 0, Code 0
+  E_PLUGIN_BAD_ARGS:          HRESULT = HRESULT($A0000001); // Failure, Customer defined, Facility 0, Code 1
+  E_PLUGIN_CONN_FAIL:         HRESULT = HRESULT($A0000002); // Failure, Customer defined, Facility 0, Code 2
 
 const
   GUID_NIL: TGUID = '{00000000-0000-0000-0000-000000000000}';
