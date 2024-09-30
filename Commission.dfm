@@ -337,6 +337,7 @@ object CommissionForm: TCommissionForm
       Top = 10
       Width = 25
       Height = 25
+      Hint = 'Show help'
       Caption = '?'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -344,8 +345,28 @@ object CommissionForm: TCommissionForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       OnClick = HelpBtnClick
+    end
+    object GoBackBtn: TButton
+      Left = 43
+      Top = 10
+      Width = 25
+      Height = 25
+      Hint = 'Go back to Artist/Client'
+      Caption = '<'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 20
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 1
+      OnClick = GoBackBtnClick
     end
   end
   object dsQuotes: TDataSource

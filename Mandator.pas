@@ -128,6 +128,7 @@ type
     ttPaymentIS_ARTIST: TBooleanField;
     ttPaymentARTIST_NAME2: TWideStringField;
     HelpBtn: TButton;
+    GoBackBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -193,6 +194,7 @@ type
     procedure ttPaymentBeforeInsert(DataSet: TDataSet);
     procedure HelpBtnClick(Sender: TObject);
     procedure ttPaymentBeforePost(DataSet: TDataSet);
+    procedure GoBackBtnClick(Sender: TObject);
   private
     SqlQueryArtistClient_Init: boolean;
     SqlQueryArtistClient_Order: string;
@@ -887,6 +889,11 @@ begin
     Close;
     Key := 0;
   end;
+end;
+
+procedure TMandatorForm.GoBackBtnClick(Sender: TObject);
+begin
+  MainForm.OpenMandatorsForm;
 end;
 
 procedure TMandatorForm.Init;

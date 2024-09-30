@@ -61,6 +61,7 @@ type
     BtnFolderSave: TButton;
     ShellChangeNotifier: TShellChangeNotifier;
     HelpBtn: TButton;
+    GoBackBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ttQuotesNewRecord(DataSet: TDataSet);
@@ -91,6 +92,7 @@ type
     procedure ttQuotesAMOUNT_LOCALGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure HelpBtnClick(Sender: TObject);
+    procedure GoBackBtnClick(Sender: TObject);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -623,6 +625,14 @@ begin
     Close;
     Key := 0;
   end;
+end;
+
+procedure TCommissionForm.GoBackBtnClick(Sender: TObject);
+var
+  parentId: string;
+begin
+  parentId := VarToStr(ADOConnection1.GetScalar('select ARTIST_ID from COMMISSION where ID = ''' + CommissionId.ToString + ''''));
+  MainForm.OpenDbObject('ARTIST', StringToGuid(parentId));
 end;
 
 procedure TCommissionForm.Init;

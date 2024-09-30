@@ -35,6 +35,7 @@ type
   public
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
+    procedure OpenMandatorsForm;
     function FindForm(guid: TGuid; addinfo1: string=''): TForm;
     procedure ShowHelpWindow(const MDFile: string);
   end;
@@ -138,7 +139,14 @@ var
   sl: TStringList;
   DBName, BackupPath, BackupFileName: string;
   LastBackupID: integer;
+  i: integer;
 begin
+  // TODO: First close all MDI child windows
+  for i := MDIChildCount - 1 downto 0 do
+  begin
+    MDIChildren[i].Close;  // This will call CloseQuery
+  end;
+
   Screen.Cursor := crHourGlass;
   WaitLabel.Visible := true;
   Application.ProcessMessages;
@@ -261,7 +269,7 @@ begin
   ShowHelpWindow('README.md');
 end;
 
-procedure TMainForm.OpenDatabase1Click(Sender: TObject);
+procedure TMainForm.OpenMandatorsForm;
 var
   MandatorsForm: TMandatorsForm;
   i: integer;
@@ -282,6 +290,11 @@ begin
   MandatorsForm.ADOConnection1.Connected := false;
   MandatorsForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
   MandatorsForm.Init;
+end;
+
+procedure TMainForm.OpenDatabase1Click(Sender: TObject);
+begin
+  OpenMandatorsForm;
 end;
 
 procedure TMainForm.RestoreBackup1Click(Sender: TObject);

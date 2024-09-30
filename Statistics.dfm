@@ -1,6 +1,7 @@
 object StatisticsForm: TStatisticsForm
   Left = 0
   Top = 0
+  Hint = 'Show help'
   Caption = 'StatisticsForm'
   ClientHeight = 441
   ClientWidth = 1100
@@ -138,6 +139,41 @@ object StatisticsForm: TStatisticsForm
       ParentFont = False
       TabOrder = 1
       OnClick = SearchBtnClick
+    end
+    object GoBackBtn: TButton
+      Left = 43
+      Top = 10
+      Width = 25
+      Height = 25
+      Hint = 'Go back to Mandator'
+      Caption = '<'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 20
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 3
+      OnClick = GoBackBtnClick
+    end
+    object HelpBtn: TButton
+      Left = 12
+      Top = 10
+      Width = 25
+      Height = 25
+      Hint = 'Show help'
+      Caption = '?'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 20
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 2
     end
   end
   object ADOConnection1: TADOConnection

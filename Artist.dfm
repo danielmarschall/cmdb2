@@ -455,6 +455,7 @@ object ArtistForm: TArtistForm
       Top = 10
       Width = 25
       Height = 25
+      Hint = 'Show help'
       Caption = '?'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -462,8 +463,28 @@ object ArtistForm: TArtistForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 2
       OnClick = HelpBtnClick
+    end
+    object GoBackBtn: TButton
+      Left = 43
+      Top = 10
+      Width = 25
+      Height = 25
+      Hint = 'Go back to Mandator'
+      Caption = '<'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 20
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 3
+      OnClick = GoBackBtnClick
     end
   end
   object ADOConnection1: TADOConnection

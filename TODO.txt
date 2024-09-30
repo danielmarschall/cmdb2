@@ -2,7 +2,7 @@
 # TODO
 
 Version 1.1:
-- Button to jump back to the superior windows (or reopen them), e.g. when you are in a commission, go to the artist
+- Tabelle ##STATISTICS existiert nicht, als ich von artist zu mandator zurück gegangen bin. warum?
 
 General:
 - Try to copy as many things from the CMDB1 GUI as possible! Step by step until we have everything. (Tables are all checked and ok)

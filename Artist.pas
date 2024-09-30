@@ -92,6 +92,7 @@ type
     ttPaymentIS_ARTIST: TBooleanField;
     ttPaymentARTIST_NAME: TWideStringField;
     HelpBtn: TButton;
+    GoBackBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgCommissionDblClick(Sender: TObject);
     procedure ttCommissionNewRecord(DataSet: TDataSet);
@@ -131,6 +132,7 @@ type
     procedure ttPaymentBeforePost(DataSet: TDataSet);
     procedure ttArtistEventBeforePost(DataSet: TDataSet);
     procedure HelpBtnClick(Sender: TObject);
+    procedure GoBackBtnClick(Sender: TObject);
   private
     SqlQueryCommission_Init: boolean;
     SqlQueryCommission_Order: string;
@@ -681,6 +683,14 @@ begin
     Close;
     Key := 0;
   end;
+end;
+
+procedure TArtistForm.GoBackBtnClick(Sender: TObject);
+var
+  parentId: string;
+begin
+  parentId := VarToStr(ADOConnection1.GetScalar('select MANDATOR_ID from ARTIST where ID = ''' + ArtistId.ToString + ''''));
+  MainForm.OpenDbObject('MANDATOR', StringToGuid(parentId));
 end;
 
 procedure TArtistForm.Init;

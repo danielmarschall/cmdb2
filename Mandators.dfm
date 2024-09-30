@@ -1,6 +1,7 @@
 object MandatorsForm: TMandatorsForm
   Left = 0
   Top = 0
+  Hint = 'Show help'
   Caption = 'MandatorsForm'
   ClientHeight = 329
   ClientWidth = 624
@@ -320,6 +321,7 @@ object MandatorsForm: TMandatorsForm
       Top = 10
       Width = 25
       Height = 25
+      Hint = 'Show help'
       Caption = '?'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -327,6 +329,8 @@ object MandatorsForm: TMandatorsForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 2
       OnClick = HelpBtnClick
     end

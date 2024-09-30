@@ -28,7 +28,7 @@ procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: 
 implementation
 
 uses
-  Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi;
+  Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi, Dialogs, System.UITypes;
 
 type
   TVtsPluginID = function(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD): HRESULT; stdcall;
@@ -170,11 +170,18 @@ begin
   begin
     try
       repeat
-        p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
         try
-          p.Init(AdoConn.ConnectionString);
-        finally
-          p.Free;
+          p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
+          try
+            p.Init(AdoConn.ConnectionString);
+          finally
+            p.Free;
+          end;
+        except
+          on E: Exception do
+          begin
+            MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+          end;
         end;
       until FindNext(SearchRec) <> 0;
     finally
@@ -194,12 +201,19 @@ begin
   begin
     try
       repeat
-        p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
         try
-          result := p.ClickEvent(AdoConn.ConnectionString, MandatorGuid, StatGuid, ItemGuid);
-          if Result.Handled then Exit;
-        finally
-          p.Free;
+          p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
+          try
+            result := p.ClickEvent(AdoConn.ConnectionString, MandatorGuid, StatGuid, ItemGuid);
+            if Result.Handled then Exit;
+          finally
+            p.Free;
+          end;
+        except
+          on E: Exception do
+          begin
+            MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+          end;
         end;
       until FindNext(SearchRec) <> 0;
     finally

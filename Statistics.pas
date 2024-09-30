@@ -25,6 +25,8 @@ type
     csvQuery: TButton;
     sdCsvQuery: TSaveDialog;
     refreshQuery: TBitBtn;
+    GoBackBtn: TButton;
+    HelpBtn: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -42,6 +44,7 @@ type
     procedure dbgQueryTitleClick(Column: TColumn);
     procedure csvQueryClick(Sender: TObject);
     procedure refreshQueryClick(Sender: TObject);
+    procedure GoBackBtnClick(Sender: TObject);
   private
     SqlQueryStatistics_Init: boolean;
     SqlQueryStatistics_Order: string;
@@ -271,6 +274,11 @@ begin
     Close;
     Key := 0;
   end;
+end;
+
+procedure TStatisticsForm.GoBackBtnClick(Sender: TObject);
+begin
+  MainForm.OpenDbObject('MANDATOR', MandatorId);
 end;
 
 procedure TStatisticsForm.Init;
