@@ -72,10 +72,6 @@ type
     procedure ttQuotesBeforePost(DataSet: TDataSet);
     procedure ttUploadsAfterPost(DataSet: TDataSet);
     procedure ttUploadsNewRecord(DataSet: TDataSet);
-    procedure ttUploadsAfterDelete(DataSet: TDataSet);
-    procedure ttUploadsAfterInsert(DataSet: TDataSet);
-    procedure ttQuotesAfterInsert(DataSet: TDataSet);
-    procedure ttQuotesAfterDelete(DataSet: TDataSet);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ttEventsBeforeDelete(DataSet: TDataSet);
@@ -158,16 +154,6 @@ begin
   end;
 end;
 
-procedure TCommissionForm.ttQuotesAfterDelete(DataSet: TDataSet);
-begin
-  RegnerateQuoteAnnotation;
-end;
-
-procedure TCommissionForm.ttQuotesAfterInsert(DataSet: TDataSet);
-begin
-  RegnerateQuoteAnnotation;
-end;
-
 procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
 begin
   RegnerateQuoteAnnotation;
@@ -186,7 +172,11 @@ end;
 
 procedure TCommissionForm.ttQuotesBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'QUOTE', 'ID');
+  try
+    InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'QUOTE', 'ID');
+  finally
+    RegnerateQuoteAnnotation;
+  end;
 end;
 
 procedure TCommissionForm.ttQuotesBeforePost(DataSet: TDataSet);
@@ -293,16 +283,6 @@ begin
   end;
 end;
 
-procedure TCommissionForm.ttUploadsAfterDelete(DataSet: TDataSet);
-begin
-  RegnerateUploadAnnotation;
-end;
-
-procedure TCommissionForm.ttUploadsAfterInsert(DataSet: TDataSet);
-begin
-  RegnerateUploadAnnotation;
-end;
-
 procedure TCommissionForm.ttUploadsAfterPost(DataSet: TDataSet);
 begin
   RegnerateUploadAnnotation;
@@ -310,7 +290,11 @@ end;
 
 procedure TCommissionForm.ttUploadsBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'UPLOAD', 'ID');
+  try
+    InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'UPLOAD', 'ID');
+  finally
+    RegnerateUploadAnnotation;
+  end;
 end;
 
 procedure TCommissionForm.ttUploadsNewRecord(DataSet: TDataSet);
@@ -408,6 +392,8 @@ end;
 
 procedure TCommissionForm.TryShowFileList(const AFolder: string='');
 begin
+  if ShellListView = nil then exit;
+
   ShellListView.Items.BeginUpdate;
   try
     try

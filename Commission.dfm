@@ -377,11 +377,9 @@ object CommissionForm: TCommissionForm
   object ttQuotes: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
-    AfterInsert = ttQuotesAfterInsert
     BeforePost = ttQuotesBeforePost
     AfterPost = ttQuotesAfterPost
     BeforeDelete = ttQuotesBeforeDelete
-    AfterDelete = ttQuotesAfterDelete
     OnNewRecord = ttQuotesNewRecord
     Parameters = <>
     SQL.Strings = (
@@ -470,10 +468,8 @@ object CommissionForm: TCommissionForm
   object ttUploads: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
-    AfterInsert = ttUploadsAfterInsert
     AfterPost = ttUploadsAfterPost
     BeforeDelete = ttUploadsBeforeDelete
-    AfterDelete = ttUploadsAfterDelete
     OnNewRecord = ttUploadsNewRecord
     Parameters = <>
     SQL.Strings = (

@@ -10,9 +10,8 @@ Version 1.1:
 - folder comparison : missing commissions (folder but no commission)
 - folder comparison : missing folders (commission but no folder)
 - bug: filtere in mandator-artists, dann gehe zu statistics, dann komme zurück, dann edit1 ist leer, aber dataset ist filtered
-- bug: in quote etwas rauslöschen => annotation wird oben nicht aktualisiert
 - TXT dump sollte abgelegt werden auf local backup dir, damit compare einfacher geht
-- DownPayment sollte eigentlich nach QUOTE Datum gehen und nicht nach Commission!!
+- !!! DownPayment sollte eigentlich nach QUOTE Datum gehen und nicht nach Commission!!
 
 General:
 - Try to copy as many things from the CMDB1 GUI as possible! Step by step until we have everything. (Tables are all checked and ok)
