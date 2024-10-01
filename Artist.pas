@@ -191,7 +191,7 @@ procedure TArtistForm.ttArtistEventNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
-  DataSet.FieldByName('DATE').AsDateTime := Now;
+  DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
 
 var
@@ -313,7 +313,7 @@ procedure TArtistForm.ttPaymentNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
-  DataSet.FieldByName('DATE').AsDateTime := Now;
+  DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
 
 procedure TArtistForm.refreshCommissionClick(Sender: TObject);

@@ -107,6 +107,8 @@ type
     function SqlQueryQuote(const search: string): string;
     function SqlQueryUpload(const search: string): string;
     procedure TryShowFileList(const AFolder: string='');
+    procedure RegnerateUploadAnnotation;
+    procedure RegnerateQuoteAnnotation;
   protected
     CommissionName: string;
   public
@@ -122,17 +124,7 @@ uses
   AdoConnHelper, DbGridHelper, VtsCurConvDLLHeader, Math, CmDbFunctions,
   ShellAPI, StrUtils, CmDbMain;
 
-procedure TCommissionForm.ttQuotesAfterDelete(DataSet: TDataSet);
-begin
-  ttQuotesAfterPost(DataSet);
-end;
-
-procedure TCommissionForm.ttQuotesAfterInsert(DataSet: TDataSet);
-begin
-  ttQuotesAfterPost(DataSet);
-end;
-
-procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
+procedure TCommissionForm.RegnerateQuoteAnnotation;
 begin
   if not (ttEvents.State in [dsEdit,dsInsert]) then ttEvents.Edit;
   ttEvents.Tag := 1; // disable Annotation change check
@@ -164,6 +156,21 @@ begin
   finally
     ttEvents.Tag := 0; // enable Annotation change check
   end;
+end;
+
+procedure TCommissionForm.ttQuotesAfterDelete(DataSet: TDataSet);
+begin
+  RegnerateQuoteAnnotation;
+end;
+
+procedure TCommissionForm.ttQuotesAfterInsert(DataSet: TDataSet);
+begin
+  RegnerateQuoteAnnotation;
+end;
+
+procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
+begin
+  RegnerateQuoteAnnotation;
 end;
 
 var
@@ -251,17 +258,7 @@ begin
   DataSet.FieldByName('IS_FREE').AsBoolean := false;
 end;
 
-procedure TCommissionForm.ttUploadsAfterDelete(DataSet: TDataSet);
-begin
-  ttUploadsAfterPost(DataSet);
-end;
-
-procedure TCommissionForm.ttUploadsAfterInsert(DataSet: TDataSet);
-begin
-  ttUploadsAfterPost(DataSet);
-end;
-
-procedure TCommissionForm.ttUploadsAfterPost(DataSet: TDataSet);
+procedure TCommissionForm.RegnerateUploadAnnotation;
 begin
   if not (ttEvents.State in [dsEdit,dsInsert]) then ttEvents.Edit;
   ttEvents.Tag := 1; // disable Annotation change check
@@ -294,6 +291,21 @@ begin
   finally
     ttEvents.Tag := 0; // enable Annotation change check
   end;
+end;
+
+procedure TCommissionForm.ttUploadsAfterDelete(DataSet: TDataSet);
+begin
+  RegnerateUploadAnnotation;
+end;
+
+procedure TCommissionForm.ttUploadsAfterInsert(DataSet: TDataSet);
+begin
+  RegnerateUploadAnnotation;
+end;
+
+procedure TCommissionForm.ttUploadsAfterPost(DataSet: TDataSet);
+begin
+  RegnerateUploadAnnotation;
 end;
 
 procedure TCommissionForm.ttUploadsBeforeDelete(DataSet: TDataSet);
@@ -391,7 +403,7 @@ procedure TCommissionForm.ttEventsNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
   DataSet.FieldByName('COMMISSION_ID').AsGuid := CommissionId;
-  DataSet.FieldByName('DATE').AsDateTime := Now;
+  DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
 
 procedure TCommissionForm.TryShowFileList(const AFolder: string='');
