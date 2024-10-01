@@ -56,12 +56,14 @@ const
   CmDbDefaultDatabaseName = 'cmdb2';
 
 procedure TMainForm.OpenDbObject(const ATableName: string; DsGuid: TGUID);
+resourcestring
+  SUnexpectedTableName = 'Unexpected TableName %s';
 var
   MandatorForm: TMandatorForm;
   Artistform: TArtistForm;
   CommissionForm: TCommissionForm;
 begin
-  if ATableName = 'MANDATOR' then
+  if ATableName = 'MANDATOR' then // do not localize
   begin
     MandatorForm := MainForm.FindForm(DsGuid) as TMandatorForm;
     if Assigned(MandatorForm) then
@@ -77,7 +79,7 @@ begin
       MandatorForm.Init;
     end;
   end
-  else if ATableName = 'ARTIST' then
+  else if ATableName = 'ARTIST' then // do not localize
   begin
     ArtistForm := MainForm.FindForm(DsGuid) as TArtistForm;
     if Assigned(ArtistForm) then
@@ -93,7 +95,7 @@ begin
       ArtistForm.Init;
     end;
   end
-  else if ATableName = 'COMMISSION' then
+  else if ATableName = 'COMMISSION' then // do not localize
   begin
     CommissionForm := MainForm.FindForm(DsGuid) as TCommissionForm;
     if Assigned(CommissionForm) then
@@ -111,7 +113,7 @@ begin
   end
   else
   begin
-    raise Exception.CreateFmt('Unexpected TableName %s', [ATableName]);
+    raise Exception.CreateFmt(SUnexpectedTableName, [ATableName]);
   end;
 end;
 
@@ -128,7 +130,7 @@ begin
   {$ELSE}
   bits := 32;
   {$ENDIF}
-  ShowMessage(Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum)])); // do not localize
+  ShowMessage(Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum)]));
 end;
 
 procedure TMainForm.BackupandExit1Click(Sender: TObject);
@@ -141,10 +143,9 @@ var
   LastBackupID: integer;
   i: integer;
 begin
-  // TODO: First close all MDI child windows
   for i := MDIChildCount - 1 downto 0 do
   begin
-    MDIChildren[i].Close;  // This will call CloseQuery
+    MDIChildren[i].Close; // This will call CloseQuery
   end;
 
   Screen.Cursor := crHourGlass;
@@ -298,6 +299,8 @@ begin
 end;
 
 procedure TMainForm.RestoreBackup1Click(Sender: TObject);
+var
+  i: integer;
 begin
   OpenDialog1.InitialDir := GetUserDirectory;
   if OpenDialog1.Execute(Handle) then
@@ -306,8 +309,10 @@ begin
     WaitLabel.Visible := true;
     Application.ProcessMessages;
     try
-      while MDIChildCount > 0 do
-        MDIChildren[0].Free;
+      for i := MDIChildCount - 1 downto 0 do
+      begin
+        MDIChildren[i].Free; // No need to call OnCloseQuery, because we will destroy all data anyways
+      end;
       CmDb_RestoreDatabase(AdoConnection1, OpenDialog1.FileName);
       OpenDatabase1.Click;
     finally
@@ -341,7 +346,7 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
     reg := TRegistry.Create;
     try
       reg.RootKey := HKEY_LOCAL_MACHINE;
-      if reg.OpenKeyReadOnly('SOFTWARE\Microsoft\Microsoft SQL Server Local DB\Installed Versions') then
+      if reg.OpenKeyReadOnly('SOFTWARE\Microsoft\Microsoft SQL Server Local DB\Installed Versions') then // do not localize
       begin
         result := reg.HasSubKeys;
         reg.CloseKey;
@@ -386,7 +391,7 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
   end;
 
 resourcestring
-  SRequireComponents = 'CMDB2 requires some Microsoft SQL Server components to be installed. Install now?';
+  SRequireComponents = 'CMDB2 requires some Microsoft SQL Server components to be installed. Install them now?';
 var
   _IsLocalDbInstalled: boolean;
   _SqlServerClientDriverInstalled: boolean;
@@ -400,6 +405,7 @@ begin
   begin
     if ParamStr(1) = '/installredist' then
     begin
+      {$REGION 'Redist install'}
       Screen.Cursor := crHourGlass;
       WaitLabel.Visible := true;
       Application.ProcessMessages;
@@ -408,7 +414,7 @@ begin
         DisableAllMenuItems(MainMenu1);
         Application.ProcessMessages;
 
-        // 1. VC++ Runtime (both required according to Microsoft)
+        // 1. VC++ Runtime (both 32bit and 64bit required according to Microsoft)
         {$IFDEF Win64}
         WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
         Application.ProcessMessages;
@@ -456,6 +462,7 @@ begin
       end;
 
       ShellExecute(Handle, 'open', PChar(ParamStr(0)), '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+      {$ENDREGION}
     end
     else if MessageDlg(SRequireComponents, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) = mrYes then
     begin
