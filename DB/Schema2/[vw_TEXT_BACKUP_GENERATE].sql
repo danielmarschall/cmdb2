@@ -18,7 +18,7 @@ select
 	ds.ID as DATASET_ID,
 	iif(art.IS_ARTIST=1,N'ArtistEvent',N'ClientEvent') as DATASET_TYPE,
 	art.NAME,
-	ds.STATE+' '+ds.ANNOTATION+'@'+CONVERT(VARCHAR(10), ds.DATE, 23)+' / LegacyID '+isnull(cast(ds.LEGACY_ID as nvarchar(10)),'n/a') as MORE_DATA
+	ds.STATE+' '+isnull(ds.ANNOTATION,'')+'@'+CONVERT(VARCHAR(10), ds.DATE, 23)+' / LegacyID '+isnull(cast(ds.LEGACY_ID as nvarchar(10)),'n/a') as MORE_DATA
 from ARTIST_EVENT ds
 left join ARTIST art on art.ID = ds.ARTIST_ID
 left join MANDATOR man on man.ID = art.MANDATOR_ID
@@ -44,7 +44,7 @@ select
 	ds.ID as DATASET_ID,
 	N'CommissionEvent' as DATASET_TYPE,
 	cm.NAME + iif(art.IS_ARTIST=1,' by ',' for ') + art.NAME,
-	ds.STATE+' '+ds.ANNOTATION+'@'+CONVERT(VARCHAR(10), ds.DATE, 23) as MORE_DATA
+	ds.STATE+' '+isnull(ds.ANNOTATION,'')+'@'+CONVERT(VARCHAR(10), ds.DATE, 23) as MORE_DATA
 from COMMISSION_EVENT ds
 left join COMMISSION cm on cm.ID = ds.COMMISSION_ID
 left join ARTIST art on art.ID = cm.ARTIST_ID
