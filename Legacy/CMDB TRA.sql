@@ -17,23 +17,23 @@ delete from cmdb2.dbo.COMMUNICATION;
 
 -- LKP_KONTAKTKANAL
 delete from cmdb2.dbo.CONFIG where NAME = 'PICKLIST_COMMUNICATION';
-insert into cmdb2.dbo.CONFIG (NAME, VALUE)
+insert into cmdb2.dbo.CONFIG (NAME, VALUE, READ_ONLY, HIDDEN)
 	select N'PICKLIST_COMMUNICATION',
-	STRING_AGG(KONTAKT_TEXT, ';') WITHIN GROUP (ORDER BY KONTAKT_TEXT)
+	STRING_AGG(KONTAKT_TEXT, ';') WITHIN GROUP (ORDER BY KONTAKT_TEXT), 0, 0
 	FROM cmdb1.dbo.LKP_KONTAKTKANAL;
 
 -- LKP_PAYPROV
 delete from cmdb2.dbo.CONFIG where NAME = 'PICKLIST_PAYPROVIDER';
-insert into cmdb2.dbo.CONFIG (NAME, VALUE)
+insert into cmdb2.dbo.CONFIG (NAME, VALUE, READ_ONLY, HIDDEN)
 	select N'PICKLIST_PAYPROVIDER',
-	STRING_AGG(PAYPROV_TEXT, ';') WITHIN GROUP (ORDER BY PAYPROV_TEXT)
+	STRING_AGG(PAYPROV_TEXT, ';') WITHIN GROUP (ORDER BY PAYPROV_TEXT), 0, 0
 	FROM cmdb1.dbo.LKP_PAYPROV;
 
 -- LKP_ARTPAGES
 delete from cmdb2.dbo.CONFIG where NAME = 'PICKLIST_ARTPAGES';
-insert into cmdb2.dbo.CONFIG (NAME, VALUE)
+insert into cmdb2.dbo.CONFIG (NAME, VALUE, READ_ONLY, HIDDEN)
 	select N'PICKLIST_ARTPAGES',
-	STRING_AGG(ARTPAGE_TEXT, ';') WITHIN GROUP (ORDER BY ARTPAGE_TEXT)
+	STRING_AGG(ARTPAGE_TEXT, ';') WITHIN GROUP (ORDER BY ARTPAGE_TEXT), 0, 0
 	FROM cmdb1.dbo.LKP_ARTPAGES;
 
 -- MANDATEN EINRICHTEN
@@ -415,7 +415,7 @@ select
 	art.ID as ARTIST_ID,
 	isnull(isnull(isnull(q.PAYDATE,q.PRICEDATE),old_cm.ERTEILT),CONVERT(DATETIME, '01.01.1900', 104)) as DATE,
 	isnull(nullif(SUM(isnull(q.PRICE_NATIVE,0)),0),-0.12345) as AMOUNT,
-	old_cur.CURRENCY_TEXT as CURRENCY,
+	isnull(old_cur.CURRENCY_TEXT,'???') as CURRENCY,
 	isnull(nullif(SUM(isnull(q.PRICE_LOCAL,0)),0),-0.12345) as AMOUNT_LOCAL,
 	IIF(isnull(q.PRECALC,1)=1,0,1) as AMOUNT_VERIFIED,
 	old_pp.PAYPROV_TEXT as PAYPROV,
@@ -511,29 +511,5 @@ SET ev.ANNOTATION = (
 )
 FROM cmdb2.dbo.COMMISSION_EVENT ev
 WHERE ev.STATE like 'upload %';
-
-
-
---- Nacharbeiten ---
-/*
---1. prüfen, hat customer ('cancel c') oder artist ('cancel a') cancelled?
-select * from cmdb2.dbo.COMMISSION_EVENT where STATE = 'cancel x';
---2. sicherstellen, dass es diesen status nicht mehr gibt
-select * from cmdb2.dbo.COMMISSION_EVENT where STATE = 'td bez' or STATE = 'aw invoice' or 'aw refund';
---3. Ungültige Währungen prüfen
-select * from cmdb2.dbo.QUOTE where CURRENCY = '???';
---4. Check missing prices (written as 0.1234)
-select art.NAME, pay.* from PAYMENT pay 
-left join ARTIST art on art.ID = pay.ARTIST_ID
-where (abs(AMOUNT) between 0.11 and 0.13) or (abs(AMOUNT_LOCAL) between 0.11 and 0.13);
---5. Check missing prices (written as 0.1234)
-select art.NAME, cm.NAME, pay.* from QUOTE pay 
-left join COMMISSION_EVENT ev on ev.ID = pay.EVENT_ID
-left join COMMISSION cm on cm.ID = ev.COMMISSION_ID
-left join ARTIST art on art.ID = cm.ARTIST_ID
-where (abs(AMOUNT) between 0.11 and 0.13) or (abs(AMOUNT_LOCAL) between 0.11 and 0.13);
---6. Vergleichen, ob laufende CM wirklich korrekt übereinstimmen
-select ART_STATUS, NAME from cmdb2.dbo.vw_COMMISSION where ART_STATUS <> 'fin' and ART_STATUS <> 'postponed' and ART_STATUS <> 'idea' and ART_STATUS <> 'cancel c' and ART_STATUS <> 'cancel x' and ART_STATUS <> 'cancel a' and ART_STATUS <> 'rejected' and ART_STATUS <> 'c td initcm' order by ART_STATUS
-*/
 
 commit
