@@ -44,7 +44,7 @@ The database grid has the following columns:
 	- `offer`: An offer (maybe even a special) one
 	- `start coop`: Start of cooperation (will change the Status field in the artist/client overview)
 	- `end coop`: End of cooperation (will change the Status field in the artist/client overview)
-	- `stoppped`: Stopped service for everyone (will change the Status field in the artist/client overview)
+	- `stopped`: Stopped service for everyone (will change the Status field in the artist/client overview)
 	- `hiatus`: Announced hiatus (will change the Status field in the artist/client overview)
 	- `inactive`: Noticed as inactive without announcement (will change the Status field in the artist/client overview)
 	- `recover`: Reverts a previously set `hiatus` or `inactive` status (will change the Status field in the artist/client overview)

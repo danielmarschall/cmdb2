@@ -272,7 +272,7 @@ object ArtistForm: TArtistForm
               'offer'
               'start coop'
               'end coop'
-              'stoppped'
+              'stopped'
               'hiatus'
               'inactive'
               'recover'
