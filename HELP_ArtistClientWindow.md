@@ -1,5 +1,5 @@
 
-[General info](README.md) | [Database window](HELP_DatabaseWindow.md) | [Mandator window](HELP_MandatorWindow.md) | Artist/Client window | [Commission window](HELP_CommissionWindow.md)
+[General info](README.md) | [Database window](HELP_DatabaseWindow.md) | [Mandator window](HELP_MandatorWindow.md) | Artist/Client window | [Commission window](HELP_CommissionWindow.md) | [Statistics](HELP_Statistics.md)
 
 # Artist/Client window
 

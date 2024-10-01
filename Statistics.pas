@@ -45,6 +45,7 @@ type
     procedure csvQueryClick(Sender: TObject);
     procedure refreshQueryClick(Sender: TObject);
     procedure GoBackBtnClick(Sender: TObject);
+    procedure HelpBtnClick(Sender: TObject);
   private
     SqlQueryStatistics_Init: boolean;
     SqlQueryStatistics_Order: string;
@@ -279,6 +280,11 @@ end;
 procedure TStatisticsForm.GoBackBtnClick(Sender: TObject);
 begin
   MainForm.OpenDbObject('MANDATOR', MandatorId);
+end;
+
+procedure TStatisticsForm.HelpBtnClick(Sender: TObject);
+begin
+  MainForm.ShowHelpWindow('HELP_Statistics.md');
 end;
 
 procedure TStatisticsForm.Init;

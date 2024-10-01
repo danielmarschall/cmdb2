@@ -1,5 +1,5 @@
 
-General info | [Database window](HELP_DatabaseWindow.md) | [Mandator window](HELP_MandatorWindow.md) | [Artist/Client window](HELP_ArtistClientWindow.md) | [Commission window](HELP_CommissionWindow.md)
+General info | [Database window](HELP_DatabaseWindow.md) | [Mandator window](HELP_MandatorWindow.md) | [Artist/Client window](HELP_ArtistClientWindow.md) | [Commission window](HELP_CommissionWindow.md) | [Statistics](HELP_Statistics.md)
 
 # Commission Database 2.0
 
@@ -50,7 +50,7 @@ It is important to understand how to handle a database grid. Here are some notes
 
 ### Common error messages
 
-Although CMDB2 is translated into English, the development environment was German, so, unfortunately, some common error messages are written in German. They are explained here:
+Although CMDB2 is translated into English, the development environment was German, so, unfortunately, some common error messages might be written in German. They are explained here:
 - "Die zum Aktualisieren angegebene Zeile wurde nicht gefunden. Einige Werte wurden seit dem letzten Lesen ggf. geändert.": This means that you are trying to change something that was already changed somewhere else. The solution is to cancel the edit/insert operation, and refresh the dataset (or close the window and reopen it) to get a fresh dataset that can be edited.
 - "In diese Spalte kann kein NULL Wert eingefügt werden": This means that you are trying to save a dataset but there are some mandatory fields missing. Check if you have entered everything that is required.
 
@@ -102,6 +102,6 @@ The program automatically calculates how much debt or credit an artist/client ha
 			- Communication
 		- Commissions (overview)
 		- Payments (overview)
-		- Statistics
+		- [Statistics](HELP_Statistics.md)
 	- Text Dumps (Backup Protocols)
 	- Settings

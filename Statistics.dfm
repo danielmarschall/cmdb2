@@ -174,6 +174,7 @@ object StatisticsForm: TStatisticsForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
+      OnClick = HelpBtnClick
     end
   end
   object ADOConnection1: TADOConnection

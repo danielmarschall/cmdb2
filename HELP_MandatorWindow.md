@@ -1,5 +1,5 @@
 
-[General info](README.md) | [Database window](HELP_DatabaseWindow.md) | Mandator window | [Artist/Client window](HELP_ArtistClientWindow.md) | [Commission window](HELP_CommissionWindow.md)
+[General info](README.md) | [Database window](HELP_DatabaseWindow.md) | Mandator window | [Artist/Client window](HELP_ArtistClientWindow.md) | [Commission window](HELP_CommissionWindow.md) | [Statistics](HELP_Statistics.md)
 
 # Mandator window
 
@@ -62,13 +62,4 @@ The database grid has the following columns:
 
 There are various statistics that are made available with plugins.
 
-Currently, there are the following statistics in the shipped statistics plugin:
-- Running commissions
-- Local sum over years (commissions outgoing)
-- Local sum over months (commissions outgoing)
-- Top artists/clients
-
-In the statistic grids you can double click to list more information and/or to jump to the referenced artists, commissions, etc.
-
-Note that deleting from a statistic grid deletes the data in the base table, so be extra careful.
-
+More information about the statistics are described [here](HELP_Statistics.md).
