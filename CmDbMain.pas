@@ -201,7 +201,7 @@ begin
         try
           ChecksumThen := q.FieldByName('CHECKSUM').AsWideString;
           LastBackupId := q.FieldByName('BAK_ID').AsInteger;
-          if (q.RecordCount = 0) or (ChecksumThen <> ChecksumNow) then
+          if (q.RecordCount = 0) or not SameText(ChecksumThen, ChecksumNow) then
           begin
             ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
             LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from [BACKUP]'));
