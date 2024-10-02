@@ -12,6 +12,7 @@ object MainForm: TMainForm
   FormStyle = fsMDIForm
   Menu = MainMenu1
   WindowState = wsMaximized
+  WindowMenu = Window1
   OnClose = FormClose
   OnCreate = FormCreate
   TextHeight = 15
@@ -55,6 +56,21 @@ object MainForm: TMainForm
     object OpenDatabase1: TMenuItem
       Caption = 'Open Database'
       OnClick = OpenDatabase1Click
+    end
+    object Window1: TMenuItem
+      Caption = 'Window'
+      object Cascade1: TMenuItem
+        Caption = 'Cascade'
+        OnClick = Cascade1Click
+      end
+      object TileHorizontally1: TMenuItem
+        Caption = 'Tile Horizontally'
+        OnClick = TileHorizontally1Click
+      end
+      object TileVertically1: TMenuItem
+        Caption = 'TileVertically'
+        OnClick = TileVertically1Click
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'

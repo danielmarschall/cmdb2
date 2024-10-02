@@ -2,7 +2,6 @@
 # TODO
 
 Version 1.1:
-- "Window" main menu item that lists all windows
 - dmx/sd beta test
 - plugin to check if folders exist
 - plugin to check uploads not in cmdb recorded

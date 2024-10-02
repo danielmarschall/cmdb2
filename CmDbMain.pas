@@ -23,6 +23,10 @@ type
     RestoreBackup1: TMenuItem;
     N2: TMenuItem;
     WaitLabel: TLabel;
+    Window1: TMenuItem;
+    Cascade1: TMenuItem;
+    TileHorizontally1: TMenuItem;
+    TileVertically1: TMenuItem;
     procedure Timer1Timer(Sender: TObject);
     procedure BackupandExit1Click(Sender: TObject);
     procedure OpenDatabase1Click(Sender: TObject);
@@ -31,6 +35,9 @@ type
     procedure Generalhelp1Click(Sender: TObject);
     procedure RestoreBackup1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Cascade1Click(Sender: TObject);
+    procedure TileHorizontally1Click(Sender: TObject);
+    procedure TileVertically1Click(Sender: TObject);
   private
     function BackupPath: string;
     procedure PerformBackupAndDefrag;
@@ -278,6 +285,26 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
+end;
+
+procedure TMainForm.Cascade1Click(Sender: TObject);
+begin
+  // Cascade all MDI child forms
+  Cascade;
+end;
+
+procedure TMainForm.TileHorizontally1Click(Sender: TObject);
+begin
+  // Tile MDI child forms horizontally
+  TileMode := tbHorizontal;
+  Tile;
+end;
+
+procedure TMainForm.TileVertically1Click(Sender: TObject);
+begin
+  // Tile MDI child forms vertically
+  TileMode := tbVertical;
+  Tile;
 end;
 
 procedure TMainForm.ShowHelpWindow(const MDFile: string);
