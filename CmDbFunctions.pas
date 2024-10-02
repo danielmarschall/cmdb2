@@ -391,6 +391,7 @@ begin
 
 
       InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
+      InstallSql(2, 'vw_COMMISSION');
 
 
       if not AdoConnection1.ColumnExists('CONFIG', 'READ_ONLY') then
