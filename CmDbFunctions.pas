@@ -7,7 +7,6 @@ uses
   Db, DateUtils;
 
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
-function Adler32(const Str: string): DWORD;
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
@@ -49,11 +48,11 @@ begin
   try
     while not q.Eof do
     begin
-      SchemaName := q.FieldByName('SchemaName').AsString;
-      TableName := q.FieldByName('TableName').AsString;
-      IndexName := q.FieldByName('IndexName').AsString;
+      SchemaName := q.FieldByName('SchemaName').AsWideString;
+      TableName := q.FieldByName('TableName').AsWideString;
+      IndexName := q.FieldByName('IndexName').AsWideString;
 
-      if q.FieldByName('IndexType').AsString = 'HEAP' then
+      if q.FieldByName('IndexType').AsWideString = 'HEAP' then
       begin
         AdoConnection.ExecSQL(Format('ALTER TABLE [%s].[%s] REBUILD;', [SchemaName, TableName]));
       end
@@ -67,25 +66,6 @@ begin
   finally
     FreeAndNil(q);
   end;
-end;
-
-function Adler32(const Str: string): DWORD;
-const
-  MOD_ADLER = 65521;
-var
-  A, B: DWORD;
-  I: Integer;
-  Data: RawByteString;
-begin
-  Data := UTF8Encode(Str);
-  A := 1;
-  B := 0;
-  for I := 1 to Length(Data) do
-  begin
-    A := (A + Ord(Data[I])) mod MOD_ADLER;
-    B := (B + A) mod MOD_ADLER;
-  end;
-  Result := (B shl 16) or A;
 end;
 
 // Returns Windows Error Code (i.e. 0=success), NOT the ShellExecute() code (>32 = success)

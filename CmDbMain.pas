@@ -52,7 +52,7 @@ implementation
 uses
   Mandators, AdoConnHelper, StrUtils, Help,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
-  ShellApi, System.UITypes;
+  ShellApi, System.UITypes, System.Hash;
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
@@ -155,7 +155,7 @@ var
   DBName, BackupFileName: string;
   LastBackupID: integer;
   i: integer;
-  ChecksumNow, ChecksumThen: DWORD;
+  ChecksumNow, ChecksumThen: string;
   NeedNewBackup: boolean;
 begin
   for i := MDIChildCount - 1 downto 0 do
@@ -188,15 +188,15 @@ begin
           FreeAndNil(q);
         end;
 
-        CheckSumNow := Adler32(sl.Text);
+        CheckSumNow := THashSHA2.GetHashString(sl.Text);
 
         q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from [BACKUP] order by BAK_ID desc');
         try
-          ChecksumThen := q.FieldByName('CHECKSUM').AsLargeInt;
+          ChecksumThen := q.FieldByName('CHECKSUM').AsWideString;
           LastBackupId := q.FieldByName('BAK_ID').AsInteger;
           if (q.RecordCount = 0) or (ChecksumThen <> ChecksumNow) then
           begin
-            ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+IntToStr(ChecksumNow)+')');
+            ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
             LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from [BACKUP]'));
             sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.csv');
             NeedNewBackup := true;

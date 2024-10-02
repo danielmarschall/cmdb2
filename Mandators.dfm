@@ -386,8 +386,9 @@ object MandatorsForm: TMandatorsForm
       FieldName = 'BAK_LINES'
       ReadOnly = True
     end
-    object ttTextBackupCHECKSUM: TLargeintField
+    object ttTextBackupCHECKSUM: TStringField
       FieldName = 'CHECKSUM'
+      Size = 64
     end
     object ttTextBackupANNOTATION: TWideStringField
       FieldName = 'ANNOTATION'
