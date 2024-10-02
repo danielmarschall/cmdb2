@@ -87,7 +87,10 @@ type
     procedure refreshConfigClick(Sender: TObject);
     procedure HelpBtnClick(Sender: TObject);
     procedure ttConfigBeforeEdit(DataSet: TDataSet);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
     SqlQueryMandator_Order: string;
     SqlQueryMandator_Asc: boolean;
@@ -252,11 +255,8 @@ end;
 
 procedure TMandatorsForm.PageControl1Change(Sender: TObject);
 begin
-  if Edit1.Text <> '' then
-  begin
-    Edit1.Clear;
-    Timer1.Enabled := false;
-  end;
+  Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name];
+  Timer1.Enabled := False;
 end;
 
 procedure TMandatorsForm.refreshConfigClick(Sender: TObject);
@@ -320,6 +320,7 @@ end;
 procedure TMandatorsForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
+  Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
   if PageControl1.ActivePage = tsMandator then
   begin
     Screen.Cursor := crHourGlass;
@@ -412,6 +413,16 @@ begin
   if ttMandator.State in [dsEdit,dsInsert] then ttMandator.Post;
   if ttTextBackup.State in [dsEdit,dsInsert] then ttTextBackup.Post;
   if ttConfig.State in [dsEdit,dsInsert] then ttConfig.Post;
+end;
+
+procedure TMandatorsForm.FormCreate(Sender: TObject);
+begin
+  Edit1Sav := TStringList.Create;
+end;
+
+procedure TMandatorsForm.FormDestroy(Sender: TObject);
+begin
+  Edit1Sav.Free;
 end;
 
 procedure TMandatorsForm.FormKeyDown(Sender: TObject; var Key: Word;

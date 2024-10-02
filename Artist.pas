@@ -133,7 +133,10 @@ type
     procedure ttArtistEventBeforePost(DataSet: TDataSet);
     procedure HelpBtnClick(Sender: TObject);
     procedure GoBackBtnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
     SqlQueryCommission_Order: string;
     SqlQueryCommission_Asc: boolean;
@@ -468,11 +471,8 @@ end;
 
 procedure TArtistForm.PageControl1Change(Sender: TObject);
 begin
-  if Edit1.Text <> '' then
-  begin
-    Edit1.Clear;
-    Timer1.Enabled := false;
-  end;
+  Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name];
+  Timer1.Enabled := False;
 end;
 
 function TArtistForm.SqlQueryArtistEvent(const search: string): string;
@@ -563,6 +563,7 @@ end;
 procedure TArtistForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
+  Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
   if PageControl1.ActivePage = tsCommissions then
   begin
     Screen.Cursor := crHourGlass;
@@ -657,6 +658,16 @@ begin
   if ttPayment.State in [dsEdit,dsInsert] then ttPayment.Post;
   if ttArtistEvent.State in [dsEdit,dsInsert] then ttArtistEvent.Post;
   if ttCommunication.State in [dsEdit,dsInsert] then ttCommunication.Post;
+end;
+
+procedure TArtistForm.FormCreate(Sender: TObject);
+begin
+  Edit1Sav := TStringList.Create;
+end;
+
+procedure TArtistForm.FormDestroy(Sender: TObject);
+begin
+  Edit1Sav.Free;
 end;
 
 procedure TArtistForm.FormKeyDown(Sender: TObject; var Key: Word;

@@ -46,7 +46,10 @@ type
     procedure refreshQueryClick(Sender: TObject);
     procedure GoBackBtnClick(Sender: TObject);
     procedure HelpBtnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    Edit1Sav: TStringList;
     SqlQueryStatistics_Init: boolean;
     SqlQueryStatistics_Order: string;
     SqlQueryStatistics_Asc: boolean;
@@ -80,11 +83,8 @@ end;
 
 procedure TStatisticsForm.PageControl1Change(Sender: TObject);
 begin
-  if Edit1.Text <> '' then
-  begin
-    Edit1.Clear;
-    Timer1.Enabled := false;
-  end;
+  Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name];
+  Timer1.Enabled := False;
 end;
 
 procedure TStatisticsForm.refreshQueryClick(Sender: TObject);
@@ -139,6 +139,7 @@ end;
 procedure TStatisticsForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
+  Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
   if PageControl1.ActivePage = tsQuery then
   begin
     Screen.Cursor := crHourGlass;
@@ -252,6 +253,16 @@ end;
 procedure TStatisticsForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   if ttQuery.State in [dsEdit,dsInsert] then ttQuery.Post;
+end;
+
+procedure TStatisticsForm.FormCreate(Sender: TObject);
+begin
+  Edit1Sav := TStringList.Create;
+end;
+
+procedure TStatisticsForm.FormDestroy(Sender: TObject);
+begin
+  Edit1Sav.Free;
 end;
 
 procedure TStatisticsForm.FormKeyDown(Sender: TObject; var Key: Word;

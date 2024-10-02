@@ -15,6 +15,8 @@ object ArtistForm: TArtistForm
   Visible = True
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
   TextHeight = 15
