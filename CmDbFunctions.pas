@@ -390,6 +390,7 @@ begin
 
       // TODO: Once all things are decided, label everything as Schema #2
 
+      {$REGION 'Statistics schema 2: Statistics are not in the core anymore, but instead in a Plugin'}
       if AdoConnection1.ColumnExists('STATISTICS', 'SQL_VIEW') or not AdoConnection1.TableExists('STATISTICS') then
       begin
         AdoConnection1.DropTableOrView('STATISTICS');
@@ -397,7 +398,7 @@ begin
         InstallSql(2, 'vw_STATISTICS');
       end;
 
-      {$REGION 'Statistics are not in the core anymore, but instead in a Plugin'}
+      //
       if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
         AdoConnection1.DropTableOrView('vw_STAT_RUNNING_COMMISSIONS');
       if AdoConnection1.TableExists('vw_STAT_SUM_YEARS') then

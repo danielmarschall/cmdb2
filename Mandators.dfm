@@ -105,6 +105,7 @@ object MandatorsForm: TMandatorsForm
         Height = 227
         Align = alClient
         DataSource = dsTextBackup
+        Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
         TabOrder = 0
         TitleFont.Charset = DEFAULT_CHARSET
         TitleFont.Color = clWindowText
@@ -140,7 +141,7 @@ object MandatorsForm: TMandatorsForm
         Width = 33
         Height = 227
         DataSource = dsTextBackup
-        VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbDelete, nbEdit, nbPost, nbCancel]
+        VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbEdit, nbPost, nbCancel]
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1

@@ -150,7 +150,7 @@ end;
 
 procedure TMandatorsForm.ttTextBackupBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'BAK_ID', 'BACKUP', 'BAK_ID');
+  Abort;
 end;
 
 procedure TMandatorsForm.ttTextBackupBeforeInsert(DataSet: TDataSet);
