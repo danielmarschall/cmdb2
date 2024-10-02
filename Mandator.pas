@@ -129,6 +129,7 @@ type
     ttPaymentARTIST_NAME2: TWideStringField;
     HelpBtn: TButton;
     GoBackBtn: TButton;
+    ttStatisticsPLUGIN: TWideStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -742,14 +743,16 @@ begin
   if not SqlQueryStatistics_Init then
   begin
     SqlQueryStatistics_Init := true;
-    SqlQueryStatistics_order := 'NO';
+    SqlQueryStatistics_order := 'PLUGIN';
     SqlQueryStatistics_asc := true;
   end;
-  result := 'select * from ##STATISTICS ';
+  result := 'select * from vw_STATISTICS ';
   if trim(search)<>'' then
     result := result + 'where lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryStatistics_order = 'NO' then
-    result := result + 'order by NO '+AscDesc(SqlQueryStatistics_asc)+', NAME'
+    result := result + 'order by NO '+AscDesc(SqlQueryStatistics_asc)+', PLUGIN, NAME'
+  else if SqlQueryStatistics_order = 'PLUGIN' then
+    result := result + 'order by PLUGIN '+AscDesc(SqlQueryStatistics_asc)+', NO, NAME'
   else
     result := result + 'order by ' + SqlQueryStatistics_order + ' ' + AscDesc(SqlQueryStatistics_asc);
 end;
@@ -945,8 +948,7 @@ begin
     dbgPayment.Columns[6].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
     {$ENDREGION}
     {$REGION 'ttStatistics / dbgStatistics'}
-    TCmDbPluginClient.CreateTables(AdoConnection1); // creates ##STATISTICS
-    TCmDbPluginClient.InitAllPlugins(AdoConnection1); // fills ##STATISTICS from plugins
+    TCmDbPluginClient.InitAllPlugins(AdoConnection1); // re-fills STATISTICS from plugins
     ttStatistics.Active := false;
     ttStatistics.SQL.Text := SqlQueryStatistics('');
     ttStatistics.Active := true;

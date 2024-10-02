@@ -8,7 +8,6 @@ uses
 type
   TCmDbPluginClient = class(TObject)
   public
-    class procedure CreateTables(AdoConn: TAdoConnection);
     class procedure InitAllPlugins(AdoConn: TAdoConnection);
     class function ClickEvent(AdoConn: TAdoConnection; MandatorGuid, StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
   end;
@@ -28,7 +27,8 @@ procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: 
 implementation
 
 uses
-  Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi, Dialogs, System.UITypes;
+  Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi, Dialogs, System.UITypes,
+  SyncObjs;
 
 type
   TVtsPluginID = function(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD): HRESULT; stdcall;
@@ -144,49 +144,41 @@ end;
 
 { TCmDbPluginClient }
 
-class procedure TCmDbPluginClient.CreateTables(AdoConn: TAdoConnection);
-begin
-  AdoConn.ExecSQL('IF NOT EXISTS (SELECT * FROM tempdb.sys.tables WHERE name = ''##STATISTICS'') ' +
-                  'BEGIN ' +
-                  ' CREATE TABLE [dbo].[##STATISTICS]( ' +
-                  ' 	[ID] [uniqueidentifier] NOT NULL, ' +
-                  ' 	[NO] [int] NOT NULL, ' +
-                  ' 	[NAME] [nvarchar](100) NOT NULL, ' +
-                  '  CONSTRAINT [PK_STATISTICS] PRIMARY KEY CLUSTERED ' +
-                  ' ( ' +
-                  ' 	[ID] ASC ' +
-                  ' )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY] ' +
-                  ' ) ON [PRIMARY]; ' +
-                  'END');
-  AdoConn.ExecSQL('delete from ##STATISTICS');
-end;
+var
+  CsPluginTableFill: TCriticalSection;
 
 class procedure TCmDbPluginClient.InitAllPlugins(AdoConn: TAdoConnection);
 var
   SearchRec: TSearchRec;
   p: TCmDbPlugin;
 begin
-  if FindFirst(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'*.spl', faAnyFile, SearchRec) = 0 then
-  begin
-    try
-      repeat
-        try
-          p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
+  CsPluginTableFill.Enter; // we cannot use a DB transaction, because EXE and DLL have two contexts
+  try
+    AdoConn.ExecSQL('delete from [STATISTICS]');
+    if FindFirst(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'*.spl', faAnyFile, SearchRec) = 0 then
+    begin
+      try
+        repeat
           try
-            p.Init(AdoConn.ConnectionString);
-          finally
-            p.Free;
+            p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
+            try
+              p.Init(AdoConn.ConnectionString);
+            finally
+              p.Free;
+            end;
+          except
+            on E: Exception do
+            begin
+              MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+            end;
           end;
-        except
-          on E: Exception do
-          begin
-            MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
-          end;
-        end;
-      until FindNext(SearchRec) <> 0;
-    finally
-      SysUtils.FindClose(SearchRec);
+        until FindNext(SearchRec) <> 0;
+      finally
+        SysUtils.FindClose(SearchRec);
+      end;
     end;
+  finally
+    CsPluginTableFill.Leave;
   end;
 end;
 
@@ -222,4 +214,8 @@ begin
   end;
 end;
 
+initialization
+  CsPluginTableFill := TCriticalSection.Create;
+finalization
+  FreeAndNil(CsPluginTableFill);
 end.

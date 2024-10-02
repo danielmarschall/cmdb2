@@ -2,7 +2,6 @@
 # TODO
 
 Version 1.1:
-- Tabelle ##STATISTICS existiert nicht, als ich von artist zu mandator zurück gegangen bin. warum?
 - "Window" main menu item that lists all windows
 - dmx/sd beta test
 - plugin to check if folders exist

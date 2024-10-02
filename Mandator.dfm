@@ -24,7 +24,7 @@ object MandatorForm: TMandatorForm
     Top = 41
     Width = 1044
     Height = 400
-    ActivePage = tsCommissions
+    ActivePage = tsStatistics
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -470,6 +470,12 @@ object MandatorForm: TMandatorForm
         Columns = <
           item
             Expanded = False
+            FieldName = 'PLUGIN'
+            Width = 154
+            Visible = True
+          end
+          item
+            Expanded = False
             FieldName = 'NO'
             Visible = True
           end
@@ -804,13 +810,17 @@ object MandatorForm: TMandatorForm
     AfterScroll = ttStatisticsAfterScroll
     Parameters = <>
     SQL.Strings = (
-      '')
+      'select * from [vw_STATISTICS]')
     Left = 544
     Top = 96
     object ttStatisticsID: TGuidField
       FieldName = 'ID'
       FixedChar = True
       Size = 38
+    end
+    object ttStatisticsPLUGIN: TWideStringField
+      FieldName = 'PLUGIN'
+      Size = 50
     end
     object ttStatisticsNO: TIntegerField
       FieldName = 'NO'

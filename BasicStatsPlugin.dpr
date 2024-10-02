@@ -47,11 +47,11 @@ begin
         Exit(E_PLUGIN_CONN_FAIL);
       end;
 
-      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_1.ToString+''', ''50'', ''Running commissions'');');
-      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_2.ToString+''', ''100'', ''Local sum over years'');');
-      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_3.ToString+''', ''101'', ''Local sum over months'');');
-      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_4.ToString+''', ''200'', ''Top artists/clients'');');
-      AdoConn.ExecSQL('insert into [##STATISTICS] (ID, NO, NAME) values ('''+GUID_9.ToString+''', ''950'', ''--- About CMDB2 ---'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_1.ToString+''', ''BasicStats'', ''50'', ''Running commissions'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_2.ToString+''', ''BasicStats'', ''100'', ''Local sum over years'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_3.ToString+''', ''BasicStats'', ''101'', ''Local sum over months'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_4.ToString+''', ''BasicStats'', ''200'', ''Top artists/clients'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_9.ToString+''', ''BasicStats'', ''950'', ''--- About CMDB2 ---'');');
 
       AdoConn.Disconnect;
     finally
