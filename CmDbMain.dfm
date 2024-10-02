@@ -12,6 +12,7 @@ object MainForm: TMainForm
   FormStyle = fsMDIForm
   Menu = MainMenu1
   WindowState = wsMaximized
+  OnClose = FormClose
   OnCreate = FormCreate
   TextHeight = 15
   object WaitLabel: TLabel
@@ -45,10 +46,6 @@ object MainForm: TMainForm
       end
       object N2: TMenuItem
         Caption = '-'
-      end
-      object Exitwithoutbackup1: TMenuItem
-        Caption = 'Exit without backup'
-        OnClick = Exitwithoutbackup1Click
       end
       object BackupandExit1: TMenuItem
         Caption = 'Backup and Exit'

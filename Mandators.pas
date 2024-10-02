@@ -55,7 +55,7 @@ type
     HelpBtn: TButton;
     ttConfigHIDDEN: TBooleanField;
     ttConfigREAD_ONLY: TBooleanField;
-    ttTextBackupCHECKSUM: TIntegerField;
+    ttTextBackupCHECKSUM: TLargeintField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);

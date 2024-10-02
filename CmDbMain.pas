@@ -13,7 +13,6 @@ type
     MainMenu1: TMainMenu;
     ADOConnection1: TADOConnection;
     BackupandExit1: TMenuItem;
-    Exitwithoutbackup1: TMenuItem;
     OpenDatabase1: TMenuItem;
     About1: TMenuItem;
     Help1: TMenuItem;
@@ -26,14 +25,15 @@ type
     WaitLabel: TLabel;
     procedure Timer1Timer(Sender: TObject);
     procedure BackupandExit1Click(Sender: TObject);
-    procedure Exitwithoutbackup1Click(Sender: TObject);
     procedure OpenDatabase1Click(Sender: TObject);
     procedure About1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Generalhelp1Click(Sender: TObject);
     procedure RestoreBackup1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     function BackupPath: string;
+    procedure PerformBackupAndDefrag;
   public
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
@@ -142,6 +142,11 @@ begin
 end;
 
 procedure TMainForm.BackupandExit1Click(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TMainForm.PerformBackupAndDefrag;
 resourcestring
   S_BackupFailed = 'Backup failed (%s). Will exit without backup.';
 var
@@ -187,7 +192,7 @@ begin
 
         q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from [BACKUP] order by BAK_ID desc');
         try
-          ChecksumThen := q.FieldByName('CHECKSUM').AsInteger;
+          ChecksumThen := q.FieldByName('CHECKSUM').AsLargeInt;
           LastBackupId := q.FieldByName('BAK_ID').AsInteger;
           if (q.RecordCount = 0) or (ChecksumThen <> ChecksumNow) then
           begin
@@ -226,14 +231,6 @@ begin
     WaitLabel.Visible := false;
     Application.ProcessMessages;
   end;
-
-  // 3. Exit
-  Close;
-end;
-
-procedure TMainForm.Exitwithoutbackup1Click(Sender: TObject);
-begin
-  Close;
 end;
 
 function TMainForm.FindForm(guid: TGuid; addinfo1: string=''): TForm;
@@ -267,6 +264,15 @@ begin
     end;
   end;
   Exit(nil);
+end;
+
+procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  PerformBackupAndDefrag;
+  try
+    AdoConnection1.Disconnect;
+  except
+  end;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);

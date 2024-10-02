@@ -426,11 +426,7 @@ begin
     end
     else if schemaVer = 1 then
     begin
-      // Future update code goes here!
-      // ...
-      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
-
-      // TODO: Once all things are decided, label everything as Schema #2
+      {$REGION 'Update schema 1 => 2'}
 
       {$REGION 'Statistics schema 2: Statistics are not in the core anymore, but instead in a Plugin'}
       if AdoConnection1.ColumnExists('STATISTICS', 'SQL_VIEW') or not AdoConnection1.TableExists('STATISTICS') then
@@ -484,6 +480,16 @@ begin
         InstallSql(2, 'vw_BACKUP');
       end;
       {$ENDREGION}
+
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
+
+      {$ENDREGION}
+    end
+    else if schemaVer = 2 then
+    begin
+      // <<< Future update code goes here! >>>
+
+      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;

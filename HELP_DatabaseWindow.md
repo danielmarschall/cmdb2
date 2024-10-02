@@ -13,11 +13,9 @@ Start by creating a new mandator simply by typing a name (e.g. your name) into t
 
 ## Database window tab "Backups"
 
-When you exit the program with the option "Backup and Exit", the program will check if you have made changes somewhere in the database, and if you did so, then create a fresh backup with a sequential number.
+The grid at the "Backups" tab shows an overview of all backups that have been created. Note that the table also contains backups which have been already deleted.
 
-This table shows an overview of all backups created. Note that the table also contains backups which might have been deleted.
-
-Beside the BAK files (which can be restored), the program will create a CSV files that contain the data in text form which allows that backups can be compared with diff-tools.
+Beside the BAK files (that can be used for restoring data), the program will create a CSV files that contain the data in text form which allows that backups can be compared with diff-tools.
 
 ## Database window tab "Settings"
 
