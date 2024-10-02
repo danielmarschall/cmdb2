@@ -370,9 +370,7 @@ object MandatorsForm: TMandatorsForm
     OnNewRecord = ttMandatorNewRecord
     Parameters = <>
     SQL.Strings = (
-      
-        'select BAK_ID, BAK_DATE, BAK_LINES, BAK_SIZE_COMPRESSED_KB, ANNO' +
-        'TATION from vw_TEXT_BACKUP')
+      'select BAK_ID, BAK_DATE, BAK_LINES, ANNOTATION from vw_BACKUP')
     Left = 272
     Top = 88
     object ttTextBackupBAK_ID: TAutoIncField

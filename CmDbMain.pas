@@ -177,14 +177,14 @@ begin
 
         CheckSumNow := Adler32(sl.Text);
 
-        q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from TEXT_BACKUP order by BAK_ID desc');
+        q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from [BACKUP] order by BAK_ID desc');
         try
           ChecksumThen := q.FieldByName('CHECKSUM').AsInteger;
           LastBackupId := q.FieldByName('BAK_ID').AsInteger;
           if (q.RecordCount = 0) or (ChecksumThen <> ChecksumNow) then
           begin
-            ADOConnection1.ExecSQL('INSERT INTO TEXT_BACKUP (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+IntToStr(ChecksumNow)+')');
-            LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from TEXT_BACKUP'));
+            ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+IntToStr(ChecksumNow)+')');
+            LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from [BACKUP]'));
             sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.csv');
             NeedNewBackup := true;
           end;

@@ -236,7 +236,7 @@ begin
     AdoConnection1.ExecSQL('delete from [UPLOAD];');
     AdoConnection1.ExecSQL('delete from [COMMUNICATION];');
     AdoConnection1.ExecSQL('delete from [CONFIG];');
-    //AdoConnection1.ExecSQL('delete from [TEXT_BACKUP];');
+    //AdoConnection1.ExecSQL('delete from [BACKUP];');
 
     AdoConnection1.ExecSQL('insert into [MANDATOR] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[MANDATOR];');
     AdoConnection1.ExecSQL('insert into [ARTIST] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[ARTIST];');
@@ -248,7 +248,7 @@ begin
     AdoConnection1.ExecSQL('insert into [UPLOAD] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[UPLOAD];');
     AdoConnection1.ExecSQL('insert into [COMMUNICATION] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[COMMUNICATION];');
     AdoConnection1.ExecSQL('insert into [CONFIG] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[CONFIG];');
-    //AdoConnection1.ExecSQL('insert into [TEXT_BACKUP] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[TEXT_BACKUP];');
+    //AdoConnection1.ExecSQL('insert into [BACKUP] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[BACKUP];');
 
     AdoConnection1.CommitTrans;
   except
@@ -431,11 +431,12 @@ begin
       {$ENDREGION}
 
       {$REGION 'Text dumps now as files and not in database anymore'}
-      if AdoConnection1.ColumnExists('TEXT_BACKUP', 'BAK_DATA') then
+      if AdoConnection1.TableExists('TEXT_BACKUP') then
       begin
         AdoConnection1.DropTableOrView('TEXT_BACKUP');
-        InstallSql(2, 'TEXT_BACKUP'); // TODO: actually, it would be good to rename this to BACKUP
-        InstallSql(2, 'vw_TEXT_BACKUP'); // TODO: actually, it would be good to rename this to vw_BACKUP
+        AdoConnection1.DropTableOrView('vw_TEXT_BACKUP');
+        InstallSql(2, 'BACKUP');
+        InstallSql(2, 'vw_BACKUP');
       end;
       {$ENDREGION}
 

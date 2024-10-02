@@ -150,7 +150,7 @@ end;
 
 procedure TMandatorsForm.ttTextBackupBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'BAK_ID', 'TEXT_BACKUP', 'BAK_ID');
+  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'BAK_ID', 'BACKUP', 'BAK_ID');
 end;
 
 procedure TMandatorsForm.ttTextBackupBeforeInsert(DataSet: TDataSet);
@@ -311,7 +311,7 @@ begin
     SqlQueryTextBackup_order := 'BAK_ID';
     SqlQueryTextBackup_asc := true;
   end;
-  result := 'select BAK_ID, BAK_DATE, BAK_LINES, ANNOTATION, CHECKSUM from vw_TEXT_BACKUP ';
+  result := 'select BAK_ID, BAK_DATE, BAK_LINES, ANNOTATION, CHECKSUM from vw_BACKUP ';
   if trim(search)<>'' then
     result := result + 'where lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   result := result + 'order by ' + SqlQueryTextBackup_order + ' ' + AscDesc(SqlQueryTextBackup_asc);
