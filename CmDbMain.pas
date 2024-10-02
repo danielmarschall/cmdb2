@@ -165,6 +165,9 @@ begin
     try
       NeedNewBackup := false;
 
+      // Make some optimizations for performance
+      DefragIndexes(AdoConnection1);
+
       {$REGION '1. Make a Text Dump if something has changed'}
       sl := TStringList.Create;
       try

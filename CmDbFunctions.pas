@@ -6,6 +6,7 @@ uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
+procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function Adler32(const Str: string): DWORD;
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
@@ -26,6 +27,47 @@ implementation
 
 uses
   ShlObj, ShellApi;
+
+procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
+var
+  q: TAdoDataSet;
+  SchemaName, TableName, IndexName: string;
+begin
+  q := AdoConnection.GetTable(
+    'SELECT ' +
+    '  s.name AS SchemaName, ' +
+    '  t.name AS TableName, ' +
+    '  i.name AS IndexName, ' +
+    '  ips.index_type_desc AS IndexType, ' +
+    '  ips.avg_fragmentation_in_percent ' +
+    'FROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, ''LIMITED'') ips ' +
+    'JOIN sys.tables t ON ips.object_id = t.object_id ' +
+    'JOIN sys.schemas s ON t.schema_id = s.schema_id ' +
+    'JOIN sys.indexes i ON ips.object_id = i.object_id AND ips.index_id = i.index_id ' +
+    'WHERE ips.avg_fragmentation_in_percent > '+IntToStr(FragmentierungSchwellenWert)+' ' +
+    'ORDER BY ips.avg_fragmentation_in_percent DESC');
+  try
+    while not q.Eof do
+    begin
+      SchemaName := q.FieldByName('SchemaName').AsString;
+      TableName := q.FieldByName('TableName').AsString;
+      IndexName := q.FieldByName('IndexName').AsString;
+
+      if q.FieldByName('IndexType').AsString = 'HEAP' then
+      begin
+        AdoConnection.ExecSQL(Format('ALTER TABLE [%s].[%s] REBUILD;', [SchemaName, TableName]));
+      end
+      else
+      begin
+        AdoConnection.ExecSQL(Format('ALTER INDEX [%s] ON [%s].[%s] REBUILD;', [IndexName, SchemaName, TableName]));
+      end;
+
+      q.Next;
+    end;
+  finally
+    FreeAndNil(q);
+  end;
+end;
 
 function Adler32(const Str: string): DWORD;
 const
