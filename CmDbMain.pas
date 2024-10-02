@@ -32,6 +32,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure Generalhelp1Click(Sender: TObject);
     procedure RestoreBackup1Click(Sender: TObject);
+  private
+    function BackupPath: string;
   public
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
@@ -133,13 +135,19 @@ begin
   ShowMessage(Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum)]));
 end;
 
+function TMainForm.BackupPath: string;
+begin
+  Result := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
+  if Result = '' then Result := GetUserDirectory;
+end;
+
 procedure TMainForm.BackupandExit1Click(Sender: TObject);
 resourcestring
   S_BackupFailed = 'Backup failed (%s). Will exit without backup.';
 var
   q: TAdoDataset;
   sl: TStringList;
-  DBName, BackupPath, BackupFileName: string;
+  DBName, BackupFileName: string;
   LastBackupID: integer;
   i: integer;
   ChecksumNow, ChecksumThen: DWORD;
@@ -155,9 +163,6 @@ begin
   Application.ProcessMessages;
   try
     try
-      BackupPath := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
-      if BackupPath = '' then BackupPath := GetUserDirectory;
-
       NeedNewBackup := false;
 
       {$REGION '1. Make a Text Dump if something has changed'}
@@ -200,8 +205,7 @@ begin
       begin
         {$REGION '2. Make a SQL Backup'}
         DBName := AdoConnection1.DatabaseName;
-        if BackupPath <> '' then BackupPath := IncludeTrailingPathDelimiter(BackupPath);
-        BackupFileName := BackupPath + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.bak';
+        BackupFileName := IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.bak';
         if AdoConnection1.SupportsBackupCompression then
           AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format, compression;')
         else
@@ -325,7 +329,7 @@ procedure TMainForm.RestoreBackup1Click(Sender: TObject);
 var
   i: integer;
 begin
-  OpenDialog1.InitialDir := GetUserDirectory;
+  OpenDialog1.InitialDir := BackupPath;
   if OpenDialog1.Execute(Handle) then
   begin
     Screen.Cursor := crHourGlass;
@@ -336,6 +340,7 @@ begin
       begin
         MDIChildren[i].Free; // No need to call OnCloseQuery, because we will destroy all data anyways
       end;
+      Application.ProcessMessages;
       CmDb_RestoreDatabase(AdoConnection1, OpenDialog1.FileName);
       OpenDatabase1.Click;
     finally
