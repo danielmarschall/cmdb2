@@ -10,7 +10,6 @@ uses
   AdoConnHelper in 'AdoConnHelper.pas',
   Statistics in 'Statistics.pas' {StatisticsForm},
   DbGridHelper in 'DbGridHelper.pas',
-  CmDbTextBackup in 'CmDbTextBackup.pas',
   VtsCurConvDLLHeader in 'VtsCurConvDLLHeader.pas',
   CmDbFunctions in 'CmDbFunctions.pas',
   Help in 'Help.pas' {HelpForm},

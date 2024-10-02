@@ -168,7 +168,6 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="DbGridHelper.pas"/>
-        <DCCReference Include="CmDbTextBackup.pas"/>
         <DCCReference Include="VtsCurConvDLLHeader.pas"/>
         <DCCReference Include="CmDbFunctions.pas"/>
         <DCCReference Include="Help.pas">
@@ -203,12 +202,6 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="CmDb2.32.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>CmDb2.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="CmDb2.64.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>CmDb2.exe</RemoteName>
@@ -217,6 +210,12 @@
                 </DeployFile>
                 <DeployFile LocalName="CmDb2.64.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
+                        <RemoteName>CmDb2.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin32\CmDb2.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
                         <RemoteName>CmDb2.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

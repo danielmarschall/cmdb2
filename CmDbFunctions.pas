@@ -6,6 +6,7 @@ uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
+function Adler32(const Str: string): DWORD;
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
@@ -25,6 +26,25 @@ implementation
 
 uses
   ShlObj, ShellApi;
+
+function Adler32(const Str: string): DWORD;
+const
+  MOD_ADLER = 65521;
+var
+  A, B: DWORD;
+  I: Integer;
+  Data: RawByteString;
+begin
+  Data := UTF8Encode(Str);
+  A := 1;
+  B := 0;
+  for I := 1 to Length(Data) do
+  begin
+    A := (A + Ord(Data[I])) mod MOD_ADLER;
+    B := (B + A) mod MOD_ADLER;
+  end;
+  Result := (B shl 16) or A;
+end;
 
 // Returns Windows Error Code (i.e. 0=success), NOT the ShellExecute() code (>32 = success)
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
@@ -368,15 +388,14 @@ begin
       // ...
       //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
 
-
       // TODO: Once all things are decided, label everything as Schema #2
+
       if AdoConnection1.ViewExists('vw_STATISTICS') then
         AdoConnection1.DropTableOrView('vw_STATISTICS');
       if AdoConnection1.TableExists('STATISTICS') then
         AdoConnection1.DropTableOrView('STATISTICS');
 
-
-
+      {$REGION 'Statistics are not in the core anymore, but instead in a Plugin'}
       if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
         AdoConnection1.DropTableOrView('vw_STAT_RUNNING_COMMISSIONS');
       if AdoConnection1.TableExists('vw_STAT_SUM_YEARS') then
@@ -387,13 +406,15 @@ begin
         AdoConnection1.DropTableOrView('vw_STAT_TOP_ARTISTS');
       if AdoConnection1.TableExists('vw_STAT_TEXT_EXPORT') then
         AdoConnection1.DropTableOrView('vw_STAT_TEXT_EXPORT');
+      {$ENDREGION}
 
-
-
+      // The text dump generation is not a statistics anymore, but a core feature
       InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
+
+      // Downpayment now uses the quote data rather than the commission date
       InstallSql(2, 'vw_COMMISSION');
 
-
+      {$REGION 'New config table fields'}
       if not AdoConnection1.ColumnExists('CONFIG', 'READ_ONLY') then
       begin
         AdoConnection1.ExecSQL('alter table CONFIG add READ_ONLY bit;');
@@ -407,7 +428,16 @@ begin
         AdoConnection1.ExecSQL('alter table CONFIG alter column HIDDEN bit NOT NULL');
       end;
       InstallSql(2, 'vw_CONFIG');
+      {$ENDREGION}
 
+      {$REGION 'Text dumps now as files and not in database anymore'}
+      if AdoConnection1.ColumnExists('TEXT_BACKUP', 'BAK_DATA') then
+      begin
+        AdoConnection1.DropTableOrView('TEXT_BACKUP');
+        InstallSql(2, 'TEXT_BACKUP'); // TODO: actually, it would be good to rename this to BACKUP
+        InstallSql(2, 'vw_TEXT_BACKUP'); // TODO: actually, it would be good to rename this to vw_BACKUP
+      end;
+      {$ENDREGION}
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;

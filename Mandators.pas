@@ -27,12 +27,10 @@ type
     tsTextDumps: TTabSheet;
     dbgTextBackup: TDBGrid;
     navTextBackup: TDBNavigator;
-    sdTextBackup: TSaveDialog;
     ttTextBackupBAK_ID: TAutoIncField;
     ttTextBackupBAK_DATE: TDateTimeField;
     ttTextBackupBAK_LINES: TIntegerField;
     ttTextBackupANNOTATION: TWideStringField;
-    ttTextBackupBAK_SIZE_COMPRESSED_KB: TLargeintField;
     ttConfig: TADOQuery;
     dsConfig: TDataSource;
     ttConfigNAME: TWideStringField;
@@ -57,6 +55,7 @@ type
     HelpBtn: TButton;
     ttConfigHIDDEN: TBooleanField;
     ttConfigREAD_ONLY: TBooleanField;
+    ttTextBackupCHECKSUM: TIntegerField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -65,7 +64,6 @@ type
     procedure PageControl1Change(Sender: TObject);
     procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchBtnClick(Sender: TObject);
-    procedure dbgTextBackupDblClick(Sender: TObject);
     procedure ttTextBackupBeforeInsert(DataSet: TDataSet);
     procedure dbgConfigDblClick(Sender: TObject);
     procedure ttConfigBeforeInsert(DataSet: TDataSet);
@@ -111,7 +109,7 @@ implementation
 {$R *.dfm}
 
 uses
-  CmDbMain, Mandator, DbGridHelper, CmDbTextBackup, CmDbFunctions;
+  CmDbMain, Mandator, DbGridHelper, CmDbFunctions;
 
 procedure TMandatorsForm.ttConfigAfterScroll(DataSet: TDataSet);
 begin
@@ -235,25 +233,6 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.dbgTextBackupDblClick(Sender: TObject);
-var
-  sl: TStringList;
-begin
-  if ttTextBackup.State in [dsEdit,dsInsert] then ttTextBackup.Post;
-  if ttTextBackup.FieldByName('BAK_ID').IsNull then exit;
-  sl := TStringList.Create;
-  try
-    sdTextBackup.FileName := 'CmDb_'+ttTextBackup.FieldByName('BAK_ID').AsWideString + '.csv';
-    if sdTextBackup.Execute then
-    begin
-      sl.Text := RetrieveAndDecompressText(AdoConnection1, ttTextBackup.FieldByName('BAK_ID').AsInteger);
-      sl.SaveToFile(sdTextBackup.FileName);
-    end;
-  finally
-    FreeAndNil(sl);
-  end;
-end;
-
 procedure TMandatorsForm.dbgTextBackupTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -332,7 +311,7 @@ begin
     SqlQueryTextBackup_order := 'BAK_ID';
     SqlQueryTextBackup_asc := true;
   end;
-  result := 'select BAK_ID, BAK_DATE, BAK_LINES, BAK_SIZE_COMPRESSED_KB, ANNOTATION from vw_TEXT_BACKUP ';
+  result := 'select BAK_ID, BAK_DATE, BAK_LINES, ANNOTATION, CHECKSUM from vw_TEXT_BACKUP ';
   if trim(search)<>'' then
     result := result + 'where lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   result := result + 'order by ' + SqlQueryTextBackup_order + ' ' + AscDesc(SqlQueryTextBackup_asc);

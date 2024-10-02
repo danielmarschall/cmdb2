@@ -11,9 +11,13 @@ Artists, Commissions, Payments, ... are stored in a mandator. You can have multi
 
 Start by creating a new mandator simply by typing a name (e.g. your name) into the grid and then save the row by leaving it (press the arrow down key). Then, double-click the newly created row to open the mandator.
 
-## Database window tab "Text Dumps"
+## Database window tab "Backups"
 
-When you exit the program with the option "Backup and Exit", the program will check if you have made changes somewhere in the database, and if you did so, then create a fresh backup. A "Text Dump" is a backup protocol that shows all the data in text format. Double-clicking a row will let you save the text file. Note that a text file is just for your information, or for comparison with diff-tools. The actual backup that can be restored lies in the user profile directory, named `cmdb2_backup_*.bak`.
+When you exit the program with the option "Backup and Exit", the program will check if you have made changes somewhere in the database, and if you did so, then create a fresh backup with a sequential number.
+
+This table shows an overview of all backups created. Note that the table also contains backups which might have been deleted.
+
+Beside the BAK files (which can be restored), the program will create a CSV files that contain the data in text form which allows that backups can be compared with diff-tools.
 
 ## Database window tab "Settings"
 

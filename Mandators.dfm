@@ -24,7 +24,7 @@ object MandatorsForm: TMandatorsForm
     Top = 41
     Width = 624
     Height = 288
-    ActivePage = tsConfig
+    ActivePage = tsTextDumps
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -96,7 +96,7 @@ object MandatorsForm: TMandatorsForm
       end
     end
     object tsTextDumps: TTabSheet
-      Caption = 'Text Dumps'
+      Caption = 'Backups'
       ImageIndex = 1
       object dbgTextBackup: TDBGrid
         Left = 33
@@ -111,7 +111,6 @@ object MandatorsForm: TMandatorsForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
-        OnDblClick = dbgTextBackupDblClick
         OnTitleClick = dbgTextBackupTitleClick
         Columns = <
           item
@@ -127,11 +126,6 @@ object MandatorsForm: TMandatorsForm
           item
             Expanded = False
             FieldName = 'BAK_LINES'
-            Visible = True
-          end
-          item
-            Expanded = False
-            FieldName = 'BAK_SIZE_COMPRESSED_KB'
             Visible = True
           end
           item
@@ -393,9 +387,8 @@ object MandatorsForm: TMandatorsForm
       FieldName = 'BAK_LINES'
       ReadOnly = True
     end
-    object ttTextBackupBAK_SIZE_COMPRESSED_KB: TLargeintField
-      FieldName = 'BAK_SIZE_COMPRESSED_KB'
-      ReadOnly = True
+    object ttTextBackupCHECKSUM: TIntegerField
+      FieldName = 'CHECKSUM'
     end
     object ttTextBackupANNOTATION: TWideStringField
       FieldName = 'ANNOTATION'
@@ -406,13 +399,6 @@ object MandatorsForm: TMandatorsForm
     DataSet = ttTextBackup
     Left = 288
     Top = 152
-  end
-  object sdTextBackup: TSaveDialog
-    DefaultExt = 'csv'
-    Filter = 'CSV Files (*.csv)|*.csv|All files (*.*)|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 292
-    Top = 259
   end
   object ttConfig: TADOQuery
     Connection = ADOConnection1

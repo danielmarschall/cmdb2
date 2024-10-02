@@ -58,10 +58,18 @@ Although CMDB2 is translated into English, the development environment was Germa
 
 Where is my data stored? By default, data is stored in your Windows profile at `C:\Users\YourName\`
 
-The files are named:
+The data files are named:
 - `cmdb2.mdf`
 - `cmdb2.ldf`
-- `cmdb2_backup_*.bak` are backups, which can be regularly purged.
+
+Backups are either stored in your Windows profile or the path you specified in the configuration setting `BACKUP_PATH`.
+
+The backup files include:
+
+- `cmdb2_backup_*.bak` which is the actual file that can be restored
+- `cmdb2_backup_*.csv` which is a protocol in text form that can be compared with diff-tools.
+
+Backup files can be regularly purged by simply deleting the files.
 
 Please create backups regularly by clicking "File" and then "Backup and Exit".
 

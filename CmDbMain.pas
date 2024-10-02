@@ -48,7 +48,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Mandators, CmDbTextBackup, AdoConnHelper, StrUtils, Help,
+  Mandators, AdoConnHelper, StrUtils, Help,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
   ShellApi, System.UITypes;
 
@@ -142,6 +142,8 @@ var
   DBName, BackupPath, BackupFileName: string;
   LastBackupID: integer;
   i: integer;
+  ChecksumNow, ChecksumThen: DWORD;
+  NeedNewBackup: boolean;
 begin
   for i := MDIChildCount - 1 downto 0 do
   begin
@@ -153,38 +155,59 @@ begin
   Application.ProcessMessages;
   try
     try
+      BackupPath := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
+      if BackupPath = '' then BackupPath := GetUserDirectory;
+
+      NeedNewBackup := false;
+
       {$REGION '1. Make a Text Dump if something has changed'}
-      q := ADOConnection1.GetTable('select * from vw_TEXT_BACKUP_GENERATE order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
       sl := TStringList.Create;
       try
-        sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');
-        while not q.EOF do
-        begin
-          sl.Add(q.Fields[0].AsWideString+';'+q.Fields[1].AsWideString+';'+q.Fields[2].AsWideString+';'+q.Fields[3].AsWideString+';'+q.Fields[4].AsWideString+';'+q.Fields[5].AsWideString);
-          q.Next;
+        q := ADOConnection1.GetTable('select * from vw_TEXT_BACKUP_GENERATE order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
+        try
+          sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');
+          while not q.EOF do
+          begin
+            sl.Add('"'+q.Fields[0].AsWideString+'";"'+q.Fields[1].AsWideString+'";"'+q.Fields[2].AsWideString+'";"'+q.Fields[3].AsWideString+'";"'+q.Fields[4].AsWideString+'";"'+q.Fields[5].AsWideString);
+            q.Next;
+          end;
+        finally
+          FreeAndNil(q);
         end;
-        LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from TEXT_BACKUP'));
-        if (LastBackupID = 0) or (RetrieveAndDecompressText(AdoConnection1, LastBackupId) <> sl.Text) then
-        begin
-          CompressAndStoreText(AdoConnection1, sl);
-          LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from TEXT_BACKUP'));
+
+        CheckSumNow := Adler32(sl.Text);
+
+        q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from TEXT_BACKUP order by BAK_ID desc');
+        try
+          ChecksumThen := q.FieldByName('CHECKSUM').AsInteger;
+          LastBackupId := q.FieldByName('BAK_ID').AsInteger;
+          if (q.RecordCount = 0) or (ChecksumThen <> ChecksumNow) then
+          begin
+            ADOConnection1.ExecSQL('INSERT INTO TEXT_BACKUP (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+IntToStr(ChecksumNow)+')');
+            LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from TEXT_BACKUP'));
+            sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.csv');
+            NeedNewBackup := true;
+          end;
+        finally
+          FreeAndNil(q);
         end;
       finally
-        FreeAndNil(q);
         FreeAndNil(sl);
       end;
       {$ENDREGION}
 
-      {$REGION '2. Make a SQL Backup'}
-      BackupPath := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
-      DBName := AdoConnection1.DatabaseName;
-      if BackupPath <> '' then BackupPath := IncludeTrailingPathDelimiter(BackupPath);
-      BackupFileName := BackupPath + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.bak';
-      if AdoConnection1.SupportsBackupCompression then
-        AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format, compression;')
-      else
-        AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format;');
-      {$ENDREGION}
+      if NeedNewBackup then
+      begin
+        {$REGION '2. Make a SQL Backup'}
+        DBName := AdoConnection1.DatabaseName;
+        if BackupPath <> '' then BackupPath := IncludeTrailingPathDelimiter(BackupPath);
+        BackupFileName := BackupPath + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.bak';
+        if AdoConnection1.SupportsBackupCompression then
+          AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format, compression;')
+        else
+          AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format;');
+        {$ENDREGION}
+      end;
     except
       on E: Exception do
       begin
