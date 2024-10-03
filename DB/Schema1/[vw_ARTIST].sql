@@ -1,21 +1,21 @@
 CREATE or ALTER view [dbo].[vw_ARTIST] as
 
 WITH FilteredUploads AS (
-    SELECT
-        art.ID AS ARTIST_ID,
-        art.NAME AS ARTIST_NAME,
-        ev.ID AS EVENT_ID,
-        ev.STATE,
-        upl.PROHIBIT,
-        ROW_NUMBER() OVER (PARTITION BY cm.ID, ev.STATE ORDER BY upl.ID) AS rn
-    FROM 
-        ARTIST art
-    LEFT JOIN 
-        COMMISSION cm ON cm.ARTIST_ID = art.ID
-    LEFT JOIN 
-        COMMISSION_EVENT ev ON ev.COMMISSION_ID = cm.ID
-    LEFT JOIN 
-        UPLOAD upl ON upl.EVENT_ID = ev.ID
+	SELECT
+		art.ID AS ARTIST_ID,
+		art.NAME AS ARTIST_NAME,
+		ev.ID AS EVENT_ID,
+		ev.STATE,
+		upl.PROHIBIT,
+		ROW_NUMBER() OVER (PARTITION BY cm.ID, ev.STATE ORDER BY upl.ID) AS rn
+	FROM 
+		ARTIST art
+	LEFT JOIN 
+		COMMISSION cm ON cm.ARTIST_ID = art.ID
+	LEFT JOIN 
+		COMMISSION_EVENT ev ON ev.COMMISSION_ID = cm.ID
+	LEFT JOIN 
+		UPLOAD upl ON upl.EVENT_ID = ev.ID
 ),
 UploadStuff as (
 	SELECT 

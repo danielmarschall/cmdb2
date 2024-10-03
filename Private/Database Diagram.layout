@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 14, 14.75" name="CMDB2">
+  <DataContextMoniker Name="/CMDB2DataContext" />
+  <nestedChildShapes>
+    <classShape Id="36d072a0-1b77-48b3-bad7-cf3d73b7eb01" absoluteBounds="3.5, 6.75, 2, 1.7708968098958335">
+      <DataClassMoniker Name="/CMDB2DataContext/ARTIST" />
+      <nestedChildShapes>
+        <elementListCompartment Id="e817740b-9cce-4707-afa4-9aed07718350" absoluteBounds="3.515, 7.2100000000000009, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="a78f1985-5206-4013-9a64-d6ab167ec2e0" absoluteBounds="11.75, 1.5, 2, 2.3478011067708335">
+      <DataClassMoniker Name="/CMDB2DataContext/UPLOAD" />
+      <nestedChildShapes>
+        <elementListCompartment Id="3a43ab45-07bb-44cc-9901-2f3a48d20fd4" absoluteBounds="11.765, 1.96, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="fb0d97f2-9266-40fa-9bfa-982c291a1b20" absoluteBounds="6.25, 6.75, 2, 1.9631982421874996">
+      <DataClassMoniker Name="/CMDB2DataContext/ARTIST_EVENT" />
+      <nestedChildShapes>
+        <elementListCompartment Id="aa51291e-311d-4a05-8276-c9c02106808e" absoluteBounds="6.265, 7.2100000000000009, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="d2a97b94-3b89-41a8-8647-37e930a44cd6" absoluteBounds="0.75, 0.75, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/CMDB2DataContext/BACKUP" />
+      <nestedChildShapes>
+        <elementListCompartment Id="0f1bb68b-b0d6-400b-8e51-7b3d109829e0" absoluteBounds="0.765, 1.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="df11cab4-7671-43ed-b2fc-794b24d3d696" absoluteBounds="6.25, 3.5, 2, 1.7708968098958326">
+      <DataClassMoniker Name="/CMDB2DataContext/COMMISSION" />
+      <nestedChildShapes>
+        <elementListCompartment Id="b039e45e-2fcf-4ab7-94c8-7e252602690f" absoluteBounds="6.265, 3.96, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="ad65cabd-0f57-488e-9c38-ce77729dbecd" absoluteBounds="9, 3.5, 2, 1.7708968098958326">
+      <DataClassMoniker Name="/CMDB2DataContext/COMMISSION_EVENT" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1a3b85a5-c1ce-473a-88e2-452374867d2c" absoluteBounds="9.015, 3.96, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="1e6957ae-66ac-4f84-9571-7448e1f5404d" absoluteBounds="6.25, 12.5, 2, 1.9631982421874987">
+      <DataClassMoniker Name="/CMDB2DataContext/COMMUNICATION" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ecce1ea7-deb3-46f5-be6f-970c64faa2fe" absoluteBounds="6.265, 12.96, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="6f5221be-9bf6-41a5-97e8-667d488a0a51" absoluteBounds="3.75, 0.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CMDB2DataContext/CONFIG" />
+      <nestedChildShapes>
+        <elementListCompartment Id="8b9a098f-daab-4ece-a846-3924989fd20e" absoluteBounds="3.765, 1.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="ac883d40-81d7-4f3c-b390-a6b670336d45" absoluteBounds="0.75, 7, 2, 1.1939925130208344">
+      <DataClassMoniker Name="/CMDB2DataContext/MANDATOR" />
+      <nestedChildShapes>
+        <elementListCompartment Id="65c1d208-0ef2-46f1-8003-a8df8770a3b6" absoluteBounds="0.765, 7.4600000000000009, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="33885429-8013-459b-8253-0bc2e5a2ecd3" absoluteBounds="6.25, 9.375, 2, 2.5401025390624987">
+      <DataClassMoniker Name="/CMDB2DataContext/PAYMENT" />
+      <nestedChildShapes>
+        <elementListCompartment Id="a1631753-db3e-445c-adf6-28c1b40a6c31" absoluteBounds="6.2650000000000006, 9.835, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="26ee5b48-2a81-44ed-8734-0068b906131b" absoluteBounds="11.75, 5.375, 2, 2.5401025390625005">
+      <DataClassMoniker Name="/CMDB2DataContext/QUOTE" />
+      <nestedChildShapes>
+        <elementListCompartment Id="9eb43905-8a17-46d2-bab1-b7bedf8e3422" absoluteBounds="11.765, 5.835, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="5d16a6db-e8c0-4c62-9c44-8d707688e2e9" absoluteBounds="0.75, 3.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CMDB2DataContext/STATISTICS" />
+      <nestedChildShapes>
+        <elementListCompartment Id="4b0d93ae-daa1-4174-acef-e0a97f39f12c" absoluteBounds="0.765, 4.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(5.5 : 7.63544840494792); (6.25 : 7.63544840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/ARTIST/ARTIST_ARTIST_EVENT" />
+      <nodes>
+        <classShapeMoniker Id="36d072a0-1b77-48b3-bad7-cf3d73b7eb01" />
+        <classShapeMoniker Id="fb0d97f2-9266-40fa-9bfa-982c291a1b20" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(4.5 : 6.75); (4.5 : 4.38544840494792); (6.25 : 4.38544840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/ARTIST/ARTIST_COMMISSION" />
+      <nodes>
+        <classShapeMoniker Id="36d072a0-1b77-48b3-bad7-cf3d73b7eb01" />
+        <classShapeMoniker Id="df11cab4-7671-43ed-b2fc-794b24d3d696" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(10 : 3.5); (10 : 2.4999995); (11.75 : 2.4999995)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/COMMISSION_EVENT/COMMISSION_EVENT_UPLOAD" />
+      <nodes>
+        <classShapeMoniker Id="ad65cabd-0f57-488e-9c38-ce77729dbecd" />
+        <classShapeMoniker Id="a78f1985-5206-4013-9a64-d6ab167ec2e0" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(8.25 : 4.38544840494792); (9 : 4.38544840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/COMMISSION/COMMISSION_COMMISSION_EVENT" />
+      <nodes>
+        <classShapeMoniker Id="df11cab4-7671-43ed-b2fc-794b24d3d696" />
+        <classShapeMoniker Id="ad65cabd-0f57-488e-9c38-ce77729dbecd" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(4.5 : 8.52089680989583); (4.5 : 13.4815991210937); (6.25 : 13.4815991210937)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/ARTIST/ARTIST_COMMUNICATION" />
+      <nodes>
+        <classShapeMoniker Id="36d072a0-1b77-48b3-bad7-cf3d73b7eb01" />
+        <classShapeMoniker Id="1e6957ae-66ac-4f84-9571-7448e1f5404d" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 7.59699625651042); (3.5 : 7.59699625651042)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/MANDATOR/MANDATOR_ARTIST" />
+      <nodes>
+        <classShapeMoniker Id="ac883d40-81d7-4f3c-b390-a6b670336d45" />
+        <classShapeMoniker Id="36d072a0-1b77-48b3-bad7-cf3d73b7eb01" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.0312525 : 8.52089680989583); (5.0312525 : 10.6450512695312); (6.25 : 10.6450512695312)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/ARTIST/ARTIST_PAYMENT" />
+      <nodes>
+        <classShapeMoniker Id="36d072a0-1b77-48b3-bad7-cf3d73b7eb01" />
+        <classShapeMoniker Id="33885429-8013-459b-8253-0bc2e5a2ecd3" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(10 : 5.27089680989583); (10 : 6.64505126953125); (11.75 : 6.64505126953125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/CMDB2DataContext/COMMISSION_EVENT/COMMISSION_EVENT_QUOTE" />
+      <nodes>
+        <classShapeMoniker Id="ad65cabd-0f57-488e-9c38-ce77729dbecd" />
+        <classShapeMoniker Id="26ee5b48-2a81-44ed-8734-0068b906131b" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

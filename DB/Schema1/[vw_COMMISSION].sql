@@ -12,79 +12,79 @@ WITH UploadStuff AS (
 	group by cm.ID
 ),
 ZahlungenSummiert AS (
-    SELECT 
-        art.ID as ARTIST_ID, 
-        pay.CURRENCY,
-        SUM(ISNULL(pay.AMOUNT, 0)) AS GesamtsummeZahlungen
-    FROM 
-        ARTIST art
-    LEFT JOIN PAYMENT pay ON pay.ARTIST_ID = art.ID
-    GROUP BY art.ID, pay.CURRENCY
+	SELECT 
+		art.ID as ARTIST_ID, 
+		pay.CURRENCY,
+		SUM(ISNULL(pay.AMOUNT, 0)) AS GesamtsummeZahlungen
+	FROM 
+		ARTIST art
+	LEFT JOIN PAYMENT pay ON pay.ARTIST_ID = art.ID
+	GROUP BY art.ID, pay.CURRENCY
 ),
 AggregierteQuotes AS (
-    SELECT 
-        cm.ID as COMMISSION_ID,
+	SELECT 
+		cm.ID as COMMISSION_ID,
 		art.NAME as ARTIST_NAME,
-        cm.ARTIST_ID,
-        cm.NAME as COMMISSION_NAME,
-        MIN(ev.DATE) as QUOTE_DATE, -- Nimm das früheste Datum der Quote für die Sortierung
-        q.CURRENCY,
-        SUM(q.AMOUNT) as QUOTE_AMOUNT, -- Summe aller Quotes pro Commission und Währung
+		cm.ARTIST_ID,
+		cm.NAME as COMMISSION_NAME,
+		MIN(ev.DATE) as QUOTE_DATE, -- Nimm das früheste Datum der Quote für die Sortierung
+		q.CURRENCY,
+		SUM(q.AMOUNT) as QUOTE_AMOUNT, -- Summe aller Quotes pro Commission und Währung
 		SUM(q.AMOUNT_LOCAL) as QUOTE_AMOUNT_LOCAL
-    FROM 
-        COMMISSION cm
-    LEFT JOIN COMMISSION_EVENT ev ON ev.COMMISSION_ID = cm.ID AND ev.STATE = 'quote'
-    LEFT JOIN QUOTE q ON q.EVENT_ID = ev.ID
+	FROM 
+		COMMISSION cm
+	LEFT JOIN COMMISSION_EVENT ev ON ev.COMMISSION_ID = cm.ID AND ev.STATE = 'quote'
+	LEFT JOIN QUOTE q ON q.EVENT_ID = ev.ID
 	LEFT JOIN ARTIST art on art.ID = cm.ARTIST_ID
 	where isnull(q.IS_FREE,0) = 0 -- q.DESCRIPTION not like '%free%' and q.DESCRIPTION not like '%gift%'
-    GROUP BY 
-        cm.ID, cm.ARTIST_ID, art.NAME, cm.NAME, q.CURRENCY
+	GROUP BY 
+		cm.ID, cm.ARTIST_ID, art.NAME, cm.NAME, q.CURRENCY
 ),
 LeistungenMitZahlungen AS (
-    SELECT 
-        aq.ARTIST_ID,
+	SELECT 
+		aq.ARTIST_ID,
 		aq.ARTIST_NAME,
-        aq.COMMISSION_ID,
-        aq.COMMISSION_NAME,
-        aq.QUOTE_DATE,
-        aq.QUOTE_AMOUNT,
+		aq.COMMISSION_ID,
+		aq.COMMISSION_NAME,
+		aq.QUOTE_DATE,
+		aq.QUOTE_AMOUNT,
 		aq.QUOTE_AMOUNT_LOCAL,
-        aq.CURRENCY,
-        COALESCE(zs.GesamtsummeZahlungen, 0) AS GesamtsummeZahlungen
-    FROM 
-        AggregierteQuotes aq
-    LEFT JOIN ZahlungenSummiert zs ON aq.ARTIST_ID = zs.ARTIST_ID AND aq.CURRENCY = zs.CURRENCY
+		aq.CURRENCY,
+		COALESCE(zs.GesamtsummeZahlungen, 0) AS GesamtsummeZahlungen
+	FROM 
+		AggregierteQuotes aq
+	LEFT JOIN ZahlungenSummiert zs ON aq.ARTIST_ID = zs.ARTIST_ID AND aq.CURRENCY = zs.CURRENCY
 ),
 KumulierteLeistungen AS (
-    SELECT 
-        ARTIST_ID,
+	SELECT 
+		ARTIST_ID,
 		ARTIST_NAME,
-        COMMISSION_ID,
-        COMMISSION_NAME,
-        QUOTE_DATE,
-        QUOTE_AMOUNT,
+		COMMISSION_ID,
+		COMMISSION_NAME,
+		QUOTE_DATE,
+		QUOTE_AMOUNT,
 		QUOTE_AMOUNT_LOCAL,
-        CURRENCY,
-        GesamtsummeZahlungen,
-        SUM(QUOTE_AMOUNT) OVER (PARTITION BY ARTIST_ID, CURRENCY ORDER BY QUOTE_DATE) AS KumulierteLeistungen
-    FROM 
-        LeistungenMitZahlungen
+		CURRENCY,
+		GesamtsummeZahlungen,
+		SUM(QUOTE_AMOUNT) OVER (PARTITION BY ARTIST_ID, CURRENCY ORDER BY QUOTE_DATE) AS KumulierteLeistungen
+	FROM 
+		LeistungenMitZahlungen
 ),
 VorherigeLeistungen AS (
-    SELECT
-        ARTIST_ID,
+	SELECT
+		ARTIST_ID,
 		ARTIST_NAME,
-        COMMISSION_ID,
-        COMMISSION_NAME,
-        QUOTE_DATE,
-        QUOTE_AMOUNT,
+		COMMISSION_ID,
+		COMMISSION_NAME,
+		QUOTE_DATE,
+		QUOTE_AMOUNT,
 		QUOTE_AMOUNT_LOCAL,
-        CURRENCY,
-        GesamtsummeZahlungen,
-        KumulierteLeistungen,
-        LAG(KumulierteLeistungen, 1, 0) OVER (PARTITION BY ARTIST_ID, CURRENCY ORDER BY QUOTE_DATE) AS VorherigeKumulierteLeistungen
-    FROM
-        KumulierteLeistungen
+		CURRENCY,
+		GesamtsummeZahlungen,
+		KumulierteLeistungen,
+		LAG(KumulierteLeistungen, 1, 0) OVER (PARTITION BY ARTIST_ID, CURRENCY ORDER BY QUOTE_DATE) AS VorherigeKumulierteLeistungen
+	FROM
+		KumulierteLeistungen
 ),
 DownPayment AS (
 	SELECT 
@@ -110,7 +110,7 @@ DownPayment AS (
 	FROM 
 		VorherigeLeistungen
 	--ORDER BY 
-	--    ARTIST_ID, CURRENCY, QUOTE_DATE;
+	--	ARTIST_ID, CURRENCY, QUOTE_DATE;
 
 union
 
@@ -129,14 +129,14 @@ union
 
 ),
 AggregatedPaymentStatus AS (
-    SELECT 
-        dp.COMMISSION_ID,        
+	SELECT 
+		dp.COMMISSION_ID,
 		STRING_AGG(
-			dp.PAY_STATUS+' '+cast(dp.QUOTE_AMOUNT as nvarchar(20))+' '+dp.CURRENCY		
+			dp.PAY_STATUS+' '+cast(dp.QUOTE_AMOUNT as nvarchar(20))+' '+dp.CURRENCY
 		, ' + ') AS PAY_STATUS,
 		SUM(dp.QUOTE_AMOUNT_LOCAL) as QUOTE_AMOUNT_LOCAL
-    FROM DownPayment dp
-    GROUP BY dp.COMMISSION_ID
+	FROM DownPayment dp
+	GROUP BY dp.COMMISSION_ID
 )
 
 select

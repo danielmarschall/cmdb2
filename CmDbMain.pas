@@ -195,7 +195,7 @@ begin
           FreeAndNil(q);
         end;
 
-        CheckSumNow := THashSHA2.GetHashString(sl.Text);
+        CheckSumNow := THashSHA2.GetHashString(sl.Text); // SHA256
 
         q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from [BACKUP] order by BAK_ID desc');
         try

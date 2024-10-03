@@ -13,30 +13,30 @@ WITH UploadStuff AS (
 	group by cm.ID
 ),
 PaymentSums AS (
-    select
+	select
 		art.ID as ARTIST_ID,
 		p.CURRENCY,
-        SUM(p.AMOUNT) AS TotalPayment
-    from PAYMENT p
-    left join ARTIST art ON art.ID = p.ARTIST_ID
-    group by art.ID, p.CURRENCY
+		SUM(p.AMOUNT) AS TotalPayment
+	from PAYMENT p
+	left join ARTIST art ON art.ID = p.ARTIST_ID
+	group by art.ID, p.CURRENCY
 ),
 QuoteSums AS (
-    select
-        q.ID AS QUOTE_ID,
-        q.CURRENCY,
-        art.ID as ARTIST_ID,
-        SUM(CASE 
+	select
+		q.ID AS QUOTE_ID,
+		q.CURRENCY,
+		art.ID as ARTIST_ID,
+		SUM(CASE 
 			WHEN isnull(q.IS_FREE,0) = 0 THEN q.AMOUNT 
 			ELSE 0 
 		END) OVER (PARTITION BY art.ID, q.CURRENCY ORDER BY
 			iif (q.DESCRIPTION like 'nicht bez%' or q.DESCRIPTION like 'not paid%', 1, 0), -- Individual for DMX/SD
 			ev.DATE, q.ID
 		) AS RunningQuoteSum
-    from QUOTE q
-    left join COMMISSION_EVENT ev ON ev.ID = q.EVENT_ID
-    left join COMMISSION cm ON cm.ID = ev.COMMISSION_ID
-    left join ARTIST art ON art.ID = cm.ARTIST_ID
+	from QUOTE q
+	left join COMMISSION_EVENT ev ON ev.ID = q.EVENT_ID
+	left join COMMISSION cm ON cm.ID = ev.COMMISSION_ID
+	left join ARTIST art ON art.ID = cm.ARTIST_ID
 ),
 QuoteNotPaid as (
 	select 

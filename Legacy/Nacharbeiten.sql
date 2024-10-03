@@ -31,5 +31,5 @@ order by art.NAME, cm.NAME;
 --where (abs(AMOUNT) between 0.11 and 0.13) or (abs(AMOUNT_LOCAL) between 0.11 and 0.13);
 
 --6. Vergleichen, ob laufende CM wirklich korrekt übereinstimmen
-select ART_STATUS, NAME from cmdb2.dbo.vw_COMMISSION where ART_STATUS <> 'fin' and ART_STATUS <> 'postponed' and ART_STATUS <> 'idea' and ART_STATUS <> 'cancel c' and ART_STATUS <> 'cancel x' and ART_STATUS <> 'cancel a' and ART_STATUS <> 'rejected' and ART_STATUS <> 'c td initcm' order by ART_STATUS
-
+-- OK!
+--select ART_STATUS, NAME from cmdb2.dbo.vw_COMMISSION where ART_STATUS <> 'fin' and ART_STATUS <> 'postponed' and ART_STATUS <> 'idea' and ART_STATUS <> 'cancel c' and ART_STATUS <> 'cancel x' and ART_STATUS <> 'cancel a' and ART_STATUS <> 'rejected' and ART_STATUS <> 'c td initcm' order by ART_STATUS
