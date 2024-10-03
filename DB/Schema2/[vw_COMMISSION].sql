@@ -27,11 +27,11 @@ QuoteSums AS (
         q.CURRENCY,
         art.ID as ARTIST_ID,
         SUM(CASE 
-			WHEN q.IS_FREE <> 1 THEN q.AMOUNT 
+			WHEN isnull(q.IS_FREE,0) = 0 THEN q.AMOUNT 
 			ELSE 0 
 		END) OVER (PARTITION BY art.ID, q.CURRENCY ORDER BY
 			iif (q.DESCRIPTION like 'nicht bez%' or q.DESCRIPTION like 'not paid%', 1, 0), -- Individual for DMX/SD
-			ev.DATE
+			ev.DATE, q.ID
 		) AS RunningQuoteSum
     from QUOTE q
     left join COMMISSION_EVENT ev ON ev.ID = q.EVENT_ID
