@@ -89,6 +89,12 @@ type
       DisplayText: Boolean);
     procedure HelpBtnClick(Sender: TObject);
     procedure GoBackBtnClick(Sender: TObject);
+    procedure dbgEventsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgQuotesKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgUploadsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -536,6 +542,21 @@ begin
     result := result + 'order by ' + SqlQueryUpload_order + ' ' + AscDesc(SqlQueryUpload_asc);
 end;
 
+procedure TCommissionForm.dbgEventsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TCommissionForm.dbgEventsTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -553,6 +574,21 @@ begin
   end;
 end;
 
+procedure TCommissionForm.dbgQuotesKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TCommissionForm.dbgQuotesTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -567,6 +603,21 @@ begin
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TCommissionForm.dbgUploadsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
   end;
 end;
 

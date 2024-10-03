@@ -26,7 +26,7 @@ object MandatorsForm: TMandatorsForm
     Top = 41
     Width = 624
     Height = 288
-    ActivePage = tsTextDumps
+    ActivePage = tsConfig
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -57,6 +57,7 @@ object MandatorsForm: TMandatorsForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgMandatorDblClick
+        OnKeyDown = dbgMandatorKeyDown
         OnTitleClick = dbgMandatorTitleClick
         Columns = <
           item
@@ -114,6 +115,7 @@ object MandatorsForm: TMandatorsForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnKeyDown = dbgTextBackupKeyDown
         OnTitleClick = dbgTextBackupTitleClick
         Columns = <
           item
@@ -209,6 +211,7 @@ object MandatorsForm: TMandatorsForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgConfigDblClick
+        OnKeyDown = dbgConfigKeyDown
         OnTitleClick = dbgConfigTitleClick
         Columns = <
           item

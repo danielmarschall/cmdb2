@@ -135,6 +135,14 @@ type
     procedure GoBackBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure dbgCommissionKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgPaymentKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgArtistEventKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgCommunicationKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -394,6 +402,21 @@ begin
     SaveGridToCsv(dbgPayment, sdCsvPayment.FileName);
 end;
 
+procedure TArtistForm.dbgArtistEventKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TArtistForm.dbgArtistEventTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -418,6 +441,21 @@ begin
   MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
+procedure TArtistForm.dbgCommissionKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TArtistForm.dbgCommissionTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -435,6 +473,21 @@ begin
   end;
 end;
 
+procedure TArtistForm.dbgCommunicationKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TArtistForm.dbgCommunicationTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -449,6 +502,21 @@ begin
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.dbgPaymentKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
   end;
 end;
 

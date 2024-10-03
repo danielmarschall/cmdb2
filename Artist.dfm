@@ -25,7 +25,7 @@ object ArtistForm: TArtistForm
     Top = 41
     Width = 1100
     Height = 400
-    ActivePage = tsArtistEvent
+    ActivePage = tsCommunication
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -45,6 +45,7 @@ object ArtistForm: TArtistForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgCommissionDblClick
+        OnKeyDown = dbgCommissionKeyDown
         OnTitleClick = dbgCommissionTitleClick
         Columns = <
           item
@@ -160,6 +161,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnKeyDown = dbgPaymentKeyDown
         OnTitleClick = dbgPaymentTitleClick
         Columns = <
           item
@@ -258,6 +260,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnKeyDown = dbgArtistEventKeyDown
         OnTitleClick = dbgArtistEventTitleClick
         Columns = <
           item
@@ -338,6 +341,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnKeyDown = dbgCommunicationKeyDown
         OnTitleClick = dbgCommunicationTitleClick
         Columns = <
           item

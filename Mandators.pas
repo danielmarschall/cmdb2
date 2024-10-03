@@ -89,6 +89,12 @@ type
     procedure ttConfigBeforeEdit(DataSet: TDataSet);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure dbgMandatorKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgConfigKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -195,6 +201,21 @@ begin
   // Nothing here
 end;
 
+procedure TMandatorsForm.dbgConfigKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'NAME');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TMandatorsForm.dbgConfigTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -219,6 +240,21 @@ begin
   MainForm.OpenDbObject('MANDATOR', ttMandator.FieldByName('ID').AsGuid);
 end;
 
+procedure TMandatorsForm.dbgMandatorKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TMandatorsForm.dbgMandatorTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -233,6 +269,21 @@ begin
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TMandatorsForm.dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'BAK_ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
   end;
 end;
 

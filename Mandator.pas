@@ -198,6 +198,16 @@ type
     procedure GoBackBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure dbgArtistsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgClientsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgCommissionsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgPaymentKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbgStatisticsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     Edit1Sav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -505,6 +515,21 @@ begin
   MainForm.OpenDbObject('ARTIST', ttArtists.FieldByName('ID').AsGuid);
 end;
 
+procedure TMandatorForm.dbgArtistsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TMandatorForm.dbgArtistsTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -527,6 +552,21 @@ begin
   if ttClients.State in [dsEdit,dsInsert] then ttClients.Post;
   if ttClients.FieldByName('ID').IsNull then exit;
   MainForm.OpenDbObject('ARTIST', ttClients.FieldByName('ID').AsGuid);
+end;
+
+procedure TMandatorForm.dbgClientsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
 end;
 
 procedure TMandatorForm.dbgClientsTitleClick(Column: TColumn);
@@ -553,6 +593,21 @@ begin
   MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
+procedure TMandatorForm.dbgCommissionsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
+end;
+
 procedure TMandatorForm.dbgCommissionsTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
@@ -567,6 +622,21 @@ begin
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TMandatorForm.dbgPaymentKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
   end;
 end;
 
@@ -596,6 +666,21 @@ begin
 
   resp := TCmDbPluginClient.ClickEvent(AdoConnection1, MandatorId, ttStatistics.FieldByName('ID').AsGuid, GUID_NIL);
   HandleClickResponse(AdoConnection1, MandatorId, resp);
+end;
+
+procedure TMandatorForm.dbgStatisticsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
+  end;
 end;
 
 procedure TMandatorForm.dbgStatisticsTitleClick(Column: TColumn);

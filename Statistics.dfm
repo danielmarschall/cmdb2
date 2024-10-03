@@ -46,6 +46,7 @@ object StatisticsForm: TStatisticsForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgQueryDblClick
+        OnKeyDown = dbgQueryKeyDown
         OnTitleClick = dbgQueryTitleClick
       end
       object navQuery: TDBNavigator

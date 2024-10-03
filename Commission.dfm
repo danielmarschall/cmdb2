@@ -23,7 +23,7 @@ object CommissionForm: TCommissionForm
     Top = 41
     Width = 758
     Height = 542
-    ActivePage = tsFiles
+    ActivePage = tsEvents
     Align = alClient
     TabOrder = 0
     object tsEvents: TTabSheet
@@ -70,6 +70,7 @@ object CommissionForm: TCommissionForm
           TitleFont.Height = -12
           TitleFont.Name = 'Segoe UI'
           TitleFont.Style = []
+          OnKeyDown = dbgEventsKeyDown
           OnTitleClick = dbgEventsTitleClick
           Columns = <
             item
@@ -116,7 +117,7 @@ object CommissionForm: TCommissionForm
         Top = 212
         Width = 750
         Height = 300
-        ActivePage = tsUploads
+        ActivePage = tsQuotes
         Align = alClient
         TabOrder = 1
         object tsQuotes: TTabSheet
@@ -145,6 +146,7 @@ object CommissionForm: TCommissionForm
             TitleFont.Height = -12
             TitleFont.Name = 'Segoe UI'
             TitleFont.Style = []
+            OnKeyDown = dbgQuotesKeyDown
             OnTitleClick = dbgQuotesTitleClick
             Columns = <
               item
@@ -207,6 +209,7 @@ object CommissionForm: TCommissionForm
             TitleFont.Height = -12
             TitleFont.Name = 'Segoe UI'
             TitleFont.Style = []
+            OnKeyDown = dbgUploadsKeyDown
             OnTitleClick = dbgUploadsTitleClick
             Columns = <
               item

@@ -46,6 +46,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgArtistsDblClick
+        OnKeyDown = dbgArtistsKeyDown
         OnTitleClick = dbgArtistsTitleClick
         Columns = <
           item
@@ -144,6 +145,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgClientsDblClick
+        OnKeyDown = dbgClientsKeyDown
         OnTitleClick = dbgClientsTitleClick
         Columns = <
           item
@@ -244,6 +246,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgCommissionsDblClick
+        OnKeyDown = dbgCommissionsKeyDown
         OnTitleClick = dbgCommissionsTitleClick
         Columns = <
           item
@@ -381,6 +384,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnKeyDown = dbgPaymentKeyDown
         OnTitleClick = dbgPaymentTitleClick
         Columns = <
           item
@@ -468,6 +472,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDblClick = dbgStatisticsDblClick
+        OnKeyDown = dbgStatisticsKeyDown
         OnTitleClick = dbgStatisticsTitleClick
         Columns = <
           item

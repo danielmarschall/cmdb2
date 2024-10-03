@@ -48,6 +48,8 @@ type
     procedure HelpBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure dbgQueryKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     Edit1Sav: TStringList;
     SqlQueryStatistics_Init: boolean;
@@ -199,6 +201,21 @@ begin
   begin
     resp := TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
     HandleClickResponse(AdoConnection1, MandatorId, resp);
+  end;
+end;
+
+procedure TStatisticsForm.dbgQueryKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    Screen.Cursor := crHourGlass;
+    try
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+    finally
+      Screen.Cursor := crDefault;
+    end;
+    Key := 0;
   end;
 end;
 
