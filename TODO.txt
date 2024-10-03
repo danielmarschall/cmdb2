@@ -2,10 +2,23 @@
 # TODO
 
 Version 1.1:
-- plugin to check if folders exist
-- plugin to check uploads not in cmdb recorded
-- folder comparison : missing commissions (folder but no commission)
-- folder comparison : missing folders (commission but no folder)
+- statistics plugin
+	- send "order" information which cmdb2.exe permutates if the user changes the sorting order?
+	- give info which fields may be edited and which fields must be readonly?
+- plugin development:
+	basic stats plugin:
+	- stats: show things that must be paid
+	- stats: show things that needs to be done (td)
+	- stats: show things that are awaited (aw)
+	- stats: show things that must be uploaded (upload c / upload a)
+	
+	upload check plugin:
+	- plugin to check uploads not in cmdb recorded
+	
+	folder check plugin:
+	- plugin to check if folders exist
+	- folder comparison : missing commissions (folder but no commission)
+	- folder comparison : missing folders (commission but no folder)
 
 General:
 - Try to copy as many things from the CMDB1 GUI as possible! Step by step until we have everything. (Tables are all checked and ok)
