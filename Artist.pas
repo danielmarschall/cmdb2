@@ -811,6 +811,7 @@ begin
     dbgPayment.Columns[5].PickList.Delimiter := ';';
     dbgPayment.Columns[5].PickList.StrictDelimiter := True;
     dbgPayment.Columns[5].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
+    dbgPayment.Columns[5].DropDownRows := 15;
     {$ENDREGION}
     {$REGION 'ttArtistEvent / dbgArtistEvent'}
     ttArtistEvent.Active := false;
@@ -828,6 +829,7 @@ begin
     dbgCommunication.Columns[0].PickList.Delimiter := ';';
     dbgCommunication.Columns[0].PickList.StrictDelimiter := True;
     dbgCommunication.Columns[0].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_COMMUNICATION'''));
+    dbgCommunication.Columns[0].DropDownRows := 15;
     {$ENDREGION}
   finally
     Screen.Cursor := crDefault;

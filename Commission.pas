@@ -729,6 +729,7 @@ begin
     dbgUploads.Columns[1].PickList.Delimiter := ';';
     dbgUploads.Columns[1].PickList.StrictDelimiter := True;
     dbgUploads.Columns[1].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_ARTPAGES'''));
+    dbgUploads.Columns[1].DropDownRows := 15;
 
     try
       FolderEdit.Text := VariantToString(ADOConnection1.GetScalar('select FOLDER from COMMISSION where ID = ' + ADOConnection1.SQLStringEscape(CommissionId.ToString)));

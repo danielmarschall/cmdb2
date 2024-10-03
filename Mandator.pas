@@ -1042,6 +1042,7 @@ begin
     dbgPayment.Columns[6].PickList.Delimiter := ';';
     dbgPayment.Columns[6].PickList.StrictDelimiter := True;
     dbgPayment.Columns[6].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
+    dbgPayment.Columns[6].DropDownRows := 15;
     {$ENDREGION}
     {$REGION 'ttStatistics / dbgStatistics'}
     TCmDbPluginClient.InitAllPlugins(AdoConnection1); // re-fills STATISTICS from plugins
