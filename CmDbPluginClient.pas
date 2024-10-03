@@ -3,11 +3,12 @@ unit CmDbPluginClient;
 interface
 
 uses
-  SysUtils, ADODb, AdoConnHelper, CmDbPluginShare;
+  SysUtils, Classes, ADODb, AdoConnHelper, CmDbPluginShare;
 
 type
   TCmDbPluginClient = class(TObject)
   public
+    class procedure GetVersionInfoOfPlugins(outSL: TStringList); static;
     class procedure InitAllPlugins(AdoConn: TAdoConnection);
     class function ClickEvent(AdoConn: TAdoConnection; MandatorGuid, StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
   end;
@@ -15,11 +16,14 @@ type
 type
   TCmDbPlugin = class(TObject)
   private
+    FDLLHandle: THandle;
     FPluginDllFilename: string;
   public
+    VerInfo: TVtsPluginAuthorInfo;
+    constructor Create(const APluginDllFilename: string);
+    destructor Destroy; override;
     procedure Init(const DBConnStr: string);
     function ClickEvent(const DBConnStr: string; MandatorGuid, StatGuid, ItemGuid: TGuid): TCmDbPluginClickResponse;
-    constructor Create(const APluginDllFilename: string);
   end;
 
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
@@ -29,9 +33,6 @@ implementation
 uses
   Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi, Dialogs, System.UITypes,
   SyncObjs;
-
-type
-  TVtsPluginID = function(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD): HRESULT; stdcall;
 
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
 var
@@ -71,37 +72,60 @@ end;
 { TCmDbPlugin }
 
 constructor TCmDbPlugin.Create(const APluginDllFilename: string);
+var
+  VtsPluginID: TVtsPluginID;
+  plgType, plgId: TGUID;
+  plgVer: DWORD;
+  AuthorInfo: Pointer;
 begin
   inherited Create;
+
   FPluginDllFilename := APluginDllFilename;
+
+  FDLLHandle := LoadLibrary(PChar(FPluginDllFilename));
+  if FDLLHandle = 0 then
+    raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
+  try
+    @VtsPluginID := GetProcAddress(FDLLHandle, 'VtsPluginID');
+    GetMem(AuthorInfo, 4096);
+    try
+      if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer, AuthorInfo)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
+        raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugin', [FPluginDllFilename]);
+      VerInfo.ReadFromMemory(AuthorInfo);
+    finally
+      FreeMem(AuthorInfo);
+    end;
+  except
+    if FDLLHandle <> 0 then
+    begin
+      FreeLibrary(FDLLHandle);
+      FDLLHandle := 0;
+    end;
+    raise;
+  end;
+end;
+
+destructor TCmDbPlugin.Destroy;
+begin
+  if FDLLHandle <> 0 then
+  begin
+    FreeLibrary(FDLLHandle);
+    FDLLHandle := 0;
+  end;
+  inherited;
 end;
 
 procedure TCmDbPlugin.Init(const DBConnStr: string);
 type
   TInitW = function(DBConnStr: PChar): HRESULT; stdcall;
 var
-  DLLHandle: THandle;
   InitW: TInitW;
-  VtsPluginID: TVtsPluginID;
-  plgType, plgId: TGUID;
-  plgVer: DWORD;
 begin
-  DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
-  if DLLHandle = 0 then
-    raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
-  try
-    @VtsPluginID := GetProcAddress(DLLHandle, 'VtsPluginID');
-    if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
-      raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugins', [FPluginDllFilename]);
-
-    @InitW := GetProcAddress(DLLHandle, 'InitW');
-    if not Assigned(InitW) then
-      raise Exception.CreateFmt('Function %s not found in %s', ['InitW', FPluginDllFilename]);
-    if Failed(InitW(PChar(DBConnStr))) then
-      raise Exception.CreateFmt('Call to %s failed in %s', ['InitW', FPluginDllFilename]);
-  finally
-    FreeLibrary(DLLHandle);
-  end;
+  @InitW := GetProcAddress(FDLLHandle, 'InitW');
+  if not Assigned(InitW) then
+    raise Exception.CreateFmt('Function %s not found in %s', ['InitW', FPluginDllFilename]);
+  if Failed(InitW(PChar(DBConnStr))) then
+    raise Exception.CreateFmt('Call to %s failed in %s', ['InitW', FPluginDllFilename]);
 end;
 
 function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
@@ -110,35 +134,20 @@ type
   TClickEventW = function(DBConnStr: PChar; MandatorGuid, StatGuid,
     ItemGuid: TGuid; ResponseData: Pointer): HRESULT; stdcall;
 var
-  DLLHandle: THandle;
   ClickEventW: TClickEventW;
   ResponseData: Pointer;
-  VtsPluginID: TVtsPluginID;
-  plgType, plgId: TGUID;
-  plgVer: DWORD;
 begin
-  DLLHandle := LoadLibrary(PChar(FPluginDllFilename));
-  if DLLHandle = 0 then
-    raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
+  @ClickEventW := GetProcAddress(FDLLHandle, 'ClickEventW');
+  if not Assigned(ClickEventW) then
+    raise Exception.CreateFmt('Function %s not found in %s', ['ClickEventW', FPluginDllFilename]);
+
+  GetMem(ResponseData, 4096);
   try
-    @VtsPluginID := GetProcAddress(DLLHandle, 'VtsPluginID');
-    if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
-      raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugins', [FPluginDllFilename]);
-
-    @ClickEventW := GetProcAddress(DLLHandle, 'ClickEventW');
-    if not Assigned(ClickEventW) then
-      raise Exception.CreateFmt('Function %s not found in %s', ['ClickEventW', FPluginDllFilename]);
-
-    GetMem(ResponseData, 4096);
-    try
-      if Failed(ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData)) then
-        raise Exception.CreateFmt('Call to %s failed in %s', ['ClickEventW', FPluginDllFilename]);
-      Result.ReadPluginClickResponse(ResponseData);
-    finally
-      FreeMem(ResponseData);
-    end;
+    if Failed(ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData)) then
+      raise Exception.CreateFmt('Call to %s failed in %s', ['ClickEventW', FPluginDllFilename]);
+    Result.ReadFromMemory(ResponseData);
   finally
-    FreeLibrary(DLLHandle);
+    FreeMem(ResponseData);
   end;
 end;
 
@@ -146,6 +155,47 @@ end;
 
 var
   CsPluginTableFill: TCriticalSection;
+
+class procedure TCmDbPluginClient.GetVersionInfoOfPlugins(outSL: TStringList);
+var
+  SearchRec: TSearchRec;
+  p: TCmDbPlugin;
+  isFirst: boolean;
+resourcestring
+  SBy = 'by';
+  SLicense = 'License';
+begin
+  isFirst := True;
+  if FindFirst(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'*.spl', faAnyFile, SearchRec) = 0 then
+  begin
+    try
+      repeat
+        try
+          p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
+          try
+            if isFirst then
+              isFirst := false
+            else
+              outSL.Add('');
+            outSL.Add('[ ' + SearchRec.Name + ' ]');
+            outSL.Add(p.VerInfo.PluginName + ' ' + p.VerInfo.PluginVersion + ' ' + SBy + ' ' + p.VerInfo.PluginAuthor);
+            outSL.Add(p.VerInfo.PluginCopyright + ', ' + SLicense + ': ' + p.VerInfo.PluginLicense);
+            if p.VerInfo.PluginMoreInfo <> '' then outSL.Add(p.VerInfo.PluginMoreInfo);
+          finally
+            p.Free;
+          end;
+        except
+          on E: Exception do
+          begin
+            MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+          end;
+        end;
+      until FindNext(SearchRec) <> 0;
+    finally
+      SysUtils.FindClose(SearchRec);
+    end;
+  end;
+end;
 
 class procedure TCmDbPluginClient.InitAllPlugins(AdoConn: TAdoConnection);
 var

@@ -24,12 +24,47 @@ const
   GUID_9A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
   GUID_9B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
 
-function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD): HRESULT; stdcall;
+function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
+var
+  AuthorInfo: TVtsPluginAuthorInfo;
+resourcestring
+  S_Info_PluginName = 'Basic Stats Plugin';
+  S_Info_PluginAuthor = 'Daniel Marschall, ViaThinkSoft';
+  S_Info_PluginVersion = '1.0';
+  S_Info_PluginCopyright = '(C) 2024 Daniel Marschall, ViaThinkSoft';
+  S_Info_PluginLicense = 'Apache 2.0';
+  S_Info_PluginMoreInfo = '';
 begin
-  lpTypeOut^ := CMDB2_STATSPLUGIN_V1_TYPE;  // identifies this plugin type and interface version
-  lpIDOut^   := GUID_STATS_PLUGIN;          // identifies this individual plugin (any version)
-  lpVerOut^  := $01000000;                  // this individual plugin version: 1.0.0.0
-  result     := S_OK;
+  if Assigned(lpTypeOut) then
+  begin
+    // identifies this plugin type and interface version
+    lpTypeOut^ := CMDB2_STATSPLUGIN_V1_TYPE;
+  end;
+
+  if Assigned(lpIDOut) then
+  begin
+    // identifies this individual plugin (any version)
+    lpIDOut^ := GUID_STATS_PLUGIN;
+  end;
+
+  if Assigned(lpVerOut) then
+  begin
+    // this individual plugin version: 1.0.0.0 (1 byte per version part)
+    lpVerOut^ := $01000000;
+  end;
+
+  if Assigned(lpAuthorInfo) then
+  begin
+    AuthorInfo.PluginName := S_Info_PluginName;
+    AuthorInfo.PluginAuthor := S_Info_PluginAuthor;
+    AuthorInfo.PluginVersion := S_Info_PluginVersion;
+    AuthorInfo.PluginCopyright := S_Info_PluginCopyright;
+    AuthorInfo.PluginLicense := S_Info_PluginLicense;
+    AuthorInfo.PluginMoreInfo := S_Info_PluginMoreInfo;
+    AuthorInfo.WriteToMemory(lpAuthorInfo);
+  end;
+
+  result := S_OK;
 end;
 
 function InitW(DBConnStr: PChar): HRESULT; stdcall;
@@ -71,6 +106,7 @@ var
   q: TADODataSet;
   Response: TCmDbPluginClickResponse;
 begin
+  if ResponseData = nil then Exit(E_PLUGIN_BAD_ARGS);
   try
     Response.Handled := false;
 
@@ -407,7 +443,7 @@ begin
     end;
     {$ENDREGION}
 
-    Response.WritePluginClickResponse(ResponseData);
+    Response.WriteToMemory(ResponseData);
     result := S_PLUGIN_OK;
   except
     Exit(E_PLUGIN_GENERIC_FAILURE);

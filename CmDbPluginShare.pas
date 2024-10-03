@@ -3,7 +3,7 @@ unit CmDbPluginShare;
 interface
 
 uses
-  SysUtils;
+  Windows, SysUtils;
 
 type
   TCmDbPluginClickResponseAction = (craNone, craObject, craStatistics);
@@ -22,12 +22,28 @@ type
     SqlAdditionalFilter: string;
     BaseTableDelete: string;
     // Read/Write functions
-    procedure WritePluginClickResponse(const Memory: Pointer);
-    procedure ReadPluginClickResponse(const Memory: Pointer);
+    procedure WriteToMemory(const Memory: Pointer);
+    procedure ReadFromMemory(const Memory: Pointer);
+  end;
+
+  TVtsPluginAuthorInfo = record
+    PluginName: string;
+    PluginAuthor: string;
+    PluginVersion: string;
+    PluginCopyright: string;
+    PluginLicense: string;
+    PluginMoreInfo: string;
+    // Read/Write functions
+    procedure WriteToMemory(const Memory: Pointer);
+    procedure ReadFromMemory(const Memory: Pointer);
   end;
 
 const
   CMDB2_STATSPLUGIN_V1_TYPE: TGUID = '{73273740-08BA-4E6E-BAAA-D4676E5B1BFF}';
+
+type
+  // Note: This technique should be used by all DLL based ViaThinkSoft plugin architectures, not just CMDB2
+  TVtsPluginID = function(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
 
 const
   S_PLUGIN_OK:                HRESULT = HRESULT($20000000); // Success, Customer defined, Facility 0, Code 0
@@ -47,71 +63,39 @@ begin
   result := 'tmp_'+guid.ToString.Replace('-','').Replace('{','').Replace('}','')+'_'+info;
 end;
 
-{ TCmDbPluginClickResponse }
-
-procedure TCmDbPluginClickResponse.WritePluginClickResponse(const Memory: Pointer);
-
-  procedure WriteWideString(var Dest: PByte; const Value: string);
-  var
-    I, LengthByte: Byte;
-  begin
-    LengthByte := Length(Value);
-    Dest^ := LengthByte;  // Länge als Byte speichern
-    Inc(Dest);            // Auf die erste Speicherposition nach dem Byte
-
-    for I := 1 to LengthByte do
-    begin
-      PWideChar(Dest)^ := Value[I]; // Zeichen als WideChar schreiben
-      Inc(Dest, 2);                 // WideChar belegt 2 Bytes
-    end;
-  end;
-
+function _ReadWideString(var Src: PByte): WideString;
 var
-  Ptr: PByte;
+  I, LengthByte: Byte;
 begin
-  Ptr := PByte(Memory);
-  Ptr^ := Ord(Self.Handled);  // Boolean als Byte schreiben
-  Inc(Ptr);
-  Ptr^ := Ord(Self.Action);   // Action als Byte schreiben
-  Inc(Ptr);
+  LengthByte := Src^;  // Die Länge aus dem Byte lesen
+  Inc(Src);            // Weiter zum ersten WideChar
 
-  case Self.Action of
-    craObject:
-    begin
-      WriteWideString(Ptr, Self.ObjTable);  // ObjTable als WideString schreiben
-      Move(Self.ObjId, Ptr^, SizeOf(TGuid)); // GUID direkt kopieren
-      Inc(Ptr, SizeOf(TGuid));
-    end;
-    craStatistics:
-    begin
-      Move(Self.StatId, Ptr^, SizeOf(TGuid));  // GUID direkt kopieren
-      Inc(Ptr, SizeOf(TGuid));
-      WriteWideString(Ptr, Self.StatName);       // StatName
-      WriteWideString(Ptr, Self.SqlTable);       // SqlTable
-      WriteWideString(Ptr, Self.SqlInitialOrder);// SqlInitialOrder
-      WriteWideString(Ptr, Self.SqlAdditionalFilter); // SqlAdditionalFilter
-      WriteWideString(Ptr, Self.BaseTableDelete); // BaseTableDelete
-    end;
+  SetLength(Result, LengthByte);
+  for I := 1 to LengthByte do
+  begin
+    Result[I] := PWideChar(Src)^;  // WideChar in den String kopieren
+    Inc(Src, 2);                   // WideChar belegt 2 Bytes
   end;
 end;
 
-procedure TCmDbPluginClickResponse.ReadPluginClickResponse(const Memory: Pointer);
+procedure _WriteWideString(var Dest: PByte; const Value: WideString);
+var
+  I, LengthByte: Byte;
+begin
+  LengthByte := Length(Value);
+  Dest^ := LengthByte;  // Länge als Byte speichern
+  Inc(Dest);            // Auf die erste Speicherposition nach dem Byte
 
-  function ReadWideString(var Src: PByte): string;
-  var
-    I, LengthByte: Byte;
+  for I := 1 to LengthByte do
   begin
-    LengthByte := Src^;  // Die Länge aus dem Byte lesen
-    Inc(Src);            // Weiter zum ersten WideChar
-
-    SetLength(Result, LengthByte);
-    for I := 1 to LengthByte do
-    begin
-      Result[I] := PWideChar(Src)^;  // WideChar in den String kopieren
-      Inc(Src, 2);                   // WideChar belegt 2 Bytes
-    end;
+    PWideChar(Dest)^ := Value[I]; // Zeichen als WideChar schreiben
+    Inc(Dest, 2);                 // WideChar belegt 2 Bytes
   end;
+end;
 
+{ TCmDbPluginClickResponse }
+
+procedure TCmDbPluginClickResponse.ReadFromMemory(const Memory: Pointer);
 var
   Ptr: PByte;
 begin
@@ -124,7 +108,7 @@ begin
   case Self.Action of
     craObject:
     begin
-      Self.ObjTable := ReadWideString(Ptr);   // ObjTable lesen
+      Self.ObjTable := _ReadWideString(Ptr);   // ObjTable lesen
       Move(Ptr^, Self.ObjId, SizeOf(TGuid));  // GUID direkt lesen
       Inc(Ptr, SizeOf(TGuid));
     end;
@@ -132,13 +116,71 @@ begin
     begin
       Move(Ptr^, Self.StatId, SizeOf(TGuid));  // GUID direkt lesen
       Inc(Ptr, SizeOf(TGuid));
-      Self.StatName := ReadWideString(Ptr);       // StatName lesen
-      Self.SqlTable := ReadWideString(Ptr);       // SqlTable lesen
-      Self.SqlInitialOrder := ReadWideString(Ptr);// SqlInitialOrder lesen
-      Self.SqlAdditionalFilter := ReadWideString(Ptr); // SqlAdditionalFilter lesen
-      Self.BaseTableDelete := ReadWideString(Ptr); // BaseTableDelete lesen
+      Self.StatName := _ReadWideString(Ptr);       // StatName lesen
+      Self.SqlTable := _ReadWideString(Ptr);       // SqlTable lesen
+      Self.SqlInitialOrder := _ReadWideString(Ptr);// SqlInitialOrder lesen
+      Self.SqlAdditionalFilter := _ReadWideString(Ptr); // SqlAdditionalFilter lesen
+      Self.BaseTableDelete := _ReadWideString(Ptr); // BaseTableDelete lesen
     end;
   end;
+end;
+
+procedure TCmDbPluginClickResponse.WriteToMemory(const Memory: Pointer);
+var
+  Ptr: PByte;
+begin
+  Ptr := PByte(Memory);
+  Ptr^ := Ord(Self.Handled);  // Boolean als Byte schreiben
+  Inc(Ptr);
+  Ptr^ := Ord(Self.Action);   // Action als Byte schreiben
+  Inc(Ptr);
+
+  case Self.Action of
+    craObject:
+    begin
+      _WriteWideString(Ptr, Self.ObjTable);  // ObjTable als WideString schreiben
+      Move(Self.ObjId, Ptr^, SizeOf(TGuid)); // GUID direkt kopieren
+      Inc(Ptr, SizeOf(TGuid));
+    end;
+    craStatistics:
+    begin
+      Move(Self.StatId, Ptr^, SizeOf(TGuid));  // GUID direkt kopieren
+      Inc(Ptr, SizeOf(TGuid));
+      _WriteWideString(Ptr, Self.StatName);       // StatName
+      _WriteWideString(Ptr, Self.SqlTable);       // SqlTable
+      _WriteWideString(Ptr, Self.SqlInitialOrder);// SqlInitialOrder
+      _WriteWideString(Ptr, Self.SqlAdditionalFilter); // SqlAdditionalFilter
+      _WriteWideString(Ptr, Self.BaseTableDelete); // BaseTableDelete
+    end;
+  end;
+end;
+
+{ TVtsPluginAuthorInfo }
+
+procedure TVtsPluginAuthorInfo.ReadFromMemory(const Memory: Pointer);
+var
+  Ptr: PByte;
+begin
+  Ptr := PByte(Memory);
+  Self.PluginName := _ReadWideString(Ptr);
+  Self.PluginAuthor := _ReadWideString(Ptr);
+  Self.PluginVersion := _ReadWideString(Ptr);
+  Self.PluginCopyright := _ReadWideString(Ptr);
+  Self.PluginLicense := _ReadWideString(Ptr);
+  Self.PluginMoreInfo := _ReadWideString(Ptr);
+end;
+
+procedure TVtsPluginAuthorInfo.WriteToMemory(const Memory: Pointer);
+var
+  Ptr: PByte;
+begin
+  Ptr := PByte(Memory);
+  _WriteWideString(Ptr, Self.PluginName);
+  _WriteWideString(Ptr, Self.PluginAuthor);
+  _WriteWideString(Ptr, Self.PluginVersion);
+  _WriteWideString(Ptr, Self.PluginCopyright);
+  _WriteWideString(Ptr, Self.PluginLicense);
+  _WriteWideString(Ptr, Self.PluginMoreInfo);
 end;
 
 end.

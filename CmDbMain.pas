@@ -57,9 +57,9 @@ implementation
 {$R *.dfm}
 
 uses
-  Mandators, AdoConnHelper, StrUtils, Help,
+  Mandators, AdoConnHelper, StrUtils, Help, CmDbPluginClient,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
-  ShellApi, System.UITypes, System.Hash;
+  ShellApi, System.UITypes, System.Hash, DateUtils;
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
@@ -130,8 +130,13 @@ procedure TMainForm.About1Click(Sender: TObject);
 var
   dateidatum: TDateTime;
   bits: integer;
+  slPlugins: TStringList;
+  CopyRightYear: string;
 resourcestring
-  S_Version = '%s (%d Bit)'+#13#10+'Version %s'+#13#10+'by Daniel Marschall, ViaThinkSoft';
+  S_Version = '%s (%d Bit), Version %s'+#13#10+'(C) %s Daniel Marschall, ViaThinkSoft, License: Apache 2.0';
+  S_InstalledPlugins = 'Installed plugins:';
+const
+  DevelopmentYear = 2024;
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   {$IFDEF WIN64}
@@ -139,7 +144,24 @@ begin
   {$ELSE}
   bits := 32;
   {$ENDIF}
-  ShowMessage(Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum)]));
+  slPlugins := TStringList.Create;
+  try
+    TCmDbPluginClient.GetVersionInfoOfPlugins(slPlugins);
+    if slPlugins.Count > 0 then
+    begin
+      slPlugins.Insert(0, '');
+      slPlugins.Insert(0, S_InstalledPlugins);
+      slPlugins.Insert(0, '');
+    end;
+    if YearOf(dateidatum) > DevelopmentYear then
+      CopyRightYear := IntToStr(DevelopmentYear) + '-' + IntToStr(YearOf(dateidatum))
+    else
+      CopyRightYear := IntToStr(DevelopmentYear);
+    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
+    ShowMessage(slPlugins.Text);
+  finally
+    FreeAndNil(slPlugins);
+  end;
 end;
 
 function TMainForm.BackupPath: string;
