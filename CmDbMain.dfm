@@ -64,11 +64,11 @@ object MainForm: TMainForm
         OnClick = Cascade1Click
       end
       object TileHorizontally1: TMenuItem
-        Caption = 'Tile Horizontally'
+        Caption = 'Tile horizontally'
         OnClick = TileHorizontally1Click
       end
       object TileVertically1: TMenuItem
-        Caption = 'TileVertically'
+        Caption = 'Tile vertically'
         OnClick = TileVertically1Click
       end
     end

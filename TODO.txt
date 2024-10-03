@@ -1,10 +1,7 @@
 
 # TODO
 
-Version 1.1:
-- statistics plugin
-	- give info which fields may be edited and which fields must be readonly?
-- plugin development:
+Plugin development:
 	basic stats plugin:
 	- stats: show things that must be paid
 	- stats: show things that needs to be done (td)

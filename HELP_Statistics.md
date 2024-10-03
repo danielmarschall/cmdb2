@@ -4,14 +4,14 @@
 # Statistics
 
 There are various statistics that are made available with plugins which are located in the directory
-**C:\Program Files...\Commission Database 2.0\Plugins** and have the file name extension "SPL" (Statistics Plugin).
+**C:\Program Files...\Commission Database 2.0\bin** and have the file name extension "SPL" (Statistics Plugin).
 
 Note that "statistics" can be "anything" - the plugin author can freely design which information to show
 and what happens when you double click an entry.
 So, for example, a plugin can also be used to perform actions such as comparing the UPLOAD table
 with a website/gallery and listing the difference.
 
-## Plugins\BasicStatsPlugin.spl
+## BasicStatsPlugin.spl
 
 Currently, there are the following statistics in the shipped statistics plugin:
 - Running commissions
