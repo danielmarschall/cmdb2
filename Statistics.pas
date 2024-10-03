@@ -75,7 +75,7 @@ implementation
 {$R *.dfm}
 
 uses
-  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbPluginShare, CmDbMain;
+  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbPluginShare, CmDbMain, Generics.Collections;
 
 procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin
@@ -100,6 +100,46 @@ begin
 end;
 
 function TStatisticsForm.SqlQueryStatistics(const search: string): string;
+
+  function _RemoveDuplicatesIgnoreOrderSuffix(const Input: string): string;
+  var
+    Words, ResultList: TArray<string>;
+    SeenWords: TDictionary<string, Boolean>;
+    CleanWord: string;
+    i: Integer;
+  begin
+    // Den Eingabestring in Wörter aufteilen
+    Words := Input.Split([','], TStringSplitOptions.ExcludeEmpty);
+
+    // Ein Dictionary zur Verfolgung der bereits gesehenen "bereinigten" Wörter
+    SeenWords := TDictionary<string, Boolean>.Create;
+
+    try
+      // Durch die Wörter iterieren und nur die ersten Vorkommen in die Ergebnisliste einfügen
+      for i := 0 to High(Words) do
+      begin
+        // Bereinige das Wort, indem " ASC" und " DESC" entfernt wird
+        CleanWord := Trim(Words[i]);
+        if String.EndsText(' ASC', CleanWord) then
+          CleanWord := CleanWord.Substring(0, CleanWord.Length - 4)
+        else if String.EndsText(' DESC', CleanWord) then
+          CleanWord := CleanWord.Substring(0, CleanWord.Length - 5);
+
+        // Füge das ursprüngliche Wort hinzu, wenn es noch nicht gesehen wurde
+        if not SeenWords.ContainsKey(CleanWord) then
+        begin
+          ResultList := ResultList + [Trim(Words[i])];
+          SeenWords.Add(CleanWord, True);
+        end;
+      end;
+
+      // Den neuen String aus den eindeutigen Wörtern zusammensetzen
+      Result := String.Join(', ', ResultList);
+    finally
+      SeenWords.Free;
+    end;
+  end;
+
 var
   q: TAdoDataSet;
 begin
@@ -130,11 +170,14 @@ begin
     q.Free;
     result := result + ') ';
   end;
+
   if (SqlQueryStatistics_order = '') and (SqlInitialOrder <> '') then
     result := result + 'order by ' + SqlInitialOrder // {No, because the DB might have asc/desc:} + ' ' + AscDesc(SqlQueryStatistics_asc)
   else if (SqlQueryStatistics_order = '') and (SqlInitialOrder = '') then
     result := result + ''
-  else
+  else if (SqlQueryStatistics_order <> '') and (SqlInitialOrder <> '') then
+    result := result + 'order by ' + _RemoveDuplicatesIgnoreOrderSuffix(SqlQueryStatistics_order + ' ' + AscDesc(SqlQueryStatistics_asc) + ', ' + SqlInitialOrder)
+  else if (SqlQueryStatistics_order <> '') and (SqlInitialOrder = '') then
     result := result + 'order by ' + SqlQueryStatistics_order + ' ' + AscDesc(SqlQueryStatistics_asc);
 end;
 

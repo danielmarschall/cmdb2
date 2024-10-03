@@ -3,7 +3,6 @@
 
 Version 1.1:
 - statistics plugin
-	- send "order" information which cmdb2.exe permutates if the user changes the sorting order?
 	- give info which fields may be edited and which fields must be readonly?
 - plugin development:
 	basic stats plugin:
