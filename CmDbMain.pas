@@ -160,10 +160,9 @@ var
   q: TAdoDataset;
   sl: TStringList;
   DBName, BackupFileName: string;
-  LastBackupID: integer;
+  NextBackupID: integer;
   i: integer;
   ChecksumNow, ChecksumThen: string;
-  NeedNewBackup: boolean;
 begin
   for i := MDIChildCount - 1 downto 0 do
   begin
@@ -175,14 +174,14 @@ begin
   Application.ProcessMessages;
   try
     try
-      NeedNewBackup := false;
+      NextBackupID := -1;
 
       // Make some optimizations for performance
       DefragIndexes(AdoConnection1);
 
-      {$REGION '1. Make a Text Dump if something has changed'}
       sl := TStringList.Create;
       try
+        {$REGION 'Check if something has changed'}
         q := ADOConnection1.GetTable('select * from vw_TEXT_BACKUP_GENERATE order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
         try
           sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');
@@ -196,36 +195,31 @@ begin
         end;
 
         CheckSumNow := THashSHA2.GetHashString(sl.Text); // SHA256
+        ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
+        if not SameText(ChecksumThen, ChecksumNow) then
+        begin
+          NextBackupID := VariantToInteger(AdoConnection1.GetScalar('SELECT IDENT_CURRENT(''BACKUP'') + IDENT_INCR(''BACKUP'');'));
+        end;
+        {$ENDREGION}
 
-        q := ADOConnection1.GetTable('select top 1 BAK_ID, CHECKSUM from [BACKUP] order by BAK_ID desc');
-        try
-          ChecksumThen := q.FieldByName('CHECKSUM').AsWideString;
-          LastBackupId := q.FieldByName('BAK_ID').AsInteger;
-          if (q.RecordCount = 0) or not SameText(ChecksumThen, ChecksumNow) then
-          begin
-            ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
-            LastBackupID := VariantToInteger(AdoConnection1.GetScalar('select max(BAK_ID) from [BACKUP]'));
-            sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.csv');
-            NeedNewBackup := true;
-          end;
-        finally
-          FreeAndNil(q);
+        if NextBackupID > 0 then
+        begin
+          {$REGION '1. Make a SQL Backup'}
+          DBName := AdoConnection1.DatabaseName;
+          BackupFileName := IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.bak';
+          if AdoConnection1.SupportsBackupCompression then
+            AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format, compression;')
+          else
+            AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format;');
+          {$ENDREGION}
+
+          {$REGION '2. Write the Text Dump and Protocol Entry'}
+          sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.csv');
+          ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
+          {$ENDREGION}
         end;
       finally
         FreeAndNil(sl);
-      end;
-      {$ENDREGION}
-
-      if NeedNewBackup then
-      begin
-        {$REGION '2. Make a SQL Backup'}
-        DBName := AdoConnection1.DatabaseName;
-        BackupFileName := IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [LastBackupID]) + '.bak';
-        if AdoConnection1.SupportsBackupCompression then
-          AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format, compression;')
-        else
-          AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format;');
-        {$ENDREGION}
       end;
     except
       on E: Exception do
