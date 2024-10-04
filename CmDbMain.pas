@@ -209,7 +209,7 @@ begin
           sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');
           while not q.EOF do
           begin
-            sl.Add('"'+q.Fields[0].AsWideString+'";"'+q.Fields[1].AsWideString+'";"'+q.Fields[2].AsWideString+'";"'+q.Fields[3].AsWideString+'";"'+q.Fields[4].AsWideString+'";"'+q.Fields[5].AsWideString);
+            sl.Add('"'+q.Fields[0].AsWideString+'";"'+q.Fields[1].AsWideString+'";"'+q.Fields[2].AsWideString+'";"'+q.Fields[3].AsWideString+'";"'+q.Fields[4].AsWideString+'";"'+q.Fields[5].AsWideString+'"');
             q.Next;
           end;
         finally

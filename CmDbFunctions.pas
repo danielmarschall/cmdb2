@@ -287,7 +287,7 @@ begin
     raise;
   end;
 
-  // For some reason I CmDb2.exe keeps the connection to the temp db, so we need to forcefully disconnect. Weird!
+  // For some reason CmDb2.exe keeps the connection to the temp db, so we need to forcefully disconnect. Weird!
   ADOConnection1.ExecSQL('ALTER DATABASE '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+' SET SINGLE_USER WITH ROLLBACK IMMEDIATE;');
 
   ADOConnection1.ExecSQL('DROP DATABASE '+AdoConnection1.SQLDatabaseNameEscape(TempDbName));
