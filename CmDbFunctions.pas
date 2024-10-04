@@ -6,6 +6,7 @@ uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
+function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function GetUserDirectory: string;
@@ -25,7 +26,15 @@ procedure InsteadOfDeleteWorkaround(DataSet: TAdoQuery; const localField, baseTa
 implementation
 
 uses
-  ShlObj, ShellApi;
+  ShlObj, ShellApi, System.Hash;
+
+function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
+var
+  salt: string;
+begin
+  salt := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
+  result := THashSHA2.GetHashString(salt + password);
+end;
 
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 var
@@ -468,6 +477,12 @@ begin
     else if schemaVer = 2 then
     begin
       // <<< Future update code goes here! >>>
+
+      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''PASSWORD_HASHED'') '+
+                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''PASSWORD_HASHED'', '''', 0, 1;');
+      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''NEW_PASSWORD'') '+
+                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''NEW_PASSWORD'', '''', 0, 0;');
+      InstallSql(3, 'vw_CONFIG');
 
       //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
 

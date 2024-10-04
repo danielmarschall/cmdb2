@@ -24,3 +24,4 @@ General:
 Ideas for the future:
 - Let users define additional commission event picklist values, and artist event picklist values
 - Allow drag'n'drop to the commission files shell view
+- Backups should be password protected, especially the CSV files. Otherwise, password protection is rather useless, isn't it?

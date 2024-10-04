@@ -410,6 +410,7 @@ object MandatorsForm: TMandatorsForm
     CursorType = ctStatic
     BeforeInsert = ttConfigBeforeInsert
     BeforeEdit = ttConfigBeforeEdit
+    BeforePost = ttConfigBeforePost
     BeforeDelete = ttConfigBeforeDelete
     AfterScroll = ttConfigAfterScroll
     OnNewRecord = ttMandatorNewRecord

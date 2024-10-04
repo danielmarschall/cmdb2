@@ -9,7 +9,7 @@ When starting `CmDb2.exe`, you will be greeted with a window called "Database". 
 
 Artists, Commissions, Payments, ... are stored in a mandator. You can have multiple mandators, e.g. a test mandator and a productive mandator, or you can have multiple mandators if you want a strict separation between some artists or artworks.
 
-Start by creating a new mandator simply by typing a name (e.g. your name) into the grid and then save the row by leaving it (press the arrow down key). Then, double-click the newly created row to open the mandator.
+Start by creating a new mandator simply by typing a name (e.g. your name) into the data grid and then save the row by leaving it (e.g. press the arrow down key followed by the arrow up key). After the row has been saved, double-click the newly created row to open the mandator.
 
 ## Database window tab "Backups"
 
@@ -24,6 +24,7 @@ Here you can find system-global settings. Currently, there are the following set
 - `BACKUP_PATH`:  If you want to store the `cmdb2_backup_*.bak` files somewhere else, then enter the path here.
 - `CURRENCY_LAYER_API_KEY`: Automatic currency conversion is only possible by creating an account at [CurrencyLayer.com](https://CurrencyLayer.com/). There is a free plan which gives you a limit number of requests per month. Enter the API key here if you want to use this feature.
 - `LOCAL_CURRENCY`: Enter a 3-letter currency code here, such as `USD` or `EUR`
+- `NEW_PASSWORD`: Enter a password to set or renew database protection. Press Ctrl+Del to remove a previously set password. This field will be empty after restart for confidentiality.
 - `PICKLIST_ARTPAGES`: Contains a semicolon-separated list of art pages to be selected in the "Uploads" tab at a commission
 - `PICKLIST_COMMUNICATION` Contains a semicolon-separated list of things you can enter in the "Communication" tab at an artist or client
 - `PICKLIST_PAYPROVIDER`: Contains a semicolon-separated list of things you can enter in the "Payment" tab at an artist/client

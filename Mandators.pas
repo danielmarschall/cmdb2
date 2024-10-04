@@ -95,6 +95,7 @@ type
       Shift: TShiftState);
     procedure dbgConfigKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure ttConfigBeforePost(DataSet: TDataSet);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -118,7 +119,7 @@ implementation
 {$R *.dfm}
 
 uses
-  CmDbMain, Mandator, DbGridHelper, CmDbFunctions;
+  CmDbMain, Mandator, DbGridHelper, CmDbFunctions, AdoConnHelper;
 
 procedure TMandatorsForm.ttConfigAfterScroll(DataSet: TDataSet);
 begin
@@ -129,12 +130,40 @@ procedure TMandatorsForm.ttConfigBeforeDelete(DataSet: TDataSet);
 resourcestring
   SDeleteNotPossible = 'Delete not possible';
 begin
-  raise Exception.Create(SDeleteNotPossible);
+  if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') then
+  begin
+    if VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';')) = '' then
+    begin
+      ShowMessage('Nothing to remove. Database is not password protected.');
+    end
+    else
+    begin
+      ADOConnection1.ExecSQL('update CONFIG set VALUE = '''' where NAME = ''PASSWORD_HASHED'';');
+      ShowMessage('Password protection disabled');
+    end;
+  end;
+  Abort;
 end;
 
 procedure TMandatorsForm.ttConfigBeforeInsert(DataSet: TDataSet);
 begin
   Abort;
+end;
+
+procedure TMandatorsForm.ttConfigBeforePost(DataSet: TDataSet);
+var
+  oldHashed: string;
+begin
+  if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') and (ttConfigVALUE.AsWideString <> '') then
+  begin
+    oldHashed := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
+    ADOConnection1.ExecSQL('update CONFIG set VALUE = '+ADOConnection1.SQLStringEscape(CmDbGetPasswordHash(AdoConnection1, ttConfigVALUE.AsWideString))+' where NAME = ''PASSWORD_HASHED'';');
+    if oldHashed = '' then
+      ShowMessage('Password protection enabled')
+    else
+      ShowMessage('Password changed');
+    ttConfigVALUE.AsWideString := '';
+  end;
 end;
 
 procedure TMandatorsForm.ttMandatorAfterScroll(DataSet: TDataSet);
@@ -503,10 +532,40 @@ begin
 end;
 
 procedure TMandatorsForm.Init;
+var
+  hashedPassword: string;
+  enteredPassword: string;
+resourcestring
+  SEnterPassword = 'Enter password:';
 begin
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   Panel1.Caption := Caption;
+  {$REGION 'Password check'}
+  hashedPassword := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
+  if hashedPassword <> '' then
+  begin
+    while true do
+    begin
+      if InputQuery(Application.Title, #0{password star} + SEnterPassword, enteredPassword) then
+      begin
+        if SameText(CmDbGetPasswordHash(AdoConnection1, enteredPassword), hashedPassword) then
+        begin
+          break;
+        end
+        else
+        begin
+          enteredPassword := '';
+        end;
+      end
+      else
+      begin
+        Close;
+        Exit;
+      end;
+    end;
+  end;
+  {$ENDREGION}
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttMandator / dbgMandator'}

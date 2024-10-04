@@ -37,12 +37,13 @@ The latest version can be downloaded at [GitHub](https://github.com/danielmarsch
 ### Handling database grids
 
 It is important to understand how to handle a database grid. Here are some notes:
+- When you edit or insert a row, leaving the row (e.g. pressing the arrow down key followed by the arrow up key) or clicking the "green check" icon in the navigator will trigger the save command to the database. Closing the program might NOT always trigger the save command.
+- Double clicking on a row opens the dataset.
 - Nearly every window in CMDB2 is a database grid.
-- Clicking the column header will let you sort the dataset. Clicking it again will reverse the sort.
+- Single clicking the column header will let you sort the dataset. Clicking it again will reverse the sort.
 - Navigate using arrow keys, "PgUp", "PgDown", "Home", and "End" or with the arrows in the navigator bar at the left.
 - When you change something in a different window and then return to a previous window, then you might reload the dataset by clicking "Refresh" at the bottom. For example, if you entered a payment for an artist, the "payment status" in the artist overview will be refreshed only after clicking the "Refresh" button.
 - A small icon left on the selected row in a grid will show the current operation. An arrow means you are in "browsing" mode. A star means you are in the "insert" mode. A bar means you are in "edit" mode.
-- When you edit or insert a row, leaving the row (arrow up or arrow down key) or clicking the "green check" icon in the navigator will trigger the save command to the database. Closing the program might not always trigger the save command.
 - Remove a row with "Ctrl + Del" or by clicking the "red minus" in the navigator.
 - Insert a row by going past the last line using the arrow keys, or click the "blue plus" in the navigator, or press the "Insert" key.
 - Cancel an edit/insert operation by pressing "Esc". Note that if you are not in the edit/insert mode, then "Esc" will close the window.
