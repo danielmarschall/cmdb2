@@ -176,6 +176,7 @@
         </DCCReference>
         <DCCReference Include="CmDbPluginClient.pas"/>
         <DCCReference Include="CmDbPluginShare.pas"/>
+        <DCCReference Include="EncryptedZipFile.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

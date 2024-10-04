@@ -42,6 +42,7 @@ type
     function BackupPath: string;
     procedure PerformBackupAndDefrag;
   public
+    CmDbZipPassword: string;
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
     procedure OpenMandatorsForm;
@@ -59,7 +60,8 @@ implementation
 uses
   Mandators, AdoConnHelper, StrUtils, Help, CmDbPluginClient,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
-  ShellApi, System.UITypes, System.Hash, DateUtils;
+  ShellApi, System.UITypes, System.Hash, DateUtils,
+  EncryptedZipFile, System.Zip;
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
@@ -185,6 +187,7 @@ var
   NextBackupID: integer;
   i: integer;
   ChecksumNow, ChecksumThen: string;
+  zip: TZipFile;
 begin
   for i := MDIChildCount - 1 downto 0 do
   begin
@@ -238,6 +241,26 @@ begin
           {$REGION '2. Write the Text Dump and Protocol Entry'}
           sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.csv');
           ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
+          {$ENDREGION}
+
+          {$REGION 'Password-Encrypt ZIP file'}
+          try
+            if CmDbZipPassword = '' then
+              zip := TZipFile.Create()
+            else
+              zip := TEncryptedZipFile.Create(CmDbZipPassword);
+            zip.Open(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.zip', TZipMode.zmWrite);
+            try
+              zip.Add(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.bak');
+              zip.Add(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.csv');
+            finally
+              zip.Close;
+            end;
+            DeleteFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.bak');
+            DeleteFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.csv');
+          except
+            DeleteFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.zip');
+          end;
           {$ENDREGION}
         end;
       finally

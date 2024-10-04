@@ -139,6 +139,7 @@ begin
     else
     begin
       ADOConnection1.ExecSQL('update CONFIG set VALUE = '''' where NAME = ''PASSWORD_HASHED'';');
+      MainForm.CmDbZipPassword := '';
       ShowMessage('Password protection disabled');
     end;
   end;
@@ -162,6 +163,7 @@ begin
       ShowMessage('Password protection enabled')
     else
       ShowMessage('Password changed');
+    MainForm.CmDbZipPassword := ttConfigVALUE.AsWideString;
     ttConfigVALUE.AsWideString := '';
   end;
 end;
@@ -551,6 +553,7 @@ begin
       begin
         if SameText(CmDbGetPasswordHash(AdoConnection1, enteredPassword), hashedPassword) then
         begin
+          MainForm.CmDbZipPassword := enteredPassword;
           break;
         end
         else

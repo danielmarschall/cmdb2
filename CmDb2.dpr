@@ -14,7 +14,8 @@ uses
   CmDbFunctions in 'CmDbFunctions.pas',
   Help in 'Help.pas' {HelpForm},
   CmDbPluginClient in 'CmDbPluginClient.pas',
-  CmDbPluginShare in 'CmDbPluginShare.pas';
+  CmDbPluginShare in 'CmDbPluginShare.pas',
+  EncryptedZipFile in 'EncryptedZipFile.pas';
 
 {$R *.res}
 
