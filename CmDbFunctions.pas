@@ -457,8 +457,14 @@ begin
         AdoConnection1.ExecSQL('update CONFIG set HIDDEN = iif(NAME=''DB_VERSION'' or NAME=''CUSTOMIZATION_ID'' or NAME=''INSTALL_ID'', 1, 0)');
         AdoConnection1.ExecSQL('alter table CONFIG alter column HIDDEN bit NOT NULL');
       end;
-      InstallSql(2, 'vw_CONFIG');
       {$ENDREGION}
+
+      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''PASSWORD_HASHED'') '+
+                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''PASSWORD_HASHED'', '''', 0, 1;');
+      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''NEW_PASSWORD'') '+
+                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''NEW_PASSWORD'', '''', 0, 0;');
+      InstallSql(2, 'vw_CONFIG');
+
 
       {$REGION 'Text dumps now as files and not in database anymore'}
       if AdoConnection1.TableExists('TEXT_BACKUP') then
@@ -477,12 +483,6 @@ begin
     else if schemaVer = 2 then
     begin
       // <<< Future update code goes here! >>>
-
-      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''PASSWORD_HASHED'') '+
-                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''PASSWORD_HASHED'', '''', 0, 1;');
-      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''NEW_PASSWORD'') '+
-                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''NEW_PASSWORD'', '''', 0, 0;');
-      InstallSql(3, 'vw_CONFIG');
 
       //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
 
