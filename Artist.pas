@@ -722,10 +722,14 @@ end;
 
 procedure TArtistForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
-  if ttPayment.State in [dsEdit,dsInsert] then ttPayment.Post;
-  if ttArtistEvent.State in [dsEdit,dsInsert] then ttArtistEvent.Post;
-  if ttCommunication.State in [dsEdit,dsInsert] then ttCommunication.Post;
+  if (ttCommission.State=dsEdit) or ((ttCommission.State=dsInsert) and (ttCommissionNAME.AsWideString<>'')) then
+    ttCommission.Post;
+  if (ttPayment.State=dsEdit) or ((ttPayment.State=dsInsert) and (ttPaymentAMOUNT.AsWideString<>'')) then
+    ttPayment.Post;
+  if (ttArtistEvent.State=dsEdit) or ((ttArtistEvent.State=dsInsert) and (ttArtistEventSTATE.AsWideString<>'')) then
+    ttArtistEvent.Post;
+  if (ttCommunication.State=dsEdit) or ((ttCommunication.State=dsInsert) and ((ttCommunicationCHANNEL.AsWideString<>'') or (ttCommunicationADDRESS.AsWideString<>''))) then
+    ttCommunication.Post;
 end;
 
 procedure TArtistForm.FormCreate(Sender: TObject);

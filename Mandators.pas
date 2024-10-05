@@ -492,9 +492,12 @@ end;
 
 procedure TMandatorsForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if ttMandator.State in [dsEdit,dsInsert] then ttMandator.Post;
-  if ttTextBackup.State in [dsEdit,dsInsert] then ttTextBackup.Post;
-  if ttConfig.State in [dsEdit,dsInsert] then ttConfig.Post;
+  if (ttMandator.State=dsEdit) or ((ttMandator.State=dsInsert) and (ttMandatorNAME.AsWideString<>'')) then
+    ttMandator.Post;
+  if (ttTextBackup.State=dsEdit) then
+    ttTextBackup.Post;
+  if (ttConfig.State=dsEdit) then
+    ttConfig.Post;
 end;
 
 procedure TMandatorsForm.FormCreate(Sender: TObject);

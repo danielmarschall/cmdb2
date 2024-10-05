@@ -646,9 +646,12 @@ end;
 procedure TCommissionForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
-  if ttEvents.State in [dsEdit,dsInsert] then ttEvents.Post;
-  if ttQuotes.State in [dsEdit,dsInsert] then ttQuotes.Post;
-  if ttUploads.State in [dsEdit,dsInsert] then ttUploads.Post;
+  if (ttEvents.State=dsEdit) or ((ttEvents.State=dsInsert) and (ttEventsSTATE.AsWideString<>'')) then
+    ttEvents.Post;
+  if (ttQuotes.State=dsEdit) or ((ttQuotes.State=dsInsert) and (ttQuotesAMOUNT.AsWideString<>'')) then
+    ttQuotes.Post;
+  if (ttUploads.State=dsEdit) or ((ttUploads.State=dsInsert) and ((ttUploadsPAGE.AsWideString<>'') or (ttUploadsURL.AsWideString<>''))) then
+    ttUploads.Post;
 end;
 
 procedure TCommissionForm.FormKeyDown(Sender: TObject; var Key: Word;

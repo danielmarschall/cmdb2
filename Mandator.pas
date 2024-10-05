@@ -947,10 +947,16 @@ end;
 
 procedure TMandatorForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if ttArtists.State in [dsEdit,dsInsert] then ttArtists.Post;
-  if ttClients.State in [dsEdit,dsInsert] then ttClients.Post;
-  if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
-  if ttStatistics.State in [dsEdit,dsInsert] then ttStatistics.Post;
+  if (ttArtists.State=dsEdit) or ((ttArtists.State=dsInsert) and (ttArtistsNAME.AsWideString<>'')) then
+    ttArtists.Post;
+  if (ttClients.State=dsEdit) or ((ttClients.State=dsInsert) and (ttClientsNAME.AsWideString<>'')) then
+    ttClients.Post;
+  if (ttCommission.State=dsEdit) then
+    ttCommission.Post;
+  if (ttPayment.State=dsEdit) then
+    ttPayment.Post;
+  if (ttStatistics.State=dsEdit) then
+    ttStatistics.Post;
 end;
 
 procedure TMandatorForm.FormCreate(Sender: TObject);

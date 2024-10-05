@@ -312,7 +312,8 @@ end;
 
 procedure TStatisticsForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  if ttQuery.State in [dsEdit,dsInsert] then ttQuery.Post;
+  if (ttQuery.State=dsEdit) then
+    ttQuery.Post;
 end;
 
 procedure TStatisticsForm.FormCreate(Sender: TObject);
