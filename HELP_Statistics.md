@@ -15,8 +15,10 @@ with a website/gallery and listing the difference.
 
 Currently, there are the following statistics in the shipped statistics plugin:
 - Running commissions
-- Local sum over years (commissions outgoing)
-- Local sum over months (commissions outgoing)
+- Local sum over years
+- Local sum over months
+- Things I am waiting for (Art, Payment, Upload)
+- Things I need to do (Art, Payment, Upload)
 - Top artists/clients
 
 In the statistic grids you can double click to list more information and/or to jump to the referenced artists, commissions, etc.

@@ -20,8 +20,8 @@ The other columns are automatically filled by the program:
 	- "Deceased"
 - Column `PAY_STATUS` contains:
 	- `OKAY` if there are no debts or credits
-	- `CREDIT` including amount and currency.
-	- `DEBT` including amount and currency.
+	- `CREDIT` including amount and currency. Credit means that the sum of payments is higher than the sum of commission quotes. If you are the artist, you need to refund or deliver art. If you are the client, you wait for refund or request more art.
+	- `DEBT` including amount and currency. Debt means that the sum of commission quotes is higher than the sum of payments. If you are the artist, you need to invoice the customer. If you are the client, you need to pay the artist.
 	- If there are credits/debts of multiple currencies, it will be displayed accordingly. (Calculation: Sum of all payments in the artist/client window minus the sum of all quotes in the commissions).
 - Column `RUNNING`: Shows the amount of open art projects and the total amount of art projects.
 - Column `UPLOAD_C`: Shows how many artworks have been uploaded by the commissioner. (Commission window event "upload c") The total amount of art projects is reduced by the amount of artwork where uploading by the client is prohibited. ("upload c" event contains the information Prohibited=True).

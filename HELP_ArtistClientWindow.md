@@ -10,7 +10,7 @@ The database grid has the following columns:
 - Column `START_DATE` contains the start date of the commission (earliest "event" of a commission such as "aw sk"; excluded events are "quote", "annot", "upload a", "upload c", "upload x", "idea", and "c td initcm"
 - Column `END_DATE` contains the end date of a commission (the "fin" event of a commission)
 - Column `ART_STATUS` contains the latest commission event such as "aw sk" or "fin"; excluded are the events "quote", "upload a", "upload c", "upload x", and "annot"
-- Column `PAY_STATUS` contains the payment status of the commission, which is `Paid`, `Partiall Paid`, or `Not Paid`, including the amount and currency.
+- Column `PAY_STATUS` contains the payment status of the commission, which is `Paid`, `PART. PAID` (partially paid), or `NOT PAID`, including the amount and currency. (Can have multiple statements, if multiple currencies were used)
 - Column `UPLOAD_A` contains the information if the artwork was uploaded by the artist (values `Yes`, `No`, or `Prohibit`, which are taken from the "upload a" event in the commission).
 - Column `UPLOAD_C` contains the information if the artwork was uploaded by the client (values `Yes`, `No`, or `Prohibit`, which are taken from the "upload c" event in the commission).
 - Column `AMOUNT_LOCAL` contains the amount in the local currency. This value is only correct if `AMOUNT_LOCAL` in the commission events is entered (or automatically converted) correctly.
@@ -21,7 +21,7 @@ When you add payments, please take care that the currency is the same as the cur
 
 The database grid has the following columns:
 - Column `DATE`: Date of the payment
-- Column `AMOUNT`: The amount in the target currency
+- Column `AMOUNT`: The amount in the target currency sent from the client to the artist. The value is always positive (except for refunds, then it is negative).
 - Column `CURRENCY`: The currency
 - Column `AMOUNT_LOCAL`: The amount in the local currency.
 - Column `AMOUNT_VERIFIED`: Set this to "True" when you have verified that the local amount is correct (i.e. after checking your bank statement). The correctness includes the actualy applied conversion rate and various fees.

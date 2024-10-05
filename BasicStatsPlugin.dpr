@@ -20,6 +20,9 @@ const
   GUID_3: TGUID = '{2A7F1225-08A6-4B55-9EF7-75C7933DFBCA}';
   GUID_3A: TGUID = '{804E25DD-5756-47E8-9727-5849DCF63E32}';
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
+  GUID_5: TGUID = '{7A913ECF-16F1-493E-AEBA-5C41711068E2}';
+  GUID_6: TGUID = '{1D9DB7D5-A5FD-405D-9AFF-7C1781D6E1C6}';
+
   GUID_9: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
   GUID_9A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
   GUID_9B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
@@ -85,8 +88,11 @@ begin
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_1.ToString+''', ''BasicStats'', ''50'', ''Running commissions'');');
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_2.ToString+''', ''BasicStats'', ''100'', ''Local sum over years'');');
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_3.ToString+''', ''BasicStats'', ''101'', ''Local sum over months'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_4.ToString+''', ''BasicStats'', ''200'', ''Top artists/clients'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_9.ToString+''', ''BasicStats'', ''950'', ''--- About CMDB2 ---'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_5.ToString+''', ''BasicStats'', ''301'', ''Things I am waiting for (Art, Payment, Upload)'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_6.ToString+''', ''BasicStats'', ''302'', ''Things I need to do (Art, Payment, Upload)'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_4.ToString+''', ''BasicStats'', ''900'', ''Top artists/clients'');');
+      // This is just an example for having a "menu plugin":
+      //AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_9.ToString+''', ''BasicStats'', ''950'', ''--- About CMDB2 ---'');');
 
       AdoConn.Disconnect;
     finally
@@ -343,6 +349,208 @@ begin
         Response.Action := craObject;
         Response.ObjTable := 'COMMISSION';
         Response.ObjId := ItemGuid;
+      end;
+    end
+    {$ENDREGION}
+    {$REGION 'Stat: Waiting List'}
+    else if IsEqualGuid(StatGuid, GUID_5) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_5, 'WAIT_LIST')+' as ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	cm.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '	cm.ID as __ID, ' + #13#10 +
+                          '	N''Art: '' + cm.ART_STATUS as TASK, ' + #13#10 +
+                          '	cm.PROJECT_NAME as SUBJECT ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'where ' + #13#10 +
+                          '-- I am the artist (the other person is the customer) and I wait for the customer ' + #13#10 +
+                          '((cm.IS_ARTIST = 0) and (cm.ART_STATUS like ''c td %'')) or ' + #13#10 +
+                          '-- I am the customer (the other person is the artist) and I wait for the artist ' + #13#10 +
+                          '((cm.IS_ARTIST = 1) and (cm.ART_STATUS like ''c aw %'')) ' + #13#10 +
+                          ' ' + #13#10 +
+                          'union ' + #13#10 +
+                          ' ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	art.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '	art.ID as ID__, ' + #13#10 +
+                          '	N''Payment: '' + art.PAY_STATUS as TASK, ' + #13#10 +
+                          '	art.NAME + IIF(art.IS_ARTIST=1, N'' (Artist)'', N'' (Client)'') as SUBJECT ' + #13#10 +
+                          'from vw_ARTIST art ' + #13#10 +
+                          'where ' + #13#10 +
+                          '-- I am the artist (the other person is the customer) and the customer has a debt (so I wait for their payment) ' + #13#10 +
+                          '(art.IS_ARTIST = 0 and art.PAY_STATUS like ''%DEBT%'') or ' + #13#10 +
+                          '-- I am the customer (the other person is the artist) and the artist owes me art or money (so I wait for art or refund) ' + #13#10 +
+                          '(art.IS_ARTIST = 1 and art.PAY_STATUS like ''%CREDIT%'') ' + #13#10 +
+                          ' ' + #13#10 +
+                          'union ' + #13#10 +
+                          ' ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '	ID as ID__, ' + #13#10 +
+                          '	iif(IS_ARTIST=1, N''Upload by Artist (them)'', N''Upload by Client (them)'') as TASK, ' + #13#10 +
+                          '	PROJECT_NAME as SUBJECT ' + #13#10 +
+                          'from vw_COMMISSION ' + #13#10 +
+                          'where ' + #13#10 +
+                          '-- I am the customer and wait for the artist to upload the artwork ' + #13#10 +
+                          '(IS_ARTIST = 1 and UPLOAD_A = ''No'') or ' + #13#10 +
+                          '-- I am the artist and wait for the cutomer to upload the artwork ' + #13#10 +
+                          '(IS_ARTIST = 0 and UPLOAD_C = ''No'')');
+        finally
+          FreeAndNil(AdoConn);
+        end;
+        Response.Handled := true;
+        Response.Action := craStatistics;
+        Response.StatId := StatGuid;
+        Response.StatName := 'Things I am waiting for (Art, Payment, Upload)';
+        Response.SqlTable := TempTableName(GUID_5, 'WAIT_LIST');
+        Response.SqlInitialOrder := 'TASK, SUBJECT';
+        Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        Response.BaseTableDelete := ''; // not possible, because there are multiple base items
+      end
+      else
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+            if AdoConn.GetScalar('select count(*) from COMMISSION where ID = ''' + ItemGuid.ToString + '''') > 0 then
+            begin
+              Response.Handled := true;
+              Response.Action := craObject;
+              Response.ObjTable := 'COMMISSION';
+              Response.ObjId := ItemGuid;
+            end
+            else if AdoConn.GetScalar('select count(*) from ARTIST where ID = ''' + ItemGuid.ToString + '''') > 0 then
+            begin
+              Response.Handled := true;
+              Response.Action := craObject;
+              Response.ObjTable := 'ARTIST';
+              Response.ObjId := ItemGuid;
+            end
+            else
+            begin
+              Response.Handled := false;
+            end;
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
+          end;
+        finally
+          FreeAndNil(AdoConn);
+        end;
+      end;
+    end
+    {$ENDREGION}
+    {$REGION 'Stat: To Do List'}
+    else if IsEqualGuid(StatGuid, GUID_6) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_6, 'TODO_LIST')+' as ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	cm.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '	cm.ID as __ID, ' + #13#10 +
+                          '	N''Art: '' + cm.ART_STATUS as TASK, ' + #13#10 +
+                          '	cm.PROJECT_NAME as SUBJECT ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'where ' + #13#10 +
+                          '-- I am the artist (the other person is the customer) and the customer waits for me ' + #13#10 +
+                          '((cm.IS_ARTIST = 0) and (cm.ART_STATUS like ''c aw %'')) or ' + #13#10 +
+                          '-- I am the customer (the other person is the artist) and the artist waits for me ' + #13#10 +
+                          '((cm.IS_ARTIST = 1) and (cm.ART_STATUS like ''c td %'')) ' + #13#10 +
+                          ' ' + #13#10 +
+                          'union ' + #13#10 +
+                          ' ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	art.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '	art.ID as ID__, ' + #13#10 +
+                          '	N''Payment: '' + art.PAY_STATUS as TASK, ' + #13#10 +
+                          '	art.NAME + IIF(art.IS_ARTIST=1, N'' (Artist)'', N'' (Client)'') as SUBJECT ' + #13#10 +
+                          'from vw_ARTIST art ' + #13#10 +
+                          'where ' + #13#10 +
+                          '-- I am the artist (the other person is the customer) and the customer has a credit (so I need to refund or deliver art) ' + #13#10 +
+                          '(art.IS_ARTIST = 0 and art.PAY_STATUS like ''%CREDIT%'') or ' + #13#10 +
+                          '-- I am the customer (the other person is the artist) and owe the artist money (so I need to pay) ' + #13#10 +
+                          '(art.IS_ARTIST = 1 and art.PAY_STATUS like ''%DEBT%'') ' + #13#10 +
+                          ' ' + #13#10 +
+                          'union ' + #13#10 +
+                          ' ' + #13#10 +
+                          'select ' + #13#10 +
+                          '	MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '	ID as ID__, ' + #13#10 +
+                          '	iif(IS_ARTIST=1, N''Upload by Customer (me)'', N''Upload by Artist (me)'') as TASK, ' + #13#10 +
+                          '	PROJECT_NAME as SUBJECT ' + #13#10 +
+                          'from vw_COMMISSION ' + #13#10 +
+                          'where ' + #13#10 +
+                          '-- I am the customer and need to upload the art ' + #13#10 +
+                          '(IS_ARTIST = 1 and UPLOAD_C = ''No'') or ' + #13#10 +
+                          '-- I am the artist and need to upload the art ' + #13#10 +
+                          '(IS_ARTIST = 0 and UPLOAD_A = ''No'')');
+        finally
+          FreeAndNil(AdoConn);
+        end;
+        Response.Handled := true;
+        Response.Action := craStatistics;
+        Response.StatId := StatGuid;
+        Response.StatName := 'Things I need to do (Art, Payment, Upload)';
+        Response.SqlTable := TempTableName(GUID_6, 'TODO_LIST');
+        Response.SqlInitialOrder := 'TASK, SUBJECT';
+        Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        Response.BaseTableDelete := ''; // not possible, because there are multiple base items
+      end
+      else
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+            if AdoConn.GetScalar('select count(*) from COMMISSION where ID = ''' + ItemGuid.ToString + '''') > 0 then
+            begin
+              Response.Handled := true;
+              Response.Action := craObject;
+              Response.ObjTable := 'COMMISSION';
+              Response.ObjId := ItemGuid;
+            end
+            else if AdoConn.GetScalar('select count(*) from ARTIST where ID = ''' + ItemGuid.ToString + '''') > 0 then
+            begin
+              Response.Handled := true;
+              Response.Action := craObject;
+              Response.ObjTable := 'ARTIST';
+              Response.ObjId := ItemGuid;
+            end
+            else
+            begin
+              Response.Handled := false;
+            end;
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
+          end;
+        finally
+          FreeAndNil(AdoConn);
+        end;
       end;
     end
     {$ENDREGION}

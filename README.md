@@ -19,6 +19,7 @@ It manages:
 - Shortcut to folders that contain the artworks
 - Collecting various information about commissions and artists, e.g. the contact details
 - Possibility to extend with plugins
+- Password protection
 
 Developers can extend the program using the programming language Embarcadero Delphi; the source files are on GitHub.
 

@@ -7,7 +7,7 @@
 
 The database grid has the following columns:
 - Column `DATE`: The date of the event.
-- Column `STATE` can have the following values:
+- Column `STATE` is the art status (independent of the payment!) which can have the following values:
 	- `idea`: This marks the commission as idea. Nothing has yet been decided.
 	- `c td initcm`: The client ("c") needs to do ("td") the initial commission ("initcm") description, which means they must contact the artist and tell what he wants to commish.
 	- `c aw ack`: The client ("c") awaits ("aw") that the commission is accepted/acknowledged ("ack").
@@ -34,7 +34,7 @@ You can create a quote by creating an event with STATE "quote". Then, leave the 
 
 The database grid of the Quote tab has the following columns:
 - Column `NO` contains a number you assign to keep a specific order.
-- Column `AMOUNT` contains the monetary amount.
+- Column `AMOUNT` contains the monetary amount sent from the client to the artist. The value is always positive (except for refunds, then it is negative).
 - Column `CURRENCY` contains the currency.
 - Column `AMOUNT_LOCAL` contains the amount in the local currency. This value is only correct if `AMOUNT_LOCAL` in the commission events is entered (or automatically converted) correctly.
 - Column `IS_FREE`: A value of "True" marks the line as free, i.e. the client doesn't have to pay for this item.

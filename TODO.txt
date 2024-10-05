@@ -2,12 +2,6 @@
 # TODO
 
 Plugin development:
-	basic stats plugin:
-	- stats: show things that must be paid
-	- stats: show things that needs to be done (td)
-	- stats: show things that are awaited (aw)
-	- stats: show things that must be uploaded (upload c / upload a)
-	
 	upload check plugin:
 	- plugin to check uploads not in cmdb recorded
 	
