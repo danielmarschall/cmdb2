@@ -400,32 +400,39 @@ procedure TCommissionForm.TryShowFileList(const AFolder: string='');
 begin
   if ShellListView = nil then exit;
 
-  ShellListView.Items.BeginUpdate;
-  try
+  if (AFolder<>'') and DirectoryExists(AFolder) then
+  begin
+    ShellListView.Items.BeginUpdate;
     try
-      if AFolder <> '' then
-      begin
-        ShellListView.Root := 'C:\'; // hack to allow that the next line works a second time
-        ShellListView.Root := AFolder;
-        ShellChangeNotifier.Root := ShellListView.Root;
-      end
-      else
-      begin
-        ShellListView.Refresh;
+      try
+        if AFolder <> '' then
+        begin
+          ShellListView.Root := 'C:\'; // hack to allow that the next line works a second time
+          ShellListView.Root := AFolder;
+          ShellChangeNotifier.Root := ShellListView.Root;
+        end
+        else
+        begin
+          ShellListView.Refresh;
+        end;
+        ShellListView.ViewStyle := vsReport;
+        ShellListView.Sorted := true;
+        ShellListView.Columns[0{Name}].Width := 300; // Does not work:  ShellListView.Columns[0].Width := LVSCW_AUTOSIZE or LVSCW_AUTOSIZE_USEHEADER;
+        ShellListView.Columns[1{Size}].Width := 95;
+        ShellListView.Columns[2{Type}].Width := 200;
+        ShellListView.Columns[3{Date}].Width := 115;
+        ShellListView.Visible := not SameText(ShellListView.Root, 'C:\');
+      except
+        ShellListView.Visible := false;
+        raise;
       end;
-      ShellListView.ViewStyle := vsReport;
-      ShellListView.Sorted := true;
-      ShellListView.Columns[0{Name}].Width := 300; // Does not work:  ShellListView.Columns[0].Width := LVSCW_AUTOSIZE or LVSCW_AUTOSIZE_USEHEADER;
-      ShellListView.Columns[1{Size}].Width := 95;
-      ShellListView.Columns[2{Type}].Width := 200;
-      ShellListView.Columns[3{Date}].Width := 115;
-      ShellListView.Visible := not SameText(ShellListView.Root, 'C:\');
-    except
-      ShellListView.Visible := false;
-      raise;
+    finally
+      ShellListView.Items.EndUpdate;
     end;
-  finally
-    ShellListView.Items.EndUpdate;
+  end
+  else
+  begin
+    ShellListView.Visible := false;
   end;
 end;
 
