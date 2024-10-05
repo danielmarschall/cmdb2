@@ -131,19 +131,25 @@ begin
             Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_1, 'RUNNING_COMMISSIONS')+' as ' + #13#10 +
-                          'select man.ID as __MANDATOR_ID, case ' + #13#10 +
-                          '	when cm.ART_STATUS = ''c aw ack'' then 1 ' + #13#10 +
-                          '	when cm.ART_STATUS = ''ack'' then 2 ' + #13#10 +
-                          '	when cm.ART_STATUS = ''c aw sk'' then 3 ' + #13#10 +
-                          '	when cm.ART_STATUS = ''c td feedback'' then 4 ' + #13#10 +
-                          '	when cm.ART_STATUS = ''c aw cont'' then 5 ' + #13#10 +
-                          '	when cm.ART_STATUS = ''c aw hires'' then 6 ' + #13#10 +
-                          '	else 7 ' + #13#10 +
-                          'end as __STATUS_ORDER, cm.ART_STATUS, art.NAME as ARTIST, cm.NAME, cm.ID as __ID, ' + #13#10 +
-                          '    CASE ' + #13#10 +
-                          '        WHEN CHARINDEX(''\'', cm.FOLDER) > 0 THEN RIGHT(cm.FOLDER, CHARINDEX(''\'', REVERSE(cm.FOLDER)) - 1) ' + #13#10 +
-                          '        ELSE cm.FOLDER ' + #13#10 +
-                          '    END AS FOLDER ' + #13#10 +
+                          'select ' + #13#10 +
+                          '    man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '    case ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw ack'' then 1 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''ack'' then 2 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw sk'' then 3 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c td feedback'' then 4 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw cont'' then 5 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw hires'' then 6 ' + #13#10 +
+                          '        else 7 ' + #13#10 +
+                          '    end as __STATUS_ORDER, ' + #13#10 +
+                          '    cm.ART_STATUS, ' + #13#10 +
+                          '    art.NAME as ARTIST, ' + #13#10 +
+                          '    cm.NAME, ' + #13#10 +
+                          '    cm.ID as __ID, ' + #13#10 +
+                          '    case ' + #13#10 +
+                          '        when CHARINDEX(''\'', cm.FOLDER) > 0 THEN RIGHT(cm.FOLDER, CHARINDEX(''\'', REVERSE(cm.FOLDER)) - 1) ' + #13#10 +
+                          '        else cm.FOLDER ' + #13#10 +
+                          '    end as FOLDER ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
@@ -185,13 +191,13 @@ begin
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_2, 'SUM_YEARS')+' as ' + #13#10 +
                           'select ' + #13#10 +
-                          '	CONVERT(UNIQUEIDENTIFIER, HASHBYTES(''SHA1'', N'''+TempTableName(GUID_2, 'SUM_YEARS')+'''+cast(man.ID as nvarchar(100))+CAST(year(cm.START_DATE) AS NVARCHAR(30)) + CAST(art.IS_ARTIST AS NVARCHAR(1)))) as __ID, ' + #13#10 +
-                          '	man.ID as __MANDATOR_ID, ' + #13#10 +
-                          '	iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
-                          '	year(cm.START_DATE) as YEAR, ' + #13#10 +
-                          '	count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
-                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
-                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          '    CONVERT(UNIQUEIDENTIFIER, HASHBYTES(''SHA1'', N'''+TempTableName(GUID_2, 'SUM_YEARS')+'''+cast(man.ID as nvarchar(100))+CAST(year(cm.START_DATE) AS NVARCHAR(30)) + CAST(art.IS_ARTIST AS NVARCHAR(1)))) as __ID, ' + #13#10 +
+                          '    man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '    iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
+                          '    year(cm.START_DATE) as YEAR, ' + #13#10 +
+                          '    count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
+                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
@@ -273,13 +279,13 @@ begin
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_3, 'SUM_MONTHS')+' as ' + #13#10 +
                           'select ' + #13#10 +
-                          '	CONVERT(UNIQUEIDENTIFIER, HASHBYTES(''SHA1'', N'''+TempTableName(GUID_3, 'SUM_MONTHS')+'''+cast(man.ID as nvarchar(100))+CAST(year(cm.START_DATE) AS NVARCHAR(30))+CAST(month(cm.START_DATE) AS NVARCHAR(30)) + CAST(art.IS_ARTIST AS NVARCHAR(1)))) as __ID, ' + #13#10 +
-                          '	man.ID as __MANDATOR_ID, ' + #13#10 +
-                          '	iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
-                          '	cast(cast(year(cm.START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(cm.START_DATE))) + cast(month(cm.START_DATE) as nvarchar(2)) as nvarchar(7)) as MONTH, ' + #13#10 +
-                          '	count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
-                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
-                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          '    CONVERT(UNIQUEIDENTIFIER, HASHBYTES(''SHA1'', N'''+TempTableName(GUID_3, 'SUM_MONTHS')+'''+cast(man.ID as nvarchar(100))+CAST(year(cm.START_DATE) AS NVARCHAR(30))+CAST(month(cm.START_DATE) AS NVARCHAR(30)) + CAST(art.IS_ARTIST AS NVARCHAR(1)))) as __ID, ' + #13#10 +
+                          '    man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '    iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
+                          '    cast(cast(year(cm.START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(cm.START_DATE))) + cast(month(cm.START_DATE) as nvarchar(2)) as nvarchar(7)) as MONTH, ' + #13#10 +
+                          '    count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
+                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
@@ -367,45 +373,51 @@ begin
             Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_5, 'WAIT_LIST')+' as ' + #13#10 +
+                          {$REGION 'Art status'}
                           'select ' + #13#10 +
-                          '	cm.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
-                          '	cm.ID as __ID, ' + #13#10 +
-                          '	N''Art: '' + cm.ART_STATUS as TASK, ' + #13#10 +
-                          '	cm.PROJECT_NAME as SUBJECT ' + #13#10 +
+                          '    cm.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '    cm.ID as __ID, ' + #13#10 +
+                          '    N''Art: '' + cm.ART_STATUS as TASK, ' + #13#10 +
+                          '    cm.PROJECT_NAME as SUBJECT ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'where ' + #13#10 +
                           '-- I am the artist (the other person is the customer) and I wait for the customer ' + #13#10 +
                           '((cm.IS_ARTIST = 0) and (cm.ART_STATUS like ''c td %'')) or ' + #13#10 +
                           '-- I am the customer (the other person is the artist) and I wait for the artist ' + #13#10 +
                           '((cm.IS_ARTIST = 1) and (cm.ART_STATUS like ''c aw %'')) ' + #13#10 +
+                          {$ENDREGION}
                           ' ' + #13#10 +
                           'union ' + #13#10 +
                           ' ' + #13#10 +
+                          {$REGION 'Pay status'}
                           'select ' + #13#10 +
-                          '	art.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
-                          '	art.ID as ID__, ' + #13#10 +
-                          '	N''Payment: '' + art.PAY_STATUS as TASK, ' + #13#10 +
-                          '	art.NAME + IIF(art.IS_ARTIST=1, N'' (Artist)'', N'' (Client)'') as SUBJECT ' + #13#10 +
+                          '    art.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '    art.ID as ID__, ' + #13#10 +
+                          '    N''Payment: '' + art.PAY_STATUS as TASK, ' + #13#10 +
+                          '    art.NAME + IIF(art.IS_ARTIST=1, N'' (Artist)'', N'' (Client)'') as SUBJECT ' + #13#10 +
                           'from vw_ARTIST art ' + #13#10 +
                           'where ' + #13#10 +
                           '-- I am the artist (the other person is the customer) and the customer has a debt (so I wait for their payment) ' + #13#10 +
                           '(art.IS_ARTIST = 0 and art.PAY_STATUS like ''%DEBT%'') or ' + #13#10 +
                           '-- I am the customer (the other person is the artist) and the artist owes me art or money (so I wait for art or refund) ' + #13#10 +
                           '(art.IS_ARTIST = 1 and art.PAY_STATUS like ''%CREDIT%'') ' + #13#10 +
+                          {$ENDREGION}
                           ' ' + #13#10 +
                           'union ' + #13#10 +
                           ' ' + #13#10 +
+                          {$REGION 'Upload status'}
                           'select ' + #13#10 +
-                          '	MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
-                          '	ID as ID__, ' + #13#10 +
-                          '	iif(IS_ARTIST=1, N''Upload by Artist (them)'', N''Upload by Client (them)'') as TASK, ' + #13#10 +
-                          '	PROJECT_NAME as SUBJECT ' + #13#10 +
+                          '    MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '    ID as ID__, ' + #13#10 +
+                          '    iif(IS_ARTIST=1, N''Upload by Artist (them)'', N''Upload by Client (them)'') as TASK, ' + #13#10 +
+                          '    PROJECT_NAME as SUBJECT ' + #13#10 +
                           'from vw_COMMISSION ' + #13#10 +
                           'where ' + #13#10 +
                           '-- I am the customer and wait for the artist to upload the artwork ' + #13#10 +
                           '(IS_ARTIST = 1 and UPLOAD_A = ''No'') or ' + #13#10 +
                           '-- I am the artist and wait for the cutomer to upload the artwork ' + #13#10 +
                           '(IS_ARTIST = 0 and UPLOAD_C = ''No'')');
+                          {$ENDREGION}
         finally
           FreeAndNil(AdoConn);
         end;
@@ -468,45 +480,51 @@ begin
             Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_6, 'TODO_LIST')+' as ' + #13#10 +
+                          {$REGION 'Art status'}
                           'select ' + #13#10 +
-                          '	cm.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
-                          '	cm.ID as __ID, ' + #13#10 +
-                          '	N''Art: '' + cm.ART_STATUS as TASK, ' + #13#10 +
-                          '	cm.PROJECT_NAME as SUBJECT ' + #13#10 +
+                          '    cm.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '    cm.ID as __ID, ' + #13#10 +
+                          '    N''Art: '' + cm.ART_STATUS as TASK, ' + #13#10 +
+                          '    cm.PROJECT_NAME as SUBJECT ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'where ' + #13#10 +
                           '-- I am the artist (the other person is the customer) and the customer waits for me ' + #13#10 +
                           '((cm.IS_ARTIST = 0) and (cm.ART_STATUS like ''c aw %'')) or ' + #13#10 +
                           '-- I am the customer (the other person is the artist) and the artist waits for me ' + #13#10 +
                           '((cm.IS_ARTIST = 1) and (cm.ART_STATUS like ''c td %'')) ' + #13#10 +
+                          {$ENDREGION}
                           ' ' + #13#10 +
                           'union ' + #13#10 +
                           ' ' + #13#10 +
+                          {$REGION 'Pay status'}
                           'select ' + #13#10 +
-                          '	art.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
-                          '	art.ID as ID__, ' + #13#10 +
-                          '	N''Payment: '' + art.PAY_STATUS as TASK, ' + #13#10 +
-                          '	art.NAME + IIF(art.IS_ARTIST=1, N'' (Artist)'', N'' (Client)'') as SUBJECT ' + #13#10 +
+                          '    art.MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '    art.ID as ID__, ' + #13#10 +
+                          '    N''Payment: '' + art.PAY_STATUS as TASK, ' + #13#10 +
+                          '    art.NAME + IIF(art.IS_ARTIST=1, N'' (Artist)'', N'' (Client)'') as SUBJECT ' + #13#10 +
                           'from vw_ARTIST art ' + #13#10 +
                           'where ' + #13#10 +
                           '-- I am the artist (the other person is the customer) and the customer has a credit (so I need to refund or deliver art) ' + #13#10 +
                           '(art.IS_ARTIST = 0 and art.PAY_STATUS like ''%CREDIT%'') or ' + #13#10 +
                           '-- I am the customer (the other person is the artist) and owe the artist money (so I need to pay) ' + #13#10 +
                           '(art.IS_ARTIST = 1 and art.PAY_STATUS like ''%DEBT%'') ' + #13#10 +
+                          {$ENDREGION}
                           ' ' + #13#10 +
                           'union ' + #13#10 +
                           ' ' + #13#10 +
+                          {$REGION 'Upload status'}
                           'select ' + #13#10 +
-                          '	MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
-                          '	ID as ID__, ' + #13#10 +
-                          '	iif(IS_ARTIST=1, N''Upload by Customer (me)'', N''Upload by Artist (me)'') as TASK, ' + #13#10 +
-                          '	PROJECT_NAME as SUBJECT ' + #13#10 +
+                          '    MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
+                          '    ID as ID__, ' + #13#10 +
+                          '    iif(IS_ARTIST=1, N''Upload by Customer (me)'', N''Upload by Artist (me)'') as TASK, ' + #13#10 +
+                          '    PROJECT_NAME as SUBJECT ' + #13#10 +
                           'from vw_COMMISSION ' + #13#10 +
                           'where ' + #13#10 +
                           '-- I am the customer and need to upload the art ' + #13#10 +
                           '(IS_ARTIST = 1 and UPLOAD_C = ''No'') or ' + #13#10 +
                           '-- I am the artist and need to upload the art ' + #13#10 +
                           '(IS_ARTIST = 0 and UPLOAD_A = ''No'')');
+                          {$ENDREGION}
         finally
           FreeAndNil(AdoConn);
         end;
@@ -570,11 +588,12 @@ begin
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_4, 'SUM_MONTHS')+' as ' + #13#10 +
                           'select ' + #13#10 +
-                          '	man.ID as __MANDATOR_ID, art.NAME as ARTISTNAME, ' + #13#10 +
-                          '	art.ID as __ID, ' + #13#10 +
-                          '	count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
-                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
-                          '	SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          '    man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '    art.NAME as ARTISTNAME, ' + #13#10 +
+                          '    art.ID as __ID, ' + #13#10 +
+                          '    count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
+                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
