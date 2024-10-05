@@ -6,6 +6,7 @@ uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
   Db, DateUtils;
 
+procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
 function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
@@ -27,6 +28,18 @@ implementation
 
 uses
   ShlObj, ShellApi, System.Hash;
+
+procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
+var
+  q: TAdoDataSet;
+begin
+  q := AdoConnection1.GetTable('select name from sysobjects where name like ''tmp_%'';');
+  while not q.EOF do
+  begin
+    AdoConnection1.DropTableOrView(q.Fields[0].AsWideString);
+    q.Next;
+  end;
+end;
 
 function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
 var

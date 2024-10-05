@@ -2,3 +2,4 @@ VCL_MARKDOWN/** linguist-vendored
 VCL_SHELLCONTROLS/** linguist-vendored
 EncryptedZipFile.pas linguist-vendored
 VtsCurConvDLLHeader.pas linguist-vendored
+AdoConnHelper.pas linguist-vendored

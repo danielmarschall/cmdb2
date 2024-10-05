@@ -1,9 +1,6 @@
 
 # TODO
 
-Version 1.1:
-- tmp_* tabellen und views beim beenden entfernen
-
 Plugin development:
 	upload check plugin:
 	- plugin to check uploads not in cmdb recorded

@@ -203,6 +203,7 @@ begin
       NextBackupID := -1;
 
       // Make some optimizations for performance
+      CmDbDropTempTables(AdoConnection1);
       DefragIndexes(AdoConnection1);
 
       sl := TStringList.Create;
