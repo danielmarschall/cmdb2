@@ -43,6 +43,7 @@ type
     procedure PerformBackupAndDefrag;
   public
     CmDbZipPassword: string;
+    DatabaseOpenedOnce: boolean;
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
     procedure OpenMandatorsForm;
@@ -206,26 +207,29 @@ begin
 
       sl := TStringList.Create;
       try
-        {$REGION 'Check if something has changed'}
-        q := ADOConnection1.GetTable('select * from vw_TEXT_BACKUP_GENERATE order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
-        try
-          sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');
-          while not q.EOF do
-          begin
-            sl.Add('"'+q.Fields[0].AsWideString+'";"'+q.Fields[1].AsWideString+'";"'+q.Fields[2].AsWideString+'";"'+q.Fields[3].AsWideString+'";"'+q.Fields[4].AsWideString+'";"'+q.Fields[5].AsWideString+'"');
-            q.Next;
-          end;
-        finally
-          FreeAndNil(q);
-        end;
-
-        CheckSumNow := THashSHA2.GetHashString(sl.Text); // SHA256
-        ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
-        if not SameText(ChecksumThen, ChecksumNow) then
+        if DatabaseOpenedOnce then
         begin
-          NextBackupID := VariantToInteger(AdoConnection1.GetScalar('SELECT IDENT_CURRENT(''BACKUP'') + IDENT_INCR(''BACKUP'');'));
+          {$REGION 'Check if something has changed'}
+          q := ADOConnection1.GetTable('select * from vw_TEXT_BACKUP_GENERATE order by __MANDATOR_NAME, __MANDATOR_ID, DATASET_TYPE, DATASET_ID');
+          try
+            sl.Add('MANDATOR_ID;MANDATOR_NAME;DATASET_ID;DATASET_TYPE;NAME;MORE_DATA');
+            while not q.EOF do
+            begin
+              sl.Add('"'+q.Fields[0].AsWideString+'";"'+q.Fields[1].AsWideString+'";"'+q.Fields[2].AsWideString+'";"'+q.Fields[3].AsWideString+'";"'+q.Fields[4].AsWideString+'";"'+q.Fields[5].AsWideString+'"');
+              q.Next;
+            end;
+          finally
+            FreeAndNil(q);
+          end;
+
+          CheckSumNow := THashSHA2.GetHashString(sl.Text); // SHA256
+          ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
+          if not SameText(ChecksumThen, ChecksumNow) then
+          begin
+            NextBackupID := VariantToInteger(AdoConnection1.GetScalar('SELECT IDENT_CURRENT(''BACKUP'') + IDENT_INCR(''BACKUP'');'));
+          end;
+          {$ENDREGION}
         end;
-        {$ENDREGION}
 
         if NextBackupID > 0 then
         begin

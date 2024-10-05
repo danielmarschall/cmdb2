@@ -569,6 +569,7 @@ begin
     end;
   end;
   {$ENDREGION}
+  MainForm.DatabaseOpenedOnce := true;
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttMandator / dbgMandator'}
