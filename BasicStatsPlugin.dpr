@@ -23,10 +23,6 @@ const
   GUID_5: TGUID = '{7A913ECF-16F1-493E-AEBA-5C41711068E2}';
   GUID_6: TGUID = '{1D9DB7D5-A5FD-405D-9AFF-7C1781D6E1C6}';
 
-  GUID_9: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
-  GUID_9A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
-  GUID_9B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
-
 function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
 var
   AuthorInfo: TVtsPluginAuthorInfo;
@@ -91,8 +87,6 @@ begin
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_5.ToString+''', ''BasicStats'', ''301'', ''Things I am waiting for (Art, Payment, Upload)'');');
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_6.ToString+''', ''BasicStats'', ''302'', ''Things I need to do (Art, Payment, Upload)'');');
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_4.ToString+''', ''BasicStats'', ''900'', ''Top artists/clients'');');
-      // This is just an example for having a "menu plugin":
-      //AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_9.ToString+''', ''BasicStats'', ''950'', ''--- About CMDB2 ---'');');
 
       AdoConn.Disconnect;
     finally
@@ -619,53 +613,6 @@ begin
         Response.Action := craObject;
         Response.ObjTable := 'ARTIST';
         Response.ObjId := ItemGuid;
-      end;
-    end
-    {$ENDREGION}
-    {$REGION 'Test menu plugin'}
-    else if IsEqualGuid(StatGuid, GUID_9) then
-    begin
-      // This is an example for creating a plugin that outputs a "menu" with custom actions (which can be anything!)
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
-      begin
-        AdoConn := TAdoConnection.Create(nil);
-        try
-          try
-            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
-            AdoConn.LoginPrompt := false;
-            AdoConn.ConnectConnStr(DBConnStr);
-          except
-            Exit(E_PLUGIN_CONN_FAIL);
-          end;
-          if not AdoConn.TableExists(TempTableName(GUID_9, 'TEST')) then
-            AdoConn.ExecSQL('create table '+TempTableName(GUID_9, 'TEST')+' ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
-          AdoConn.ExecSQL('delete from '+TempTableName(GUID_9, 'TEST'));
-          AdoConn.ExecSQL('insert into '+TempTableName(GUID_9, 'TEST')+' select '''+GUID_9A.ToString+''', ''View Source Code'';');
-          AdoConn.ExecSQL('insert into '+TempTableName(GUID_9, 'TEST')+' select '''+GUID_9B.ToString+''', ''Download latest version'';');
-        finally
-          FreeAndNil(AdoConn);
-        end;
-
-        Response.Handled := true;
-        Response.Action := craStatistics;
-        Response.StatId := StatGuid;
-        Response.StatName := 'Web sources';
-        Response.SqlTable := TempTableName(GUID_9, 'TEST');
-        Response.SqlInitialOrder := '';
-        Response.SqlAdditionalFilter := '';
-        Response.BaseTableDelete := '';
-      end
-      else if IsEqualGUID(ItemGuid, GUID_9A) then
-      begin
-        Response.Handled := true;
-        Response.Action := craNone;
-        ShellExecute(0, 'open', 'https://github.com/danielmarschall/cmdb2', '', '', SW_NORMAL);
-      end
-      else if IsEqualGUID(ItemGuid, GUID_9B) then
-      begin
-        Response.Handled := true;
-        Response.Action := craNone;
-        ShellExecute(0, 'open', 'https://github.com/danielmarschall/cmdb2/releases', '', '', SW_NORMAL);
       end;
     end;
     {$ENDREGION}

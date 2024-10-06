@@ -9,6 +9,15 @@
         <Projects Include="BasicStatsPlugin.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="FolderCheckPlugin.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="UploadComparisonPlugin.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="MenuTestPlugin.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +44,41 @@
     <Target Name="BasicStatsPlugin:Make">
         <MSBuild Projects="BasicStatsPlugin.dproj" Targets="Make"/>
     </Target>
+    <Target Name="FolderCheckPlugin">
+        <MSBuild Projects="FolderCheckPlugin.dproj"/>
+    </Target>
+    <Target Name="FolderCheckPlugin:Clean">
+        <MSBuild Projects="FolderCheckPlugin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FolderCheckPlugin:Make">
+        <MSBuild Projects="FolderCheckPlugin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="UploadComparisonPlugin">
+        <MSBuild Projects="UploadComparisonPlugin.dproj"/>
+    </Target>
+    <Target Name="UploadComparisonPlugin:Clean">
+        <MSBuild Projects="UploadComparisonPlugin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="UploadComparisonPlugin:Make">
+        <MSBuild Projects="UploadComparisonPlugin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MenuTestPlugin">
+        <MSBuild Projects="MenuTestPlugin.dproj"/>
+    </Target>
+    <Target Name="MenuTestPlugin:Clean">
+        <MSBuild Projects="MenuTestPlugin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MenuTestPlugin:Make">
+        <MSBuild Projects="MenuTestPlugin.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="CmDb2;BasicStatsPlugin"/>
+        <CallTarget Targets="CmDb2;BasicStatsPlugin;FolderCheckPlugin;UploadComparisonPlugin;MenuTestPlugin"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CmDb2:Clean;BasicStatsPlugin:Clean"/>
+        <CallTarget Targets="CmDb2:Clean;BasicStatsPlugin:Clean;FolderCheckPlugin:Clean;UploadComparisonPlugin:Clean;MenuTestPlugin:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CmDb2:Make;BasicStatsPlugin:Make"/>
+        <CallTarget Targets="CmDb2:Make;BasicStatsPlugin:Make;FolderCheckPlugin:Make;UploadComparisonPlugin:Make;MenuTestPlugin:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
