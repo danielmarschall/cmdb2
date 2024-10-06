@@ -113,6 +113,7 @@ type
     procedure RegnerateQuoteAnnotation;
   protected
     CommissionName: string;
+    SavedFolder: string;
   public
     CommissionId: TGUID;
     procedure Init;
@@ -467,11 +468,12 @@ procedure TCommissionForm.BtnFolderSaveClick(Sender: TObject);
 begin
   TryShowFileList(Trim(FolderEdit.Text));
   ADOConnection1.ExecSQL('update COMMISSION set FOLDER = '+ADOConnection1.SQLStringEscape(Trim(FolderEdit.Text))+' where ID = '+ADOConnection1.SQLStringEscape(CommissionId.ToString));
+  SavedFolder := Trim(FolderEdit.Text);
 end;
 
 procedure TCommissionForm.ShellChangeNotifierChange;
 begin
-  TryShowFileList;
+  TryShowFileList(SavedFolder);
 end;
 
 procedure TCommissionForm.ShellListViewDblClick(Sender: TObject);
@@ -742,8 +744,9 @@ begin
     dbgUploads.Columns[1].DropDownRows := 15;
 
     try
-      FolderEdit.Text := VariantToString(ADOConnection1.GetScalar('select FOLDER from COMMISSION where ID = ' + ADOConnection1.SQLStringEscape(CommissionId.ToString)));
-      TryShowFileList(FolderEdit.Text);
+      SavedFolder := VariantToString(ADOConnection1.GetScalar('select FOLDER from COMMISSION where ID = ' + ADOConnection1.SQLStringEscape(CommissionId.ToString)));
+      FolderEdit.Text := SavedFolder;
+      TryShowFileList(SavedFolder);
     except
     end;
   finally
