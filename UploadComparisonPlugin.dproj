@@ -113,6 +113,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="CmDbPluginShare.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -156,6 +157,12 @@
                 </DeployFile>
                 <DeployFile LocalName="Win64\Release\UploadComparisonPlugin.dll" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
+                        <RemoteName>UploadComparisonPlugin.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin32\UploadComparisonPlugin.spl" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
                         <RemoteName>UploadComparisonPlugin.dll</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

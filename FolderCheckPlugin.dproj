@@ -113,6 +113,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="CmDbPluginShare.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -156,6 +157,12 @@
                 </DeployFile>
                 <DeployFile LocalName="Win64\Release\FolderCheckPlugin.dll" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
+                        <RemoteName>FolderCheckPlugin.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin32\FolderCheckPlugin.spl" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
                         <RemoteName>FolderCheckPlugin.dll</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

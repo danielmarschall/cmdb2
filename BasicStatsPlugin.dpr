@@ -13,7 +13,7 @@ uses
 
 const
   // Ctrl+Shift+G to generate new GUIDs
-  GUID_STATS_PLUGIN: TGUID = '{72FFE4A5-2C2F-406B-92DE-D6AD8CD81594}';
+  GUID_THIS_PLUGIN: TGUID = '{72FFE4A5-2C2F-406B-92DE-D6AD8CD81594}';
   GUID_1: TGUID = '{6F7E0568-3612-4BD0-BEA6-B23560A5F594}';
   GUID_2: TGUID = '{08F3D4C0-8DBD-4F3E-8891-241858779E49}';
   GUID_2A: TGUID = '{8B46FC53-21E8-4E8C-AB60-AC9811B8D8B4}';
@@ -22,6 +22,15 @@ const
   GUID_4: TGUID = '{636CD096-DB61-4ECF-BA79-00445AEB8798}';
   GUID_5: TGUID = '{7A913ECF-16F1-493E-AEBA-5C41711068E2}';
   GUID_6: TGUID = '{1D9DB7D5-A5FD-405D-9AFF-7C1781D6E1C6}';
+
+resourcestring
+  DESC_PLUGIN_SHORT = 'Basic Stats';
+  DESC_1 = 'Running commissions';
+  DESC_2 = 'Local sum over years';
+  DESC_3 = 'Local sum over months';
+  DESC_5 = 'Things I am waiting for (Art, Payment, Upload)';
+  DESC_6 = 'Things I need to do (Art, Payment, Upload)';
+  DESC_4 = 'Top artists/clients';
 
 function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
 var
@@ -43,7 +52,7 @@ begin
   if Assigned(lpIDOut) then
   begin
     // identifies this individual plugin (any version)
-    lpIDOut^ := GUID_STATS_PLUGIN;
+    lpIDOut^ := GUID_THIS_PLUGIN;
   end;
 
   if Assigned(lpVerOut) then
@@ -81,12 +90,12 @@ begin
         Exit(E_PLUGIN_CONN_FAIL);
       end;
 
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_1.ToString+''', ''BasicStats'', ''50'', ''Running commissions'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_2.ToString+''', ''BasicStats'', ''100'', ''Local sum over years'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_3.ToString+''', ''BasicStats'', ''101'', ''Local sum over months'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_5.ToString+''', ''BasicStats'', ''301'', ''Things I am waiting for (Art, Payment, Upload)'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_6.ToString+''', ''BasicStats'', ''302'', ''Things I need to do (Art, Payment, Upload)'');');
-      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('''+GUID_4.ToString+''', ''BasicStats'', ''900'', ''Top artists/clients'');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_1.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+',  50, '+AdoConn.SQLStringEscape(DESC_1)+');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_2.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+', 100, '+AdoConn.SQLStringEscape(DESC_2)+');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_3.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+', 101, '+AdoConn.SQLStringEscape(DESC_3)+');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_5.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+', 301, '+AdoConn.SQLStringEscape(DESC_5)+');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_6.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+', 302, '+AdoConn.SQLStringEscape(DESC_6)+');');
+      AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_4.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+', 900, '+AdoConn.SQLStringEscape(DESC_4)+');');
 
       AdoConn.Disconnect;
     finally
@@ -110,7 +119,7 @@ begin
   try
     Response.Handled := false;
 
-    {$REGION 'Stat: Running commissions'}
+    {$REGION 'Stat 1: Running commissions'}
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -154,7 +163,7 @@ begin
         Response.Handled := true;
         Response.Action := craStatistics;
         Response.StatId := StatGuid;
-        Response.StatName := 'Running commissions';
+        Response.StatName := DESC_1;
         Response.SqlTable := TempTableName(GUID_1, 'RUNNING_COMMISSIONS');
         Response.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
@@ -169,7 +178,7 @@ begin
       end;
     end
     {$ENDREGION}
-    {$REGION 'Stat: Local sum over years'}
+    {$REGION 'Stat 2: Local sum over years'}
     else if IsEqualGuid(StatGuid, GUID_2) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -205,7 +214,7 @@ begin
         Response.Handled := true;
         Response.Action := craStatistics;
         Response.StatId := StatGuid;
-        Response.StatName := 'Local sum over years';
+        Response.StatName := DESC_2;
         Response.SqlTable := TempTableName(GUID_2, 'SUM_YEARS');
         Response.SqlInitialOrder := 'YEAR desc, DIRECTION';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
@@ -257,7 +266,7 @@ begin
       Response.ObjId := ItemGuid;
     end
     {$ENDREGION}
-    {$REGION 'Stat: Local sum over months'}
+    {$REGION 'Stat 3: Local sum over months'}
     else if IsEqualGuid(StatGuid, GUID_3) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -293,7 +302,7 @@ begin
         Response.Handled := true;
         Response.Action := craStatistics;
         Response.StatId := StatGuid;
-        Response.StatName := 'Local sum over months';
+        Response.StatName := DESC_3;
         Response.SqlTable := TempTableName(GUID_3, 'SUM_MONTHS');
         Response.SqlInitialOrder := 'MONTH desc, DIRECTION';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
@@ -352,7 +361,7 @@ begin
       end;
     end
     {$ENDREGION}
-    {$REGION 'Stat: Waiting List'}
+    {$REGION 'Stat 5: Waiting List'}
     else if IsEqualGuid(StatGuid, GUID_5) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -418,7 +427,7 @@ begin
         Response.Handled := true;
         Response.Action := craStatistics;
         Response.StatId := StatGuid;
-        Response.StatName := 'Things I am waiting for (Art, Payment, Upload)';
+        Response.StatName := DESC_5;
         Response.SqlTable := TempTableName(GUID_5, 'WAIT_LIST');
         Response.SqlInitialOrder := 'TASK, SUBJECT';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
@@ -459,7 +468,7 @@ begin
       end;
     end
     {$ENDREGION}
-    {$REGION 'Stat: To Do List'}
+    {$REGION 'Stat 6: To Do List'}
     else if IsEqualGuid(StatGuid, GUID_6) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -525,7 +534,7 @@ begin
         Response.Handled := true;
         Response.Action := craStatistics;
         Response.StatId := StatGuid;
-        Response.StatName := 'Things I need to do (Art, Payment, Upload)';
+        Response.StatName := DESC_6;
         Response.SqlTable := TempTableName(GUID_6, 'TODO_LIST');
         Response.SqlInitialOrder := 'TASK, SUBJECT';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
@@ -566,7 +575,7 @@ begin
       end;
     end
     {$ENDREGION}
-    {$REGION 'Stat: Top artists/clients'}
+    {$REGION 'Stat 4: Top artists/clients'}
     else if IsEqualGuid(StatGuid, GUID_4) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
@@ -601,7 +610,7 @@ begin
         Response.Handled := true;
         Response.Action := craStatistics;
         Response.StatId := StatGuid;
-        Response.StatName := 'Top artists/clients';
+        Response.StatName := DESC_4;
         Response.SqlTable := TempTableName(GUID_4, 'SUM_MONTHS');
         Response.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
