@@ -539,7 +539,10 @@ end;
 
 procedure TArtistForm.PageControl1Change(Sender: TObject);
 begin
-  Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name];
+  if Assigned(Edit1Sav) then
+    Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name]
+  else
+    Edit1.Text := '';
   Timer1.Enabled := False;
 end;
 
@@ -631,7 +634,10 @@ end;
 procedure TArtistForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
-  Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+  if Assigned(Edit1Sav) then
+  begin
+    Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+  end;
   if PageControl1.ActivePage = tsCommissions then
   begin
     Screen.Cursor := crHourGlass;
@@ -739,7 +745,7 @@ end;
 
 procedure TArtistForm.FormDestroy(Sender: TObject);
 begin
-  Edit1Sav.Free;
+  FreeAndNil(Edit1Sav);
 end;
 
 procedure TArtistForm.FormKeyDown(Sender: TObject; var Key: Word;

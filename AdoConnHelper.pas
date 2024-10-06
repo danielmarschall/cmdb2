@@ -104,7 +104,7 @@ begin
     end;
     ds.Close;
   finally
-    ds.Free;
+    FreeAndNil(ds);
   end;
 end;
 
@@ -116,7 +116,7 @@ begin
   try
     result := ds.Fields[0].AsVariant;
   finally
-    ds.Free;
+    FreeAndNil(ds);
   end;
 end;
 
@@ -145,7 +145,7 @@ begin
   try
     result := not q.EOF;
   finally
-    q.Free;
+    FreeAndNil(q);
   end;
 end;
 
@@ -191,7 +191,7 @@ begin
 
       result := q1.Fields[0{INSERT_ID}].AsInteger;
     finally
-      q1.Free;
+      FreeAndNil(q1);
     end;
   finally
     CommitTrans;
@@ -277,7 +277,7 @@ begin
       cmd.CommandTimeout := self.CommandTimeout;
     cmd.Execute;
   finally
-    cmd.Free;
+    FreeAndNil(cmd);
   end;
 end;
 
@@ -498,7 +498,7 @@ begin
       q.Next;
     end;
   finally
-    q.Free;
+    FreeAndNil(q);
   end;
 end;
 

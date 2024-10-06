@@ -265,7 +265,7 @@ begin
     CmDb_InstallOrUpdateSchema(AdoConnection2);
     AdoConnection2.Disconnect;
   finally
-    AdoConnection2.Free;
+    FreeAndNil(AdoConnection2);
   end;
 
   AdoConnection1.BeginTrans;
@@ -355,7 +355,7 @@ resourcestring
         sl.LoadFromFile(ExtractFilePath(ParamStr(0))+'\..\DB\Schema'+IntToStr(targetSchema)+'\'+'['+fil+'].sql');
         AdoConnection1.ExecSQL(sl.Text);
       finally
-        sl.Free;
+        FreeAndNil(sl);
       end;
     except
       on E: Exception do
@@ -608,7 +608,7 @@ begin
     end;
   finally
     // Close the CSV file
-    csvFile.Free;
+    FreeAndNil(csvFile);
 
     // Return to the saved record position (Bookmark)
     if grid.DataSource.DataSet.BookmarkValid(bookmark) then

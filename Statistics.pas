@@ -85,7 +85,10 @@ end;
 
 procedure TStatisticsForm.PageControl1Change(Sender: TObject);
 begin
-  Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name];
+  if Assigned(Edit1Sav) then
+    Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name]
+  else
+    Edit1.Text := '';
   Timer1.Enabled := False;
 end;
 
@@ -136,7 +139,7 @@ function TStatisticsForm.SqlQueryStatistics(const search: string): string;
       // Den neuen String aus den eindeutigen Wörtern zusammensetzen
       Result := String.Join(', ', ResultList);
     finally
-      SeenWords.Free;
+      FreeAndNil(SeenWords);
     end;
   end;
 
@@ -162,12 +165,15 @@ begin
                                  'where TABLE_NAME = '+ADOConnection1.SQLStringEscape(SqlTable)+' ' +
                                  //'and TABLE_SCHEMA = ''dbo'' ' +
                                  'and COLUMN_NAME not like ''\_\_%'' escape ''\'';');
-    while not q.EOF do
-    begin
-      result := result + 'or ' + ADOConnection1.SQLFieldNameEscape(q.Fields[0].AsWideString) + ' like ' + AdoConnection1.SQLStringEscape('%'+search+'%');
-      q.Next;
+    try
+      while not q.EOF do
+      begin
+        result := result + 'or ' + ADOConnection1.SQLFieldNameEscape(q.Fields[0].AsWideString) + ' like ' + AdoConnection1.SQLStringEscape('%'+search+'%');
+        q.Next;
+      end;
+    finally
+      FreeAndNil(q);
     end;
-    q.Free;
     result := result + ') ';
   end;
 
@@ -184,7 +190,10 @@ end;
 procedure TStatisticsForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
-  Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+  if Assigned(Edit1Sav) then
+  begin
+    Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+  end;
   if PageControl1.ActivePage = tsQuery then
   begin
     Screen.Cursor := crHourGlass;
@@ -323,7 +332,7 @@ end;
 
 procedure TStatisticsForm.FormDestroy(Sender: TObject);
 begin
-  Edit1Sav.Free;
+  FreeAndNil(Edit1Sav);
 end;
 
 procedure TStatisticsForm.FormKeyDown(Sender: TObject; var Key: Word;

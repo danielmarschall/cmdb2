@@ -240,7 +240,7 @@ end;
 { TCryptStream }
 destructor TCryptStream.Destroy;
 begin
-  FCryptor.Free;
+  FreeAndNil(FCryptor);
   inherited Destroy;
 end;
 
@@ -477,10 +477,10 @@ begin
     try
       LCompressionStream.CopyFrom(Self, 0);
     finally
-      LCompressionStream.Free;
+      FreeAndNil(LCompressionStream);
     end;
   finally
-    LEncryptStream.Free;
+    FreeAndNil(LEncryptStream);
   end;
 end;
 

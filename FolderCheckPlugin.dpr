@@ -3,6 +3,8 @@ library MenuTestPlugin;
 uses
   System.SysUtils,
   System.Classes,
+  System.Generics.Collections,
+  System.IOUtils,
   Adodb,
   AdoConnHelper,
   Windows,
@@ -88,7 +90,7 @@ begin
 
       AdoConn.Disconnect;
     finally
-      AdoConn.Free;
+      FreeAndNil(AdoConn);
     end;
 
     result := S_PLUGIN_OK;
@@ -96,6 +98,97 @@ begin
     Exit(E_PLUGIN_GENERIC_FAILURE);
   end;
 end;
+
+function _ListContainsIgnoreCase(List: TStringList; const Value: string): Boolean;
+var
+  Item: string;
+begin
+  Result := False;
+  for Item in List do
+  begin
+    if SameText(Item, Value) then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
+end;
+
+procedure _CompareFolders(AdoConn: TAdoConnection);
+var
+  SQLQuery: TAdoDataset;
+  DBFolders: TStringList;
+  FSFolders: TStringList;
+  Folder: string;
+  Path: string;
+  DBFolderName: string;
+begin
+  Path := 'D:\OneDrive\Commissions\'; // TODO: bestimmen durch DB Abfrage
+
+  AdoConn.ExecSQL('delete from '+TempTableName(GUID_3, 'FOLDER_COMPARE'));
+
+  // Liste der Verzeichnisse im Dateisystem
+  FSFolders := TStringList.Create;
+  FSFolders.Duplicates := dupIgnore;
+  FSFolders.Sorted := true;
+  try
+    // Rekursiv alle Ordner im Verzeichnis sammeln
+    for Folder in TDirectory.GetDirectories(Path, '*', TSearchOption.soTopDirectoryOnly) do
+    begin
+      FSFolders.Add(IncludeTrailingPathDelimiter(Path) + ExtractFileName(Folder));
+    end;
+
+    // SQL Abfrage, um die Verzeichnisnamen aus der Tabelle zu holen
+    SQLQuery := AdoConn.GetTable('select art.MANDATOR_ID, cm.FOLDER ' +
+                                 'from COMMISSION cm ' +
+                                 'left join ARTIST art on art.ID = cm.ARTIST_ID');
+    try
+      // Liste der Verzeichnisse aus der Datenbank erstellen
+      DBFolders := TStringList.Create;
+      DBFolders.Duplicates := dupIgnore;
+      DBFolders.Sorted := true;
+      try
+        while not SQLQuery.Eof do
+        begin
+          DBFolderName := SQLQuery.FieldByName('FOLDER').AsWideString;
+          DBFolders.Add(DBFolderName);
+          SQLQuery.Next;
+        end;
+
+        // 1. Ordner, die im Dateisystem, aber nicht in der Datenbank existieren
+//        Writeln('Ordner im Dateisystem, aber nicht in der Datenbank:');
+        for Folder in FSFolders do
+        begin
+          if not _ListContainsIgnoreCase(DBFolders, Folder) then
+          begin
+            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' select newid(), '+AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', N''InFilesystem / NotInDatabase'', '+AdoConn.SQLStringEscape(Folder)+';');
+//            Writeln(Folder);
+          end;
+        end;
+
+        // 2. Ordner, die in der Datenbank, aber nicht im Dateisystem existieren
+//        Writeln('Ordner in der Datenbank, aber nicht im Dateisystem:');
+        for Folder in DBFolders do
+        begin
+          if not _ListContainsIgnoreCase(FSFolders, Folder) then
+          begin
+            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' select newid(), '+AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', N''InDatabase / NotInFilesystem'', '+AdoConn.SQLStringEscape(Folder)+';');
+//            Writeln(Folder);
+          end;
+        end;
+
+      finally
+        FreeAndNil(DBFolders);
+      end;
+    finally
+      FreeAndNil(SQLQuery);
+    end;
+
+  finally
+    FreeAndNil(FSFolders);
+  end;
+end;
+
 
 function ClickEventW(DBConnStr: PChar; MandatorGuid, StatGuid,
   ItemGuid: TGuid; ResponseData: Pointer): HRESULT; stdcall;
@@ -107,7 +200,59 @@ begin
   try
     Response.Handled := false;
 
-    // TODO: Add code here
+    {$REGION 'Stat 1: Commissions without folders'}
+    if IsEqualGuid(StatGuid, GUID_1) then
+    begin
+      // TODO: Implement
+    end
+    {$ENDREGION}
+    {$REGION 'Stat 2: Commission folders invalid / not existing'}
+    else if IsEqualGuid(StatGuid, GUID_2) then
+    begin
+      // TODO: Implement
+    end
+    {$ENDREGION}
+    {$REGION 'Stat 3: Comparison Drive / Database folders'}
+    else if IsEqualGuid(StatGuid, GUID_3) then
+    begin
+      // TODO: Implement
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          if not AdoConn.TableExists(TempTableName(GUID_3, 'FOLDER_COMPARE')) then
+          begin
+            AdoConn.ExecSQL('create table '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' ( __ID uniqueidentifier NOT NULL, __MANDATOR_ID uniqueidentifier NOT NULL, PROBLEM nvarchar(50), FOLDER nvarchar(250) );');
+          end;
+          _CompareFolders(AdoConn);
+        finally
+          FreeAndNil(AdoConn);
+        end;
+        Response.Handled := true;
+        Response.Action := craStatistics;
+        Response.StatId := StatGuid;
+        Response.StatName := DESC_3;
+        Response.SqlTable := TempTableName(GUID_3, 'FOLDER_COMPARE');
+        Response.SqlInitialOrder := 'PROBLEM, FOLDER';
+        Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        Response.BaseTableDelete := 'COMMISSION';
+      end
+      else
+      begin
+        Response.Handled := true;
+        Response.Action := craObject;
+        Response.ObjTable := 'COMMISSION';
+        Response.ObjId := ItemGuid;
+      end;
+    end;
+    {$ENDREGION}
 
     Response.WriteToMemory(ResponseData);
     result := S_PLUGIN_OK;

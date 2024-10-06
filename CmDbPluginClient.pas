@@ -182,7 +182,7 @@ begin
             outSL.Add(p.VerInfo.PluginCopyright + ', ' + SLicense + ': ' + p.VerInfo.PluginLicense);
             if p.VerInfo.PluginMoreInfo <> '' then outSL.Add(p.VerInfo.PluginMoreInfo);
           finally
-            p.Free;
+            FreeAndNil(p);
           end;
         except
           on E: Exception do
@@ -214,7 +214,7 @@ begin
             try
               p.Init(AdoConn.ConnectionString);
             finally
-              p.Free;
+              FreeAndNil(p);
             end;
           except
             on E: Exception do
@@ -249,7 +249,7 @@ begin
             result := p.ClickEvent(AdoConn.ConnectionString, MandatorGuid, StatGuid, ItemGuid);
             if Result.Handled then Exit;
           finally
-            p.Free;
+            FreeAndNil(p);
           end;
         except
           on E: Exception do

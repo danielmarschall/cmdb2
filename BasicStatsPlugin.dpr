@@ -99,7 +99,7 @@ begin
 
       AdoConn.Disconnect;
     finally
-      AdoConn.Free;
+      FreeAndNil(AdoConn);
     end;
 
     result := S_PLUGIN_OK;

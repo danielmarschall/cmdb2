@@ -95,6 +95,7 @@ type
       Shift: TShiftState);
     procedure dbgUploadsKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure dbgUploadsDblClick(Sender: TObject);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -613,6 +614,13 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TCommissionForm.dbgUploadsDblClick(Sender: TObject);
+begin
+  if ttUploads.RecordCount = 0 then exit;
+  if ttUploadsURL.AsWideString = '' then exit;
+  ShellExecute(Handle, 'open', PChar(ttUploadsURL.AsWideString), '', '', SW_NORMAL);
 end;
 
 procedure TCommissionForm.dbgUploadsKeyDown(Sender: TObject; var Key: Word;
