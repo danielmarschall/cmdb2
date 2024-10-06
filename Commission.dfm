@@ -86,7 +86,6 @@ object CommissionForm: TCommissionForm
                 'idea'
                 'c td initcm'
                 'c aw ack'
-                'ack'
                 'quote'
                 'c aw sk'
                 'c td feedback'

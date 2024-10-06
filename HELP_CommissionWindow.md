@@ -11,7 +11,6 @@ The database grid has the following columns:
 	- `idea`: This marks the commission as idea. Nothing has yet been decided.
 	- `c td initcm`: The client ("c") needs to do ("td") the initial commission ("initcm") description, which means they must contact the artist and tell what he wants to commish.
 	- `c aw ack`: The client ("c") awaits ("aw") that the commission is accepted/acknowledged ("ack").
-	- `ack`: The artist has accepted/acknowledged ("ack") the commission.
 	- `quote`: A quote has been entered. **If this event is selected, a new tab "Quote" will be shown!**
 	- `c aw sk`: The client ("c") waits ("aw") a sketch ("sk").
 	- `c td feedback`: The client ("c") needs to do ("td") a feedback report for a sketch/WIP he has received.

@@ -438,7 +438,6 @@ begin
         InstallSql(2, 'vw_STATISTICS');
       end;
 
-      //
       if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
         AdoConnection1.DropTableOrView('vw_STAT_RUNNING_COMMISSIONS');
       if AdoConnection1.TableExists('vw_STAT_SUM_YEARS') then
@@ -478,7 +477,6 @@ begin
                              'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''NEW_PASSWORD'', '''', 0, 0;');
       InstallSql(2, 'vw_CONFIG');
 
-
       {$REGION 'Text dumps now as files and not in database anymore'}
       if AdoConnection1.TableExists('TEXT_BACKUP') then
       begin
@@ -488,6 +486,8 @@ begin
         InstallSql(2, 'vw_BACKUP');
       end;
       {$ENDREGION}
+
+      AdoConnection1.ExecSQL('update COMMISSION_EVENT set STATE = ''c aw sk'' where STATE = ''ack''');
 
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
 

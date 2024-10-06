@@ -138,12 +138,11 @@ begin
                           '    man.ID as __MANDATOR_ID, ' + #13#10 +
                           '    case ' + #13#10 +
                           '        when cm.ART_STATUS = ''c aw ack'' then 1 ' + #13#10 +
-                          '        when cm.ART_STATUS = ''ack'' then 2 ' + #13#10 +
-                          '        when cm.ART_STATUS = ''c aw sk'' then 3 ' + #13#10 +
-                          '        when cm.ART_STATUS = ''c td feedback'' then 4 ' + #13#10 +
-                          '        when cm.ART_STATUS = ''c aw cont'' then 5 ' + #13#10 +
-                          '        when cm.ART_STATUS = ''c aw hires'' then 6 ' + #13#10 +
-                          '        else 7 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw sk'' then 2 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c td feedback'' then 3 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw cont'' then 4 ' + #13#10 +
+                          '        when cm.ART_STATUS = ''c aw hires'' then 5 ' + #13#10 +
+                          '        else 6 ' + #13#10 +
                           '    end as __STATUS_ORDER, ' + #13#10 +
                           '    cm.ART_STATUS, ' + #13#10 +
                           '    art.NAME as ARTIST, ' + #13#10 +
