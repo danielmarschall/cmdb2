@@ -495,6 +495,8 @@ begin
 
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
 
+      AdoConnection1.ExecSQL('delete from CONFIG where NAME = ''CUSTOMIZATION_ID'''); // use INSTALL_ID instead
+
       {$ENDREGION}
     end
     else if schemaVer = 2 then

@@ -135,13 +135,16 @@ var
   bits: integer;
   slPlugins: TStringList;
   CopyRightYear: string;
+  InstallId: string;
 resourcestring
   S_Version = '%s (%d Bit), Version %s'+#13#10+'(C) %s Daniel Marschall, ViaThinkSoft, License: Apache 2.0';
+  S_InstallId = 'Installation ID: %s';
   S_InstalledPlugins = 'Installed plugins:';
 const
   DevelopmentYear = 2024;
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
+  InstallId := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
   {$IFDEF WIN64}
   bits := 64;
   {$ELSE}
@@ -160,7 +163,11 @@ begin
       CopyRightYear := IntToStr(DevelopmentYear) + '-' + IntToStr(YearOf(dateidatum))
     else
       CopyRightYear := IntToStr(DevelopmentYear);
+    slPlugins.Insert(0, '');
+    slPlugins.Insert(0, Format(S_InstallId, [InstallId]));
+    slPlugins.Insert(0, '');
     slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
+
     ShowMessage(slPlugins.Text);
   finally
     FreeAndNil(slPlugins);
