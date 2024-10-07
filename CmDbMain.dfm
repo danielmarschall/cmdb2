@@ -94,8 +94,10 @@ object MainForm: TMainForm
     Top = 288
   end
   object OpenDialog1: TOpenDialog
-    DefaultExt = 'bak'
-    Filter = 'Backup files (*.bak)|*.bak|All files (*.*)|*.*'
+    DefaultExt = 'zip'
+    Filter = 
+      'Backup files (*.bak; *.zip)|*.bak;*.zip|Raw backup files (*.bak)' +
+      '|*.bak|ZIP files (*.zip)|*.zip|All files (*.*)|*.*'
     Options = [ofReadOnly, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofCreatePrompt, ofEnableSizing]
     Left = 40
     Top = 16

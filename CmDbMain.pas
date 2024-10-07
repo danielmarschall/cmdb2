@@ -412,10 +412,69 @@ end;
 procedure TMainForm.RestoreBackup1Click(Sender: TObject);
 var
   i: integer;
+  bakFileName: string;
+  zip: TEncryptedZipFile;
+  stmp: string;
+  deleteBakFileAfterwards: boolean;
+resourcestring
+  SInvalidBackupFile = 'Invalid backup file';
 begin
   OpenDialog1.InitialDir := BackupPath;
   if OpenDialog1.Execute(Handle) then
   begin
+    if string.EndsText('.bak', OpenDialog1.FileName) then
+    begin
+      bakFileName := OpenDialog1.FileName;
+      deleteBakFileAfterwards := false;
+    end
+    else if string.EndsText('.zip', OpenDialog1.FileName) then
+    begin
+      {$REGION 'Extract ZIP file'}
+      zip := TEncryptedZipFile.Create('dummy'); // we need to enter "any" password
+      try
+        zip.open(OpenDialog1.FileName, zmRead);
+        while true do
+        begin
+          try
+            bakFileName := '';
+            for stmp in zip.FileNames do
+            begin
+              if string.StartsText('cmdb2_backup_', stmp) and string.EndsText('.bak', stmp) then
+              begin
+                bakFileName := stmp;
+                break;
+              end;
+            end;
+            if bakFileName = '' then raise Exception.Create(SInvalidBackupFile);
+            zip.Extract(bakFileName, GetUserDirectory, false);
+            bakFileName := IncludeTrailingPathDelimiter(GetUserDirectory) + bakFileName;
+            deleteBakFileAfterwards := true;
+            break;
+          except
+            on E: EZipInvalidPassword do
+            begin
+              zip.Password := InputBox(Caption, #0+'ZIP Password', '');
+            end;
+            on E: EZipNoPassword do
+            begin
+              Abort;
+            end;
+            else
+            begin
+              raise;
+            end;
+          end;
+        end;
+        zip.Close;
+      finally
+        FreeAndNil(zip);
+      end;
+      {$ENDREGION}
+    end
+    else
+    begin
+      raise Exception.Create(SInvalidBackupFile);
+    end;
     Screen.Cursor := crHourGlass;
     WaitLabel.Visible := true;
     Application.ProcessMessages;
@@ -425,9 +484,11 @@ begin
         MDIChildren[i].Free; // No need to call OnCloseQuery, because we will destroy all data anyways
       end;
       Application.ProcessMessages;
-      CmDb_RestoreDatabase(AdoConnection1, OpenDialog1.FileName);
+      CmDb_RestoreDatabase(AdoConnection1, bakFileName);
       OpenDatabase1.Click;
     finally
+      if deleteBakFileAfterwards then
+        DeleteFile(bakFileName);
       Screen.Cursor := crDefault;
       WaitLabel.Visible := false;
       Application.ProcessMessages;
