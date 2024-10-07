@@ -1,6 +1,9 @@
 
 # TODO
 
+PROBLEM:
+- "Instead of delete" is EXTREMELY shit if the requery did a re-sort, and then you delete wrong lines!!!
+
 Plugin development:
 	upload check plugin:
 	- plugin to check uploads not in cmdb recorded

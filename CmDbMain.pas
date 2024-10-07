@@ -437,7 +437,10 @@ begin
     else if string.EndsText('.zip', OpenDialog1.FileName) then
     begin
       {$REGION 'Extract ZIP file'}
-      zip := TEncryptedZipFile.Create('dummy'); // we need to enter "any" password
+      if CmDbZipPassword = '' then
+        zip := TEncryptedZipFile.Create('dummy') // 'dummy' password, we need to enter "any" non-empty password until we can ask the user
+      else
+        zip := TEncryptedZipFile.Create(CmDbZipPassword);
       try
         zip.open(OpenDialog1.FileName, zmRead);
         while true do
