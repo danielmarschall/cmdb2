@@ -34,10 +34,14 @@ var
   q: TAdoDataSet;
 begin
   q := AdoConnection1.GetTable('select name from sysobjects where name like ''tmp_%'';');
-  while not q.EOF do
-  begin
-    AdoConnection1.DropTableOrView(q.Fields[0].AsWideString);
-    q.Next;
+  try
+    while not q.EOF do
+    begin
+      AdoConnection1.DropTableOrView(q.Fields[0].AsWideString);
+      q.Next;
+    end;
+  finally
+    FreeAndNil(q);
   end;
 end;
 
