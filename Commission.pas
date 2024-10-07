@@ -96,6 +96,8 @@ type
     procedure dbgUploadsKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure dbgUploadsDblClick(Sender: TObject);
+    procedure ShellListViewKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -400,7 +402,7 @@ end;
 
 procedure TCommissionForm.TryShowFileList(const AFolder: string='');
 begin
-  if ShellListView = nil then exit;
+  if not Assigned(ShellListView) or not Assigned(ShellChangeNotifier) then exit;
 
   if (AFolder<>'') and DirectoryExists(AFolder) then
   begin
@@ -485,6 +487,16 @@ begin
   if Assigned(LFolder) then
   begin
     ShellExecute(Handle, 'open', PChar(LFolder.PathName), '', '', SW_NORMAL);
+  end;
+end;
+
+procedure TCommissionForm.ShellListViewKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F5 then
+  begin
+    TryShowFileList(SavedFolder);
+    Key := 0;
   end;
 end;
 

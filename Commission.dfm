@@ -23,7 +23,7 @@ object CommissionForm: TCommissionForm
     Top = 41
     Width = 758
     Height = 542
-    ActivePage = tsEvents
+    ActivePage = tsFiles
     Align = alClient
     TabOrder = 0
     object tsEvents: TTabSheet
@@ -265,6 +265,7 @@ object CommissionForm: TCommissionForm
         HideSelection = False
         TabOrder = 0
         ViewStyle = vsReport
+        OnKeyDown = ShellListViewKeyDown
       end
       object Panel3: TPanel
         Left = 0

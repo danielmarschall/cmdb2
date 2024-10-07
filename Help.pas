@@ -66,9 +66,9 @@ begin
     if FileExists(cssFile) then
       slCss.LoadFromFile(cssFile);
     md := TMarkdownProcessor.CreateDialect(mdCommonMark);
-    sHtml := md.process(UTF8ToString(RawByteString(slHtml.Text)));
-    sHtml := sHtml.Replace('<p><img src="CmDb2_Screenshot.png" alt="Screenshot" /></p>', ''); // <-- this is only for GitHub, not for the integrated help
     try
+      sHtml := md.process(UTF8ToString(RawByteString(slHtml.Text)));
+      sHtml := sHtml.Replace('<p><img src="CmDb2_Screenshot.png" alt="Screenshot" /></p>', ''); // <-- this is only for GitHub, not for the integrated help
       //md.AllowUnsafe := true;
       ShowHTMLHelp(
         '<html>'+                                                                // do not localize
