@@ -3,6 +3,8 @@
 
 # Statistics
 
+![Screenshot](CmDb2_Screenshot_Statistics.png)
+
 There are various statistics that are made available with plugins which are located in the directory
 **C:\Program Files...\Commission Database 2.0\bin** and have the file name extension "SPL" (Statistics Plugin).
 

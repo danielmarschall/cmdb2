@@ -3,6 +3,8 @@
 
 # Database window
 
+![Screenshot](CmDb2_Screenshot_Database.png)
+
 When starting `CmDb2.exe`, you will be greeted with a window called "Database". If you have closed it, you can always re-open it by clicking "Open Database" at the main menu at the top.
 
 ## Database window tab "Mandators"

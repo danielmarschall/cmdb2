@@ -3,6 +3,8 @@
 
 # Mandator window
 
+![Screenshot](CmDb2_Screenshot_Mandator.png)
+
 ## Mandator window tabs "Artists" and "Clients"
 
 To create a new artist (or client) simply create a new row with the name of that artist (or client).

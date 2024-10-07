@@ -68,7 +68,7 @@ begin
     md := TMarkdownProcessor.CreateDialect(mdCommonMark);
     try
       sHtml := md.process(UTF8ToString(RawByteString(slHtml.Text)));
-      sHtml := sHtml.Replace('<p><img src="CmDb2_Screenshot.png" alt="Screenshot" /></p>', ''); // <-- this is only for GitHub, not for the integrated help
+      sHtml := sHtml.Replace('<p><img src="CmDb2_Screenshot', '<p><xx src="CmDb2_Screenshot'); // <-- thse images are only for GitHub, not for the integrated help. So invalidate them.
       //md.AllowUnsafe := true;
       ShowHTMLHelp(
         '<html>'+                                                                // do not localize

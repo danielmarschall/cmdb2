@@ -3,6 +3,8 @@
 
 # Artist/Client window
 
+![Screenshot](CmDb2_Screenshot_Artist.png)
+
 ## Artist/Client window tab "Commissions"
 
 The database grid has the following columns:

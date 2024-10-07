@@ -3,6 +3,8 @@
 
 # Commission window
 
+![Screenshot](CmDb2_Screenshot_Commission.png)
+
 ## Commission window events
 
 The database grid has the following columns:
