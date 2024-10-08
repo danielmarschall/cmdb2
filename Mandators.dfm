@@ -56,6 +56,7 @@ object MandatorsForm: TMandatorsForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgMandatorDrawColumnCell
         OnDblClick = dbgMandatorDblClick
         OnKeyDown = dbgMandatorKeyDown
         OnTitleClick = dbgMandatorTitleClick
@@ -349,6 +350,7 @@ object MandatorsForm: TMandatorsForm
   object ttMandator: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttMandatorBeforeEdit
     BeforeDelete = ttMandatorBeforeDelete
     AfterScroll = ttMandatorAfterScroll
     OnNewRecord = ttMandatorNewRecord

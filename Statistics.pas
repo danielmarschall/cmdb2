@@ -50,6 +50,8 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure dbgQueryKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure dbgQueryDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     Edit1Sav: TStringList;
     SqlQueryStatistics_Init: boolean;
@@ -218,13 +220,14 @@ resourcestring
   SDeleteNotPossible = 'Delete not possible';
 begin
   if BaseTableDelete <> '' then
-    InsteadOfDeleteWorkaround(ttQuery, '__ID', BaseTableDelete, 'ID')
+    InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, '__ID', BaseTableDelete, 'ID')
   else
     raise Exception.Create(SDeleteNotPossible);
 end;
 
 procedure TStatisticsForm.ttQueryBeforeEdit(DataSet: TDataSet);
 begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, '__ID');
   Abort;
 end;
 
@@ -254,6 +257,12 @@ begin
     resp := TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
     HandleClickResponse(AdoConnection1, MandatorId, resp);
   end;
+end;
+
+procedure TStatisticsForm.dbgQueryDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, '__ID');
 end;
 
 procedure TStatisticsForm.dbgQueryKeyDown(Sender: TObject; var Key: Word;
@@ -385,7 +394,8 @@ begin
   if BaseTableDelete = '' then
   begin
     navQuery.VisibleButtons := navQuery.VisibleButtons - [nbDelete];
-    dbgQuery.Options :=dbgQuery.Options - [dgConfirmDelete];
+    navQuery.ConfirmDelete := false;
+    dbgQuery.Options := dbgQuery.Options - [dgConfirmDelete];
   end;
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
@@ -400,6 +410,7 @@ begin
     dbgQuery.Columns.RebuildColumns; // otherwise column colors won't work!
     dbgQuery.HideColumnPrefix('__');
     dbgQuery.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuery, navQuery);
     {$ENDREGION}
   finally
     Screen.Cursor := crDefault;

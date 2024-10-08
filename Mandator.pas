@@ -208,6 +208,17 @@ type
       Shift: TShiftState);
     procedure dbgStatisticsKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure ttPaymentBeforeEdit(DataSet: TDataSet);
+    procedure dbgPaymentDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure dbgCommissionsDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttClientsBeforeEdit(DataSet: TDataSet);
+    procedure dbgClientsDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttArtistsBeforeEdit(DataSet: TDataSet);
+    procedure dbgArtistsDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     Edit1Sav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -259,7 +270,12 @@ end;
 
 procedure TMandatorForm.ttArtistsBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'ARTIST', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'ARTIST', 'ID');
+end;
+
+procedure TMandatorForm.ttArtistsBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TMandatorForm.ttArtistsNewRecord(DataSet: TDataSet);
@@ -284,7 +300,12 @@ end;
 
 procedure TMandatorForm.ttClientsBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'ARTIST', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'ARTIST', 'ID');
+end;
+
+procedure TMandatorForm.ttClientsBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TMandatorForm.ttClientsNewRecord(DataSet: TDataSet);
@@ -355,11 +376,12 @@ end;
 
 procedure TMandatorForm.ttCommissionBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'COMMISSION', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'COMMISSION', 'ID');
 end;
 
 procedure TMandatorForm.ttCommissionBeforeEdit(DataSet: TDataSet);
 begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
   Abort;
 end;
 
@@ -375,7 +397,12 @@ end;
 
 procedure TMandatorForm.ttPaymentBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'PAYMENT', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'PAYMENT', 'ID');
+end;
+
+procedure TMandatorForm.ttPaymentBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TMandatorForm.ttPaymentBeforeInsert(DataSet: TDataSet);
@@ -515,6 +542,12 @@ begin
   MainForm.OpenDbObject('ARTIST', ttArtists.FieldByName('ID').AsGuid);
 end;
 
+procedure TMandatorForm.dbgArtistsDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TMandatorForm.dbgArtistsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -552,6 +585,12 @@ begin
   if ttClients.State in [dsEdit,dsInsert] then ttClients.Post;
   if ttClients.FieldByName('ID').IsNull then exit;
   MainForm.OpenDbObject('ARTIST', ttClients.FieldByName('ID').AsGuid);
+end;
+
+procedure TMandatorForm.dbgClientsDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
 procedure TMandatorForm.dbgClientsKeyDown(Sender: TObject; var Key: Word;
@@ -593,6 +632,12 @@ begin
   MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
+procedure TMandatorForm.dbgCommissionsDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TMandatorForm.dbgCommissionsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -623,6 +668,12 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TMandatorForm.dbgPaymentDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
 procedure TMandatorForm.dbgPaymentKeyDown(Sender: TObject; var Key: Word;
@@ -1031,12 +1082,14 @@ begin
     ttArtists.SQL.Text := SqlQueryArtistClient(true, '');
     ttArtists.Active := true;
     dbgArtists.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgArtists, navArtists);
     {$ENDREGION}
     {$REGION 'ttClients / dbgClients'}
     ttClients.Active := false;
     ttClients.SQL.Text := SqlQueryArtistClient(false, '');
     ttClients.Active := true;
     dbgClients.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgClients, navClients);
     {$ENDREGION}
     {$REGION 'ttCommission / dbgCommissions'}
     ttCommission.Active := false;
@@ -1044,6 +1097,7 @@ begin
     ttCommission.Active := true;
     ttCommission.Last;
     dbgCommissions.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommissions, navCommissions);
     {$ENDREGION}
     {$REGION 'ttPayment / dbgPayment'}
     ttPayment.Active := false;
@@ -1055,6 +1109,7 @@ begin
     dbgPayment.Columns[6].PickList.StrictDelimiter := True;
     dbgPayment.Columns[6].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
     dbgPayment.Columns[6].DropDownRows := 15;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgPayment, navPayment);
     {$ENDREGION}
     {$REGION 'ttStatistics / dbgStatistics'}
     TCmDbPluginClient.InitAllPlugins(AdoConnection1); // re-fills STATISTICS from plugins

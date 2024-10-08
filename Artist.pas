@@ -143,6 +143,18 @@ type
       Shift: TShiftState);
     procedure dbgCommunicationKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure ttArtistEventBeforeEdit(DataSet: TDataSet);
+    procedure dbgArtistEventDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttCommissionBeforeEdit(DataSet: TDataSet);
+    procedure dbgCommissionDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttCommunicationBeforeEdit(DataSet: TDataSet);
+    procedure dbgCommunicationDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttPaymentBeforeEdit(DataSet: TDataSet);
+    procedure dbgPaymentDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -183,7 +195,12 @@ end;
 
 procedure TArtistForm.ttArtistEventBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'ARTIST_EVENT', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'ARTIST_EVENT', 'ID');
+end;
+
+procedure TArtistForm.ttArtistEventBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TArtistForm.ttArtistEventBeforePost(DataSet: TDataSet);
@@ -223,7 +240,12 @@ end;
 
 procedure TArtistForm.ttCommissionBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'COMMISSION', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'COMMISSION', 'ID');
+end;
+
+procedure TArtistForm.ttCommissionBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TArtistForm.ttCommissionNewRecord(DataSet: TDataSet);
@@ -239,7 +261,12 @@ end;
 
 procedure TArtistForm.ttCommunicationBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'COMMUNICATION', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'COMMUNICATION', 'ID');
+end;
+
+procedure TArtistForm.ttCommunicationBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TArtistForm.ttCommunicationNewRecord(DataSet: TDataSet);
@@ -255,7 +282,12 @@ end;
 
 procedure TArtistForm.ttPaymentBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(Dataset as TAdoQuery, 'ID', 'PAYMENT', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'PAYMENT', 'ID');
+end;
+
+procedure TArtistForm.ttPaymentBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TArtistForm.ttPaymentBeforePost(DataSet: TDataSet);
@@ -402,6 +434,12 @@ begin
     SaveGridToCsv(dbgPayment, sdCsvPayment.FileName);
 end;
 
+procedure TArtistForm.dbgArtistEventDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TArtistForm.dbgArtistEventKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -441,6 +479,12 @@ begin
   MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
+procedure TArtistForm.dbgCommissionDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TArtistForm.dbgCommissionKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -473,6 +517,12 @@ begin
   end;
 end;
 
+procedure TArtistForm.dbgCommunicationDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TArtistForm.dbgCommunicationKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -503,6 +553,12 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TArtistForm.dbgPaymentDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
 procedure TArtistForm.dbgPaymentKeyDown(Sender: TObject; var Key: Word;
@@ -811,6 +867,7 @@ begin
     ttCommission.Active := true;
     ttCommission.Last;
     dbgCommission.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommission, navCommission);
     {$ENDREGION}
     {$REGION 'ttPayment / dbgPayment'}
     ttPayment.Active := false;
@@ -822,6 +879,7 @@ begin
     dbgPayment.Columns[5].PickList.StrictDelimiter := True;
     dbgPayment.Columns[5].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
     dbgPayment.Columns[5].DropDownRows := 15;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgPayment, navPayment);
     {$ENDREGION}
     {$REGION 'ttArtistEvent / dbgArtistEvent'}
     ttArtistEvent.Active := false;
@@ -829,6 +887,7 @@ begin
     ttArtistEvent.Active := true;
     //ttArtistEvent.Last;
     dbgArtistEvent.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgArtistEvent, navArtistEvent);
     {$ENDREGION}
     {$REGION 'ttCommunication / dbgCommunication'}
     ttCommunication.Active := false;
@@ -840,6 +899,7 @@ begin
     dbgCommunication.Columns[0].PickList.StrictDelimiter := True;
     dbgCommunication.Columns[0].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_COMMUNICATION'''));
     dbgCommunication.Columns[0].DropDownRows := 15;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommunication, navCommunication);
     {$ENDREGION}
   finally
     Screen.Cursor := crDefault;

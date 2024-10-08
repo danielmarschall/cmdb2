@@ -26,7 +26,7 @@ object MandatorForm: TMandatorForm
     Top = 41
     Width = 1044
     Height = 400
-    ActivePage = tsStatistics
+    ActivePage = tsArtists
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -45,6 +45,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgArtistsDrawColumnCell
         OnDblClick = dbgArtistsDblClick
         OnKeyDown = dbgArtistsKeyDown
         OnTitleClick = dbgArtistsTitleClick
@@ -144,6 +145,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgClientsDrawColumnCell
         OnDblClick = dbgClientsDblClick
         OnKeyDown = dbgClientsKeyDown
         OnTitleClick = dbgClientsTitleClick
@@ -245,6 +247,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgCommissionsDrawColumnCell
         OnDblClick = dbgCommissionsDblClick
         OnKeyDown = dbgCommissionsKeyDown
         OnTitleClick = dbgCommissionsTitleClick
@@ -384,6 +387,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgPaymentDrawColumnCell
         OnKeyDown = dbgPaymentKeyDown
         OnTitleClick = dbgPaymentTitleClick
         Columns = <
@@ -631,6 +635,7 @@ object MandatorForm: TMandatorForm
   object ttArtists: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttArtistsBeforeEdit
     BeforeDelete = ttArtistsBeforeDelete
     AfterScroll = ttArtistsAfterScroll
     OnNewRecord = ttArtistsNewRecord
@@ -721,6 +726,7 @@ object MandatorForm: TMandatorForm
   object ttClients: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttClientsBeforeEdit
     BeforeDelete = ttClientsBeforeDelete
     AfterScroll = ttClientsAfterScroll
     OnNewRecord = ttClientsNewRecord
@@ -972,6 +978,7 @@ object MandatorForm: TMandatorForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeInsert = ttPaymentBeforeInsert
+    BeforeEdit = ttPaymentBeforeEdit
     BeforePost = ttPaymentBeforePost
     BeforeDelete = ttPaymentBeforeDelete
     AfterScroll = ttPaymentAfterScroll

@@ -23,7 +23,7 @@ object CommissionForm: TCommissionForm
     Top = 41
     Width = 758
     Height = 542
-    ActivePage = tsFiles
+    ActivePage = tsEvents
     Align = alClient
     TabOrder = 0
     object tsEvents: TTabSheet
@@ -70,6 +70,7 @@ object CommissionForm: TCommissionForm
           TitleFont.Height = -12
           TitleFont.Name = 'Segoe UI'
           TitleFont.Style = []
+          OnDrawColumnCell = dbgEventsDrawColumnCell
           OnKeyDown = dbgEventsKeyDown
           OnTitleClick = dbgEventsTitleClick
           Columns = <
@@ -145,6 +146,7 @@ object CommissionForm: TCommissionForm
             TitleFont.Height = -12
             TitleFont.Name = 'Segoe UI'
             TitleFont.Style = []
+            OnDrawColumnCell = dbgQuotesDrawColumnCell
             OnKeyDown = dbgQuotesKeyDown
             OnTitleClick = dbgQuotesTitleClick
             Columns = <
@@ -208,6 +210,7 @@ object CommissionForm: TCommissionForm
             TitleFont.Height = -12
             TitleFont.Name = 'Segoe UI'
             TitleFont.Style = []
+            OnDrawColumnCell = dbgUploadsDrawColumnCell
             OnDblClick = dbgUploadsDblClick
             OnKeyDown = dbgUploadsKeyDown
             OnTitleClick = dbgUploadsTitleClick
@@ -380,6 +383,7 @@ object CommissionForm: TCommissionForm
   object ttQuotes: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttQuotesBeforeEdit
     BeforePost = ttQuotesBeforePost
     AfterPost = ttQuotesAfterPost
     BeforeDelete = ttQuotesBeforeDelete
@@ -432,6 +436,7 @@ object CommissionForm: TCommissionForm
   object ttEvents: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttEventsBeforeEdit
     BeforePost = ttEventsBeforePost
     BeforeDelete = ttEventsBeforeDelete
     AfterScroll = ttEventsAfterScroll
@@ -471,6 +476,7 @@ object CommissionForm: TCommissionForm
   object ttUploads: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttUploadsBeforeEdit
     AfterPost = ttUploadsAfterPost
     BeforeDelete = ttUploadsBeforeDelete
     OnNewRecord = ttUploadsNewRecord

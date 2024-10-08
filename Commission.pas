@@ -98,6 +98,15 @@ type
     procedure dbgUploadsDblClick(Sender: TObject);
     procedure ShellListViewKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure ttQuotesBeforeEdit(DataSet: TDataSet);
+    procedure dbgQuotesDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttUploadsBeforeEdit(DataSet: TDataSet);
+    procedure dbgUploadsDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttEventsBeforeEdit(DataSet: TDataSet);
+    procedure dbgEventsDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -183,10 +192,15 @@ end;
 procedure TCommissionForm.ttQuotesBeforeDelete(DataSet: TDataSet);
 begin
   try
-    InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'QUOTE', 'ID');
+    InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'QUOTE', 'ID');
   finally
     RegnerateQuoteAnnotation;
   end;
+end;
+
+procedure TCommissionForm.ttQuotesBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TCommissionForm.ttQuotesBeforePost(DataSet: TDataSet);
@@ -301,10 +315,15 @@ end;
 procedure TCommissionForm.ttUploadsBeforeDelete(DataSet: TDataSet);
 begin
   try
-    InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'UPLOAD', 'ID');
+    InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'UPLOAD', 'ID');
   finally
     RegnerateUploadAnnotation;
   end;
+end;
+
+procedure TCommissionForm.ttUploadsBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TCommissionForm.ttUploadsNewRecord(DataSet: TDataSet);
@@ -361,7 +380,12 @@ end;
 
 procedure TCommissionForm.ttEventsBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'COMMISSION_EVENT', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'COMMISSION_EVENT', 'ID');
+end;
+
+procedure TCommissionForm.ttEventsBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TCommissionForm.ttEventsBeforePost(DataSet: TDataSet);
@@ -564,6 +588,12 @@ begin
     result := result + 'order by ' + SqlQueryUpload_order + ' ' + AscDesc(SqlQueryUpload_asc);
 end;
 
+procedure TCommissionForm.dbgEventsDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TCommissionForm.dbgEventsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -594,6 +624,12 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TCommissionForm.dbgQuotesDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
 procedure TCommissionForm.dbgQuotesKeyDown(Sender: TObject; var Key: Word;
@@ -633,6 +669,12 @@ begin
   if ttUploads.RecordCount = 0 then exit;
   if ttUploadsURL.AsWideString = '' then exit;
   ShellExecute(Handle, 'open', PChar(ttUploadsURL.AsWideString), '', '', SW_NORMAL);
+end;
+
+procedure TCommissionForm.dbgUploadsDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
 procedure TCommissionForm.dbgUploadsKeyDown(Sender: TObject; var Key: Word;
@@ -756,12 +798,16 @@ begin
     ttEvents.SQL.Text := SqlQueryCommissionEvent('');
     ttEvents.Active := true;
     dbgEvents.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgEvents, navEvents);
     {$ENDREGION}
 
     dbgUploads.Columns[1].PickList.Delimiter := ';';
     dbgUploads.Columns[1].PickList.StrictDelimiter := True;
     dbgUploads.Columns[1].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_ARTPAGES'''));
     dbgUploads.Columns[1].DropDownRows := 15;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgUploads, navUploads);
+
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuotes, navQuotes);
 
     try
       SavedFolder := VariantToString(ADOConnection1.GetScalar('select FOLDER from COMMISSION where ID = ' + ADOConnection1.SQLStringEscape(CommissionId.ToString)));

@@ -25,7 +25,7 @@ object ArtistForm: TArtistForm
     Top = 41
     Width = 1100
     Height = 400
-    ActivePage = tsCommunication
+    ActivePage = tsPayment
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -44,6 +44,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgCommissionDrawColumnCell
         OnDblClick = dbgCommissionDblClick
         OnKeyDown = dbgCommissionKeyDown
         OnTitleClick = dbgCommissionTitleClick
@@ -161,6 +162,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgPaymentDrawColumnCell
         OnKeyDown = dbgPaymentKeyDown
         OnTitleClick = dbgPaymentTitleClick
         Columns = <
@@ -260,6 +262,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgArtistEventDrawColumnCell
         OnKeyDown = dbgArtistEventKeyDown
         OnTitleClick = dbgArtistEventTitleClick
         Columns = <
@@ -341,6 +344,7 @@ object ArtistForm: TArtistForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgCommunicationDrawColumnCell
         OnKeyDown = dbgCommunicationKeyDown
         OnTitleClick = dbgCommunicationTitleClick
         Columns = <
@@ -502,6 +506,7 @@ object ArtistForm: TArtistForm
   object ttCommission: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttCommissionBeforeEdit
     BeforeDelete = ttCommissionBeforeDelete
     AfterScroll = ttCommissionAfterScroll
     OnNewRecord = ttCommissionNewRecord
@@ -588,6 +593,7 @@ object ArtistForm: TArtistForm
   object ttPayment: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttPaymentBeforeEdit
     BeforePost = ttPaymentBeforePost
     BeforeDelete = ttPaymentBeforeDelete
     AfterScroll = ttPaymentAfterScroll
@@ -657,6 +663,7 @@ object ArtistForm: TArtistForm
   object ttArtistEvent: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttArtistEventBeforeEdit
     BeforePost = ttArtistEventBeforePost
     BeforeDelete = ttArtistEventBeforeDelete
     AfterScroll = ttArtistEventAfterScroll
@@ -695,6 +702,7 @@ object ArtistForm: TArtistForm
   object ttCommunication: TADOQuery
     Connection = ADOConnection1
     CursorType = ctStatic
+    BeforeEdit = ttCommunicationBeforeEdit
     BeforeDelete = ttCommunicationBeforeDelete
     AfterScroll = ttCommunicationAfterScroll
     OnNewRecord = ttCommunicationNewRecord

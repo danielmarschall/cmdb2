@@ -96,6 +96,9 @@ type
     procedure dbgConfigKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure ttConfigBeforePost(DataSet: TDataSet);
+    procedure dbgMandatorDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttMandatorBeforeEdit(DataSet: TDataSet);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -175,7 +178,12 @@ end;
 
 procedure TMandatorsForm.ttMandatorBeforeDelete(DataSet: TDataSet);
 begin
-  InsteadOfDeleteWorkaround(DataSet as TAdoQuery, 'ID', 'MANDATOR', 'ID');
+  InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'MANDATOR', 'ID');
+end;
+
+procedure TMandatorsForm.ttMandatorBeforeEdit(DataSet: TDataSet);
+begin
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TMandatorsForm.ttMandatorNewRecord(DataSet: TDataSet);
@@ -269,6 +277,12 @@ begin
   if ttMandator.State in [dsEdit,dsInsert] then ttMandator.Post;
   if ttMandator.FieldByName('ID').IsNull then exit;
   MainForm.OpenDbObject('MANDATOR', ttMandator.FieldByName('ID').AsGuid);
+end;
+
+procedure TMandatorsForm.dbgMandatorDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
 procedure TMandatorsForm.dbgMandatorKeyDown(Sender: TObject; var Key: Word;
@@ -586,6 +600,7 @@ begin
     ttMandator.SQL.Text := SqlQueryMandator('');
     ttMandator.Active := true;
     dbgMandator.AutoSizeColumns;
+    InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgMandator, navMandator);
     {$ENDREGION}
     {$REGION 'ttTextBackup / dbgTextBackup'}
     ttTextBackup.Active := false;

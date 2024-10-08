@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
-  Db, DateUtils;
+  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls;
 
 procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
 function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
@@ -22,12 +22,20 @@ procedure SaveGridToCsv(grid: TDbGrid; const filename: string);
 function TitleButtonHelper(Column: TColumn): boolean;
 function AscDesc(asc: boolean): string;
 procedure AdoQueryRefresh(ADataset: TAdoQuery; const ALocateField: string);
-procedure InsteadOfDeleteWorkaround(DataSet: TAdoQuery; const localField, baseTable, baseTableField: string);
+
+procedure InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbg: TDBGrid; nav: TDBNavigator);
+procedure InsteadOfDeleteWorkaround_BeforeEdit(DataSet: TCustomADODataSet; const localField: string);
+procedure InsteadOfDeleteWorkaround_BeforeDelete(DataSet: TCustomADODataSet; const localField, baseTable, baseTableField: string);
+procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState; const localField: string);
 
 implementation
 
 uses
-  ShlObj, ShellApi, System.Hash;
+  ShlObj, ShellApi, System.Hash, Dialogs;
+
+const
+  LOCALDB_INSTANCE_NAME = 'MSSQLLocalDB';
 
 procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
 var
@@ -317,7 +325,7 @@ begin
   // 2. sqllocaldb create MSSQLLocalDB
   //    sqllocaldb start MSSQLLocalDB
 
-  ADOConnection1.ConnectNtAuth('(localdb)\MSSQLLocalDB', 'master');
+  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, 'master');
   ADOConnection1.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = N'+AdoConnection1.SQLStringEscape(DataBaseName)+') ' +
     'BEGIN ' +
@@ -341,7 +349,7 @@ begin
     '  ALTER DATABASE '+AdoConnection1.SQLDatabaseNameEscape(DataBaseName)+' SET MULTI_USER; ' +
     'END'
   );
-  ADOConnection1.ConnectNtAuth('(localdb)\MSSQLLocalDB', DataBaseName);
+  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);
 end;
 
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
@@ -672,35 +680,88 @@ begin
   end;
 end;
 
-procedure InsteadOfDeleteWorkaround(DataSet: TAdoQuery; const localField, baseTable, baseTableField: string);
-  // This procedure is used to prevent that a delete command in an ADO Query
-  // causes deletion in all connected tables.
-  // For some reason, if you delete something from a DBGrid, then the
-  // command to the SQL Server will be delete commands to the connected tables.
-  // There is no delete SQL query to the actual view; hence, it is not possible
-  // to solve this with a "instead of delete" trigger on that view!
-  // This procedure is a workaround for this. It will be called in the
-  // BeforeDelete event of the view TAdoQuery, and it will delete the dataset
-  // on the base table and then reload the query, trying to maintain the position.
+// These 4 procedures are used to prevent that a delete command in an ADO Query
+// causes deletion in all connected tables.
+// For some reason, if you delete something from a DBGrid, then the
+// command to the SQL Server will be delete commands to the connected tables.
+// There is no delete SQL query to the actual view; hence, it is not possible
+// to solve this with a "instead of delete" trigger on that view!
 
 var
-  id: string;
-begin
-  Dataset.Connection.ExecSQL('delete from '+Dataset.Connection.SQLObjectNameEscape(basetable)+' where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ''' + DataSet.FieldByName(localField).AsWideString + '''');
+  DeletedList: TStringList;
 
+procedure InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbg: TDBGrid; nav: TDBNavigator);
+begin
+  nav.ConfirmDelete := false;
+  dbg.Options := dbg.Options - [dgConfirmDelete];
+end;
+
+procedure InsteadOfDeleteWorkaround_BeforeEdit(DataSet: TCustomADODataSet; const localField: string);
+begin
+  showmessage(DataSet.UnitName+'.'+DataSet.Name);
+  if DeletedList.Contains(IntToStr(Int64(Pointer(Dataset)))+':'+DataSet.FieldByName(localField).AsWideString) then Abort;
+end;
+
+procedure InsteadOfDeleteWorkaround_BeforeDelete(DataSet: TCustomADODataSet; const localField, baseTable, baseTableField: string);
+resourcestring
+  SReallyDelete = 'Do you really want to delete this line and all connected data to it?';
+begin
+  if DeletedList.Contains(IntToStr(Int64(Pointer(Dataset)))+':'+DataSet.FieldByName(localField).AsWideString) then Abort;
+  if MessageDlg(SReallyDelete, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) <> ID_YES then Abort;
+  DeletedList.Add(IntToStr(Int64(Pointer(Dataset)))+':'+DataSet.FieldByName(localField).AsWideString);
+  Dataset.Connection.ExecSQL('delete from '+Dataset.Connection.SQLObjectNameEscape(basetable)+' '+
+                             'where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ''' + DataSet.FieldByName(localField).AsWideString + '''');
+
+  // Jump to next line, or at previous line if we are at the end
   Dataset.Next;
   if Dataset.EOF then Dataset.Prior;
-  if Dataset.BOF then
-    id := ''
+
+  Abort; // prevent the default delete action
+end;
+
+procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState; const localField: string);
+begin
+  // We strike through the deleted record, because a requery might cause a re-ordering
+  // and if the user deletes multiple lines, then they might delete wrong record!
+
+  // Set the background color (optional)
+  if gdSelected in State then
+  begin
+    // Handle selected cell (focused or selected) background and text
+    TDBGrid(Sender).Canvas.Brush.Color := clHighlight;       // Set highlight background
+    TDBGrid(Sender).Canvas.Font.Color := clHighlightText;    // Set text color to highlight text
+  end
   else
-    id := Dataset.FieldByName(localField).AsWideString;
-  try
-    Dataset.Requery;
-  finally
-    if id <> '' then Dataset.Locate(localField, id, []);
+  begin
+    // Handle regular cell background
+    TDBGrid(Sender).Canvas.Brush.Color := clWhite;
+    TDBGrid(Sender).Canvas.Font.Color := clBlack;
   end;
 
-  Abort;
+  // Check if the record should be struck through
+  if DeletedList.Contains(IntToStr(Int64(Pointer(TDBGrid(Sender).DataSource.DataSet)))+':'+TDBGrid(Sender).DataSource.DataSet.FieldByName(localField).AsWideString) then
+  begin
+    TDBGrid(Sender).Canvas.Font.Color := clGray;
+    TDBGrid(Sender).Canvas.Font.Style := TDBGrid(Sender).Canvas.Font.Style + [fsStrikeOut];  // Add strikethrough
+  end
+  else
+  begin
+    TDBGrid(Sender).Canvas.Font.Style := [];  // Regular font style (no strikethrough)
+  end;
+
+  // Finally, draw the text inside the cell
+  TDBGrid(Sender).Canvas.FillRect(Rect);  // Clear the background
+  TDBGrid(Sender).Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, Column.Field.AsWideString);
+
+  // Optional: Reset font style after drawing
+  TDBGrid(Sender).Canvas.Font.Style := [];
 end;
+
+initialization
+  DeletedList := TStringList.Create;
+
+finalization
+  FreeAndNil(DeletedList);
 
 end.

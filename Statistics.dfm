@@ -45,6 +45,7 @@ object StatisticsForm: TStatisticsForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgQueryDrawColumnCell
         OnDblClick = dbgQueryDblClick
         OnKeyDown = dbgQueryKeyDown
         OnTitleClick = dbgQueryTitleClick
