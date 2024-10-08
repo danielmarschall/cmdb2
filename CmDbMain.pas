@@ -68,13 +68,12 @@ const
   CmDbDefaultDatabaseName = 'cmdb2';
 
 procedure TMainForm.OpenDbObject(const ATableName: string; DsGuid: TGUID);
-resourcestring
-  SUnexpectedTableName = 'Unexpected TableName %s';
 var
   MandatorForm: TMandatorForm;
   Artistform: TArtistForm;
   CommissionForm: TCommissionForm;
 begin
+  if VarIsNull(ADOConnection1.GetScalar('select top 1 ID from ' + ATableName + ' where ID = ' + AdoConnection1.SQLStringEscape(DsGuid.ToString))) then Exit;
   if ATableName = 'MANDATOR' then // do not localize
   begin
     MandatorForm := MainForm.FindForm(DsGuid) as TMandatorForm;
@@ -122,10 +121,6 @@ begin
       CommissionForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
       CommissionForm.Init;
     end;
-  end
-  else
-  begin
-    raise Exception.CreateFmt(SUnexpectedTableName, [ATableName]);
   end;
 end;
 

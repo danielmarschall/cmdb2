@@ -132,18 +132,20 @@ end;
 procedure TMandatorsForm.ttConfigBeforeDelete(DataSet: TDataSet);
 resourcestring
   SDeleteNotPossible = 'Delete not possible';
+  SPasswordProtectionDisabled = 'Password protection disabled';
+  SNoPasswordToRemove = 'Nothing to remove. Database is not password protected.';
 begin
   if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') then
   begin
     if VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';')) = '' then
     begin
-      ShowMessage('Nothing to remove. Database is not password protected.');
+      ShowMessage(SNoPasswordToRemove);
     end
     else
     begin
       ADOConnection1.ExecSQL('update CONFIG set VALUE = '''' where NAME = ''PASSWORD_HASHED'';');
       MainForm.CmDbZipPassword := '';
-      ShowMessage('Password protection disabled');
+      ShowMessage(SPasswordProtectionDisabled);
     end;
   end;
   Abort;
@@ -157,15 +159,18 @@ end;
 procedure TMandatorsForm.ttConfigBeforePost(DataSet: TDataSet);
 var
   oldHashed: string;
+resourcestring
+  SPasswordProtectionEnabled = 'Password protection enabled';
+  SPasswordChanged = 'Password changed';
 begin
   if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') and (ttConfigVALUE.AsWideString <> '') then
   begin
     oldHashed := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
     ADOConnection1.ExecSQL('update CONFIG set VALUE = '+ADOConnection1.SQLStringEscape(CmDbGetPasswordHash(AdoConnection1, ttConfigVALUE.AsWideString))+' where NAME = ''PASSWORD_HASHED'';');
     if oldHashed = '' then
-      ShowMessage('Password protection enabled')
+      ShowMessage(SPasswordProtectionEnabled)
     else
-      ShowMessage('Password changed');
+      ShowMessage(SPasswordChanged);
     MainForm.CmDbZipPassword := ttConfigVALUE.AsWideString;
     ttConfigVALUE.AsWideString := '';
   end;

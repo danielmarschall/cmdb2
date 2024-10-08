@@ -200,6 +200,7 @@ end;
 
 procedure TCommissionForm.ttQuotesBeforeEdit(DataSet: TDataSet);
 begin
+  if ttEvents.State in [dsEdit, dsInsert] then ttEvents.Post;
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
@@ -323,6 +324,7 @@ end;
 
 procedure TCommissionForm.ttUploadsBeforeEdit(DataSet: TDataSet);
 begin
+  if ttEvents.State in [dsEdit, dsInsert] then ttEvents.Post;
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
@@ -385,15 +387,71 @@ end;
 
 procedure TCommissionForm.ttEventsBeforeEdit(DataSet: TDataSet);
 begin
+  if ttUploads.State in [dsEdit, dsInsert] then ttUploads.Post;
+  if ttQuotes.State in [dsEdit, dsInsert] then ttQuotes.Post;
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TCommissionForm.ttEventsBeforePost(DataSet: TDataSet);
+
+  // Since Quote and Upload data can be connected to an event, we must take
+  // care that the event state stays to quote/upload.
+  function CanChangeStateAtoB(StateA, StateB: string): boolean;
+  var
+    oldIsQuote: boolean;
+    oldIsUpload: boolean;
+    //oldIsMisc: boolean;
+    newIsQuote: boolean;
+    newIsUpload: boolean;
+    //newIsMisc: boolean;
+  begin
+    oldIsQuote := StateA = 'quote';
+    oldIsUpload := StateA.StartsWith('upload');
+    //oldIsMisc := not oldIsQuote and not oldIsUpload;
+
+    newIsQuote := StateB = 'quote';
+    newIsUpload := StateB.StartsWith('upload');
+    //newIsMisc := not newIsQuote and not newIsUpload;
+
+    if oldIsQuote then
+    begin
+      if newIsQuote then
+      begin
+        Exit(true);
+      end
+      else
+      begin
+        Exit(VarIsNull(AdoConnection1.GetScalar(
+          'select top 1 ID from QUOTE where EVENT_ID = ' +
+          AdoConnection1.SQLStringEscape(ttEventsID.AsWideString)
+        )));
+      end;
+    end
+    else if oldIsUpload then
+    begin
+      if newIsUpload then
+      begin
+        Exit(true);
+      end
+      else
+      begin
+        Exit(VarIsNull(AdoConnection1.GetScalar(
+          'select top 1 ID from UPLOAD where EVENT_ID = ' +
+          AdoConnection1.SQLStringEscape(ttEventsID.AsWideString)
+        )));
+      end;
+    end
+    else // if oldIsMisc then
+    begin
+      Exit(true);
+    end;
+  end;
+
 var
   i: integer;
 resourcestring
   SInvalidEventType = 'Invalid event type. Please pick one from the list.';
-  SEventTypeNotChangeable = 'The event type of that row can only be changed during creation of the row.';
+  SEventTypeNotChangeable = 'The event type of that row can only be changed from Quote or from Upload during creation of the row.';
   SAnnotationSetNotAllowed = 'Annotations for Quotes and Uploads are automatically filled. Please remove the annotation you have entered.';
   SAnnotationEditNotAllowed = 'Annotations for Quotes and Uploads are automatically filled. You must not edit them.';
 begin
@@ -413,7 +471,7 @@ begin
   end;
 
   // Event type is not changeable, because Quotes and Uploads might be attached to it
-  if (Dataset.State = dsEdit) and (Dataset.FieldByName('STATE').OldValue <> Dataset.FieldByName('STATE').NewValue) then
+  if (Dataset.State = dsEdit) and not CanChangeStateAtoB(Dataset.FieldByName('STATE').OldValue, Dataset.FieldByName('STATE').NewValue) then
     raise Exception.Create(SEventTypeNotChangeable);
 end;
 

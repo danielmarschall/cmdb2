@@ -690,6 +690,12 @@ end;
 var
   DeletedList: TStringList;
 
+function _DeletedListName(DataSet: TDataSet; const IdFieldName: string): string;
+begin
+  //result := IntToStr(Int64(Pointer(Dataset)))+':'+IdFieldName+':'+DataSet.FieldByName(IdFieldName).AsWideString;
+  result := DataSet.Owner.Name+'.'+DataSet.Name+':'+IdFieldName+':'+DataSet.FieldByName(IdFieldName).AsWideString;
+end;
+
 procedure InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbg: TDBGrid; nav: TDBNavigator);
 begin
   nav.ConfirmDelete := false;
@@ -698,17 +704,16 @@ end;
 
 procedure InsteadOfDeleteWorkaround_BeforeEdit(DataSet: TCustomADODataSet; const localField: string);
 begin
-  showmessage(DataSet.UnitName+'.'+DataSet.Name);
-  if DeletedList.Contains(IntToStr(Int64(Pointer(Dataset)))+':'+DataSet.FieldByName(localField).AsWideString) then Abort;
+  if DeletedList.Contains(_DeletedListName(DataSet, localField)) then Abort;
 end;
 
 procedure InsteadOfDeleteWorkaround_BeforeDelete(DataSet: TCustomADODataSet; const localField, baseTable, baseTableField: string);
 resourcestring
   SReallyDelete = 'Do you really want to delete this line and all connected data to it?';
 begin
-  if DeletedList.Contains(IntToStr(Int64(Pointer(Dataset)))+':'+DataSet.FieldByName(localField).AsWideString) then Abort;
+  if DeletedList.Contains(_DeletedListName(DataSet, localField)) then Abort;
   if MessageDlg(SReallyDelete, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) <> ID_YES then Abort;
-  DeletedList.Add(IntToStr(Int64(Pointer(Dataset)))+':'+DataSet.FieldByName(localField).AsWideString);
+  DeletedList.Add(_DeletedListName(DataSet, localField));
   Dataset.Connection.ExecSQL('delete from '+Dataset.Connection.SQLObjectNameEscape(basetable)+' '+
                              'where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ''' + DataSet.FieldByName(localField).AsWideString + '''');
 
@@ -740,7 +745,7 @@ begin
   end;
 
   // Check if the record should be struck through
-  if DeletedList.Contains(IntToStr(Int64(Pointer(TDBGrid(Sender).DataSource.DataSet)))+':'+TDBGrid(Sender).DataSource.DataSet.FieldByName(localField).AsWideString) then
+  if DeletedList.Contains(_DeletedListName(TDBGrid(Sender).DataSource.DataSet, localField)) then
   begin
     TDBGrid(Sender).Canvas.Font.Color := clGray;
     TDBGrid(Sender).Canvas.Font.Style := TDBGrid(Sender).Canvas.Font.Style + [fsStrikeOut];  // Add strikethrough
