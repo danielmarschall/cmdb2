@@ -160,10 +160,26 @@ procedure TMandatorsForm.ttConfigBeforePost(DataSet: TDataSet);
 var
   oldHashed: string;
 resourcestring
+  SInvalidCurrency = 'Invalid currency code. Please enter a valid 3-character code, e.g. USD.';
   SPasswordProtectionEnabled = 'Password protection enabled';
   SPasswordChanged = 'Password changed';
+  SDirectoryDoesNotExist = 'Directory does not exist! Please enter a valid directory, or leave the value blank for the user directory.';
 begin
-  if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') and (ttConfigVALUE.AsWideString <> '') then
+  if (ttConfigNAME.AsWideString = 'BACKUP_PATH') then
+  begin
+    if (ttConfigVALUE.AsWideString <> '') and not DirectoryExists(ttConfigVALUE.AsWideString) then
+    begin
+      raise Exception.Create(SDirectoryDoesNotExist);
+    end;
+  end
+  else if (ttConfigNAME.AsWideString = 'LOCAL_CURRENCY') then
+  begin
+    if Length(ttConfigVALUE.AsWideString) <> 3 then
+      raise Exception.Create(SInvalidCurrency)
+    else
+      ttConfigVALUE.AsWideString := ttConfigVALUE.AsWideString.ToUpper;
+  end
+  else if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') and (ttConfigVALUE.AsWideString <> '') then
   begin
     oldHashed := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
     ADOConnection1.ExecSQL('update CONFIG set VALUE = '+ADOConnection1.SQLStringEscape(CmDbGetPasswordHash(AdoConnection1, ttConfigVALUE.AsWideString))+' where NAME = ''PASSWORD_HASHED'';');

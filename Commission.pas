@@ -215,13 +215,12 @@ resourcestring
 const
   CacheMaxAge = 24*60*60;
 begin
-  ttQuotesCURRENCY.AsWideString := ttQuotesCURRENCY.AsWideString.ToUpper;
-  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-
   if Length(ttQuotesCURRENCY.AsWideString) <> 3 then
-  begin
-    raise Exception.Create(SInvalidCurrency);
-  end;
+    raise Exception.Create(SInvalidCurrency)
+  else
+    ttQuotesCURRENCY.AsWideString := ttQuotesCURRENCY.AsWideString.ToUpper;
+
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   if ttQuotesAMOUNT.IsNull then
   begin

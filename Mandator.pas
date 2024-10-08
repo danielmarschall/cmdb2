@@ -416,10 +416,16 @@ var
   LocalCurrency: string;
   convertedValue: double;
   dummyTimestamp: TDateTime;
+resourcestring
+  SInvalidCurrency = 'Invalid currency code. Please enter a valid 3-character code, e.g. USD.';
 const
   CacheMaxAge = 24*60*60;
 begin
-  ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
+  if Length(ttPaymentCURRENCY.AsWideString) <> 3 then
+    raise Exception.Create(SInvalidCurrency)
+  else
+    ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
+
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   if ttPaymentAMOUNT_VERIFIED.IsNull then

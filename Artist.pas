@@ -301,13 +301,12 @@ resourcestring
 const
   CacheMaxAge = 24*60*60;
 begin
-  ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
-  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-
   if Length(ttPaymentCURRENCY.AsWideString) <> 3 then
-  begin
-    raise Exception.Create(SInvalidCurrency);
-  end;
+    raise Exception.Create(SInvalidCurrency)
+  else
+    ttPaymentCURRENCY.AsWideString := ttPaymentCURRENCY.AsWideString.ToUpper;
+
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   if ttPaymentAMOUNT_VERIFIED.IsNull then
     ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
