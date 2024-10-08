@@ -210,11 +210,18 @@ var
   LocalCurrency: string;
   convertedValue: double;
   dummyTimestamp: TDateTime;
+resourcestring
+  SInvalidCurrency = 'Invalid currency code. Please enter a valid 3-character code, e.g. USD.';
 const
   CacheMaxAge = 24*60*60;
 begin
   ttQuotesCURRENCY.AsWideString := ttQuotesCURRENCY.AsWideString.ToUpper;
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
+
+  if Length(ttQuotesCURRENCY.AsWideString) <> 3 then
+  begin
+    raise Exception.Create(SInvalidCurrency);
+  end;
 
   if ttQuotesAMOUNT.IsNull then
   begin
