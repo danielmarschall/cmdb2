@@ -172,7 +172,7 @@ end;
 function TMainForm.BackupPath: string;
 begin
   Result := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
-  if Result = '' then Result := GetUserDirectory;
+  if Result = '' then Result := CmDbGetDefaultDataPath;
 end;
 
 procedure TMainForm.BackupandExit1Click(Sender: TObject);
@@ -420,6 +420,7 @@ var
   deleteBakFileAfterwards: boolean;
 resourcestring
   SInvalidBackupFile = 'Invalid backup file';
+  SZipPassword = 'ZIP Password';
 begin
   OpenDialog1.InitialDir := BackupPath;
   if OpenDialog1.Execute(Handle) then
@@ -451,14 +452,14 @@ begin
               end;
             end;
             if bakFileName = '' then raise Exception.Create(SInvalidBackupFile);
-            zip.Extract(bakFileName, GetUserDirectory, false);
-            bakFileName := IncludeTrailingPathDelimiter(GetUserDirectory) + bakFileName;
+            zip.Extract(bakFileName, CmDbGetDefaultDataPath, false);
+            bakFileName := IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + bakFileName;
             deleteBakFileAfterwards := true;
             break;
           except
             on E: EZipInvalidPassword do
             begin
-              zip.Password := InputBox(Caption, #0+'ZIP Password', '');
+              zip.Password := InputBox(Caption, #0+SZipPassword, '');
             end;
             on E: EZipNoPassword do
             begin

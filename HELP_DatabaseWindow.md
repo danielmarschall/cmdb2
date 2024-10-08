@@ -23,7 +23,7 @@ Beside the BAK files (that can be used for restoring data), the program will cre
 
 Here you can find system-global settings. Currently, there are the following settings:
 
-- `BACKUP_PATH`:  If you want to store the `cmdb2_backup_*.bak` files somewhere else, then enter the path here.
+- `BACKUP_PATH`:  If you want to store the `cmdb2_backup_*.bak` files somewhere else, then enter the path here. Otherwise, the CMDB2 folder in your user directory will be chosen.
 - `CURRENCY_LAYER_API_KEY`: Automatic currency conversion is only possible by creating an account at [CurrencyLayer.com](https://CurrencyLayer.com/). There is a free plan which gives you a limit number of requests per month. Enter the API key here if you want to use this feature.
 - `LOCAL_CURRENCY`: Enter a 3-letter currency code here, such as `USD` or `EUR`
 - `NEW_PASSWORD`: Enter a password to set or renew database protection. Press Ctrl+Del to remove a previously set password. This field will be empty after restart for confidentiality.

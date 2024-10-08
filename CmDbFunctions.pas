@@ -10,7 +10,7 @@ procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
 function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
-function GetUserDirectory: string;
+function CmDbGetDefaultDataPath: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
@@ -232,15 +232,22 @@ begin
   end;
 end;
 
-function GetUserDirectory: string;
-var
-  Path: array [0..MAX_PATH] of Char;
+function CmDbGetDefaultDataPath: string;
+
+  function GetUserDirectory: string;
+  var
+    Path: array [0..MAX_PATH] of Char;
+  begin
+    // Use SHGetFolderPath to get the user profile directory
+    if Succeeded(SHGetFolderPath(0, CSIDL_PROFILE, 0, 0, @Path[0])) then
+      Result := Path
+    else
+      Result := ''; // Return an empty string if it fails
+  end;
+
 begin
-  // Use SHGetFolderPath to get the user profile directory
-  if Succeeded(SHGetFolderPath(0, CSIDL_PROFILE, 0, 0, @Path[0])) then
-    Result := Path
-  else
-    Result := ''; // Return an empty string if it fails
+  result := IncludeTrailingPathDelimiter(GetUserDirectory) + 'CMDB2';
+  ForceDirectories(result);
 end;
 
 const
@@ -264,8 +271,8 @@ begin
     'RESTORE DATABASE '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+' ' +
     'FROM DISK = N'+AdoConnection1.SQLStringEscape(BakFileName)+' ' +
     'WITH ' +
-    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameData)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(GetUserDirectory) + TempDbName + '.mdf')+', ' +
-    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameLog)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(GetUserDirectory) + TempDbName + '.ldf')+', ' +
+    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameData)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + TempDbName + '.mdf')+', ' +
+    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameLog)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + TempDbName + '.ldf')+', ' +
     '    REPLACE, ' +
     '    RECOVERY;');
 
@@ -333,7 +340,7 @@ begin
     '  ON PRIMARY ' +
     '  ( ' +
     '      NAME = N'+AdoConnection1.SQLStringEscape(LogicalNameData)+', '+
-    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(GetUserDirectory) + DatabaseName + '.mdf')+', '+
+    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + DatabaseName + '.mdf')+', '+
     '      SIZE = 10MB, ' +
     '      MAXSIZE = UNLIMITED, ' +
     '      FILEGROWTH = 5MB ' +
@@ -341,7 +348,7 @@ begin
     '  LOG ON ' +
     '  ( ' +
     '      NAME = N'+AdoConnection1.SQLStringEscape(LogicalNameLog)+', '+
-    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(GetUserDirectory) + DatabaseName + '.ldf')+', ' +
+    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + DatabaseName + '.ldf')+', ' +
     '      SIZE = 5MB, ' +
     '      MAXSIZE = 50MB, ' +
     '      FILEGROWTH = 1MB ' +

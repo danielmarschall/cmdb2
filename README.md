@@ -58,7 +58,7 @@ Although CMDB2 is translated into English, the development environment was Germa
 
 ### Data storage
 
-Where is my data stored? By default, data is stored in your Windows profile at `C:\Users\YourName\`
+Where is my data stored? By default, data is stored at your Windows user profile folder at `C:\Users\YourName\CMDB2`
 
 The data files are named:
 - `cmdb2.mdf`
@@ -66,7 +66,7 @@ The data files are named:
 
 ### Backups
 
-Backups are either stored in your Windows profile or the path you specified in the configuration setting `BACKUP_PATH`.
+Backups are either stored in your Windows user profile folder at `C:\Users\YourName\CMDB2`, or in the path you specified in the configuration setting `BACKUP_PATH`.
 
 The backup files include:
 
