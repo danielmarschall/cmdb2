@@ -136,7 +136,14 @@ cm.NAME + iif(art.IS_ARTIST=1,' by ',' for ') + art.NAME as PROJECT_NAME,
 	select top 1 STATE from COMMISSION_EVENT ev where ev.COMMISSION_ID = cm.ID and ev.STATE <> 'quote' and ev.STATE <> 'annot' and ev.STATE not like 'upload %'
 	order by case when ev.STATE='fin' then 1
 	              when ev.STATE like 'cancel %' then 2
-	              else 3 end, ev.DATE desc
+	              when ev.STATE like 'c aw hires' then 3
+	              when ev.STATE like 'c aw cont' then 4
+	              when ev.STATE like 'c td feedback' then 5
+	              when ev.STATE like 'c aw sk' then 6
+	              when ev.STATE like 'c aw ack' then 7
+	              when ev.STATE like 'c td initcm' then 8
+	              when ev.STATE like 'idea' then 9
+	              else 10 end, ev.DATE desc
 ) as ART_STATUS,
 
 QuotePayStatusAggr.PAY_STATUS,

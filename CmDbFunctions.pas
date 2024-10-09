@@ -473,6 +473,7 @@ begin
       InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
 
       // Downpayment now uses the quote data rather than the commission date
+      // Also, the order of ART_STATUS has been mended
       InstallSql(2, 'vw_COMMISSION');
 
       {$REGION 'New config table fields'}
