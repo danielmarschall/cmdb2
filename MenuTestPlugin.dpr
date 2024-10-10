@@ -17,6 +17,7 @@ const
   GUID_1: TGUID = '{4DCE53CA-8744-408C-ABA8-3702DCC9C51E}';
   GUID_1A: TGUID = '{AC6FE7BE-91CD-43D0-9971-C6229C3F596D}';
   GUID_1B: TGUID = '{5FF02681-8A21-4218-B1D2-38ECC9827CD2}';
+  GUID_1C: TGUID = '{DC56C114-B7D5-4A5A-8EF7-237F52CDEB30}';
 
 resourcestring
   DESC_PLUGIN_SHORT = 'Test';
@@ -120,10 +121,14 @@ begin
           end;
           if AdoConn.TableExists(TempTableName(GUID_1, 'TEST')) then
             AdoConn.ExecSQL('drop table '+TempTableName(GUID_1, 'TEST'));
-          AdoConn.ExecSQL('create table '+TempTableName(GUID_1, 'TEST')+' ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
+          AdoConn.ExecSQL('create table '+TempTableName(GUID_1, 'TEST')+' ( ' + #13#10 +
+                          '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                          'NAME varchar(200) NOT NULL );');
           AdoConn.ExecSQL('delete from '+TempTableName(GUID_1, 'TEST'));
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1A.ToString+''', ''View Source Code'';');
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1B.ToString+''', ''Download latest version'';');
+          Randomize;
+          AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1C.ToString+''', ''Random number: '+IntToStr(Random(10000))+''';');
         finally
           FreeAndNil(AdoConn);
         end;

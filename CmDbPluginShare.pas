@@ -65,31 +65,39 @@ end;
 
 function _ReadWideString(var Src: PByte): WideString;
 var
-  I, LengthByte: Byte;
+  I: Integer;
+  LengthWord: Word;
 begin
-  LengthByte := Src^;  // Die Länge aus dem Byte lesen
-  Inc(Src);            // Weiter zum ersten WideChar
+  // Die Länge als Word (16 Bit) lesen
+  LengthWord := PWord(Src)^;
+  Inc(Src, 2);  // Weiter zum ersten WideChar, 2 Bytes für das Word
 
-  SetLength(Result, LengthByte);
-  for I := 1 to LengthByte do
+  // Den Result-String auf die Länge des gelesenen Wertes setzen
+  SetLength(Result, LengthWord);
+
+  // WideChars auslesen und dem Result-String zuweisen
+  for I := 1 to LengthWord do
   begin
-    Result[I] := PWideChar(Src)^;  // WideChar in den String kopieren
-    Inc(Src, 2);                   // WideChar belegt 2 Bytes
+    Result[I] := PWideChar(Src)^;
+    Inc(Src, 2);  // Weiter zum nächsten WideChar, 2 Bytes pro WideChar
   end;
 end;
 
 procedure _WriteWideString(var Dest: PByte; const Value: WideString);
 var
-  I, LengthByte: Byte;
+  I: Integer;
+  LengthWord: Word;
 begin
-  LengthByte := Length(Value);
-  Dest^ := LengthByte;  // Länge als Byte speichern
-  Inc(Dest);            // Auf die erste Speicherposition nach dem Byte
+  // Länge des Strings als Word (16 Bit) speichern
+  LengthWord := Length(Value);
+  PWord(Dest)^ := LengthWord;
+  Inc(Dest, 2);  // Weiter zur ersten Speicherposition nach dem Word
 
-  for I := 1 to LengthByte do
+  // Zeichen als WideChars schreiben
+  for I := 1 to LengthWord do
   begin
-    PWideChar(Dest)^ := Value[I]; // Zeichen als WideChar schreiben
-    Inc(Dest, 2);                 // WideChar belegt 2 Bytes
+    PWideChar(Dest)^ := Value[I];
+    Inc(Dest, 2);  // WideChar belegt 2 Bytes
   end;
 end;
 

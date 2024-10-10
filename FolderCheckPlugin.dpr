@@ -260,7 +260,6 @@ begin
           end;
           if AdoConn.TableExists(TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')) then
             AdoConn.ExecSQL('drop table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING'));
-          // TODO: For plugins like this (which fill a table), we must have a call back from the "Refresh/F5" button!
           AdoConn.ExecSQL('create table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')+' ( ' + #13#10 +
                           '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
                           '__ID uniqueidentifier NOT NULL, ' + #13#10 +

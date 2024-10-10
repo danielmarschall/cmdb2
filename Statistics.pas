@@ -98,7 +98,10 @@ procedure TStatisticsForm.refreshQueryClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    // TODO: Callback to SPL file
+    // Note: ClickEvent will be called to refresh or regenerate the data
+    //       (this is important if the dataset is not a view but a table filled by the plugin).
+    //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
+    TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
     AdoQueryRefresh(ttQuery, '');
   finally
     Screen.Cursor := crDefault;
@@ -278,7 +281,10 @@ begin
   begin
     Screen.Cursor := crHourGlass;
     try
-      // TODO: Callback to SPL file
+      // Note: ClickEvent will be called to refresh or regenerate the data
+      //       (this is important if the dataset is not a view but a table filled by the plugin).
+      //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
+      TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
     finally
       Screen.Cursor := crDefault;
