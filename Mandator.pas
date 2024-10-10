@@ -721,8 +721,13 @@ begin
   if ttStatistics.State in [dsEdit,dsInsert] then ttStatistics.Post;
   if ttStatistics.FieldByName('ID').IsNull then exit;
 
-  resp := TCmDbPluginClient.ClickEvent(AdoConnection1, MandatorId, ttStatistics.FieldByName('ID').AsGuid, GUID_NIL);
-  HandleClickResponse(AdoConnection1, MandatorId, resp);
+  Screen.Cursor := crHourGlass;
+  try
+    resp := TCmDbPluginClient.ClickEvent(AdoConnection1, MandatorId, ttStatistics.FieldByName('ID').AsGuid, GUID_NIL);
+    HandleClickResponse(AdoConnection1, MandatorId, resp);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 procedure TMandatorForm.dbgStatisticsKeyDown(Sender: TObject; var Key: Word;

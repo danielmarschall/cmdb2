@@ -118,8 +118,9 @@ begin
           except
             Exit(E_PLUGIN_CONN_FAIL);
           end;
-          if not AdoConn.TableExists(TempTableName(GUID_1, 'TEST')) then
-            AdoConn.ExecSQL('create table '+TempTableName(GUID_1, 'TEST')+' ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
+          if AdoConn.TableExists(TempTableName(GUID_1, 'TEST')) then
+            AdoConn.ExecSQL('drop table '+TempTableName(GUID_1, 'TEST'));
+          AdoConn.ExecSQL('create table '+TempTableName(GUID_1, 'TEST')+' ( __ID uniqueidentifier NOT NULL, NAME varchar(200) NOT NULL );');
           AdoConn.ExecSQL('delete from '+TempTableName(GUID_1, 'TEST'));
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1A.ToString+''', ''View Source Code'';');
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1B.ToString+''', ''Download latest version'';');

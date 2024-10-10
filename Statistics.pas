@@ -98,6 +98,7 @@ procedure TStatisticsForm.refreshQueryClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
+    // TODO: Callback to SPL file
     AdoQueryRefresh(ttQuery, '');
   finally
     Screen.Cursor := crDefault;
@@ -254,8 +255,13 @@ var
 begin
   if ttQuery.FindField('__ID') <> nil then
   begin
-    resp := TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
-    HandleClickResponse(AdoConnection1, MandatorId, resp);
+    Screen.Cursor := crHourGlass;
+    try
+      resp := TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, ttQuery.FieldByName('__ID').AsGuid);
+      HandleClickResponse(AdoConnection1, MandatorId, resp);
+    finally
+      Screen.Cursor := crDefault;
+    end;
   end;
 end;
 
@@ -272,6 +278,7 @@ begin
   begin
     Screen.Cursor := crHourGlass;
     try
+      // TODO: Callback to SPL file
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
     finally
       Screen.Cursor := crDefault;

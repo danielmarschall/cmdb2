@@ -23,7 +23,7 @@ const
 resourcestring
   DESC_PLUGIN_SHORT = 'Folder Check';
   DESC_1 = 'Commissions without folders';
-  DESC_2 = 'Commission folders invalid / not existing';
+  DESC_2 = 'Commission folders not existing';
   DESC_3 = 'Comparison Drive / Database folders';
 
 function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
@@ -156,24 +156,20 @@ begin
         end;
 
         // 1. Ordner, die im Dateisystem, aber nicht in der Datenbank existieren
-//        Writeln('Ordner im Dateisystem, aber nicht in der Datenbank:');
         for Folder in FSFolders do
         begin
           if not _ListContainsIgnoreCase(DBFolders, Folder) then
           begin
-            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' select newid(), '+AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', N''InFilesystem / NotInDatabase'', '+AdoConn.SQLStringEscape(Folder)+';');
-//            Writeln(Folder);
+            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' select newid(), '+AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', N''NotInDatabase / HasCommissionFolder'', '+AdoConn.SQLStringEscape(Folder)+';');
           end;
         end;
 
         // 2. Ordner, die in der Datenbank, aber nicht im Dateisystem existieren
-//        Writeln('Ordner in der Datenbank, aber nicht im Dateisystem:');
         for Folder in DBFolders do
         begin
           if not _ListContainsIgnoreCase(FSFolders, Folder) then
           begin
-            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' select newid(), '+AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', N''InDatabase / NotInFilesystem'', '+AdoConn.SQLStringEscape(Folder)+';');
-//            Writeln(Folder);
+            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' select newid(), '+AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', N''InDatabase / NoCommissionFolder'', '+AdoConn.SQLStringEscape(Folder)+';');
           end;
         end;
 
@@ -195,6 +191,7 @@ function ClickEventW(DBConnStr: PChar; MandatorGuid, StatGuid,
 var
   AdoConn: TADOConnection;
   Response: TCmDbPluginClickResponse;
+  q: TADODataSet;
 begin
   if ResponseData = nil then Exit(E_PLUGIN_BAD_ARGS);
   try
@@ -203,19 +200,6 @@ begin
     {$REGION 'Stat 1: Commissions without folders'}
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
-      // TODO: Implement
-    end
-    {$ENDREGION}
-    {$REGION 'Stat 2: Commission folders invalid / not existing'}
-    else if IsEqualGuid(StatGuid, GUID_2) then
-    begin
-      // TODO: Implement
-    end
-    {$ENDREGION}
-    {$REGION 'Stat 3: Comparison Drive / Database folders'}
-    else if IsEqualGuid(StatGuid, GUID_3) then
-    begin
-      // TODO: Implement
       if IsEqualGuid(ItemGuid, GUID_NIL) then
       begin
         AdoConn := TAdoConnection.Create(nil);
@@ -227,10 +211,136 @@ begin
           except
             Exit(E_PLUGIN_CONN_FAIL);
           end;
-          if not AdoConn.TableExists(TempTableName(GUID_3, 'FOLDER_COMPARE')) then
-          begin
-            AdoConn.ExecSQL('create table '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' ( __ID uniqueidentifier NOT NULL, __MANDATOR_ID uniqueidentifier NOT NULL, PROBLEM nvarchar(50), FOLDER nvarchar(250) );');
+          AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_1, 'COMMISSION_NO_FOLDER')+' as ' + #13#10 +
+                          'select ' + #13#10 +
+                          '    man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '    cm.ID as __ID, ' + #13#10 +
+                          '    art.NAME as ARTIST, ' + #13#10 +
+                          '    cm.NAME, ' + #13#10 +
+                          '    cm.ART_STATUS, ' + #13#10 +
+                          '    cm.FOLDER ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
+                          'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
+                          'where len(cm.FOLDER) < 4');
+        finally
+          FreeAndNil(AdoConn);
+        end;
+        Response.Handled := true;
+        Response.Action := craStatistics;
+        Response.StatId := StatGuid;
+        Response.StatName := DESC_1;
+        Response.SqlTable := TempTableName(GUID_1, 'COMMISSION_NO_FOLDER');
+        Response.SqlInitialOrder := 'ARTIST, NAME';
+        Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        Response.BaseTableDelete := 'COMMISSION';
+      end
+      else
+      begin
+        Response.Handled := true;
+        Response.Action := craObject;
+        Response.ObjTable := 'COMMISSION';
+        Response.ObjId := ItemGuid;
+      end;
+    end
+    {$ENDREGION}
+    {$REGION 'Stat 2: Commission folders not existing'}
+    else if IsEqualGuid(StatGuid, GUID_2) then
+    begin
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
           end;
+          if AdoConn.TableExists(TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')) then
+            AdoConn.ExecSQL('drop table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING'));
+          // TODO: For plugins like this (which fill a table), we must have a call back from the "Refresh/F5" button!
+          AdoConn.ExecSQL('create table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')+' ( ' + #13#10 +
+                          '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
+                          '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                          'ARTIST nvarchar(50), ' + #13#10 +
+                          'NAME nvarchar(100), ' + #13#10 +
+                          'ART_STATUS nvarchar(20), ' + #13#10 +
+                          'FOLDER nvarchar(200) );');
+          q := AdoConn.GetTable(
+                          'select ' + #13#10 +
+                          '    man.ID as __MANDATOR_ID, ' + #13#10 +
+                          '    cm.ID as __ID, ' + #13#10 +
+                          '    art.NAME as ARTIST, ' + #13#10 +
+                          '    cm.NAME, ' + #13#10 +
+                          '    cm.ART_STATUS, ' + #13#10 +
+                          '    cm.FOLDER ' + #13#10 +
+                          'from vw_COMMISSION cm ' + #13#10 +
+                          'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
+                          'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
+                          'where len(cm.FOLDER) >= 4');
+          try
+            while not q.EOF do
+            begin
+              if not TDirectory.Exists(q.Fields[5{FOLDER}].AsWideString) then
+              begin
+                AdoConn.ExecSQL('insert into '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')+' ' +
+                                'select ' + AdoConn.SQLStringEscape(q.Fields[0].AsWideString) + ', ' +
+                                            AdoConn.SQLStringEscape(q.Fields[1].AsWideString) + ', ' +
+                                            AdoConn.SQLStringEscape(q.Fields[2].AsWideString) + ', ' +
+                                            AdoConn.SQLStringEscape(q.Fields[3].AsWideString) + ', ' +
+                                            AdoConn.SQLStringEscape(q.Fields[4].AsWideString) + ', ' +
+                                            AdoConn.SQLStringEscape(q.Fields[5].AsWideString) + ';');
+              end;
+              q.Next;
+            end;
+          finally
+            FreeAndNil(q);
+          end;
+        finally
+          FreeAndNil(AdoConn);
+        end;
+        Response.Handled := true;
+        Response.Action := craStatistics;
+        Response.StatId := StatGuid;
+        Response.StatName := DESC_3;
+        Response.SqlTable := TempTableName(GUID_2, 'FOLDER_NOT_EXISTING');
+        Response.SqlInitialOrder := 'ARTIST, NAME';
+        Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
+        Response.BaseTableDelete := 'COMMISSION';
+      end
+      else
+      begin
+        Response.Handled := true;
+        Response.Action := craObject;
+        Response.ObjTable := 'COMMISSION';
+        Response.ObjId := ItemGuid;
+      end;
+    end
+    {$ENDREGION}
+    {$REGION 'Stat 3: Comparison Drive / Database folders'}
+    else if IsEqualGuid(StatGuid, GUID_3) then
+    begin
+      // TODO: Check if everything is correct and working
+      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      begin
+        AdoConn := TAdoConnection.Create(nil);
+        try
+          try
+            if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
+            AdoConn.LoginPrompt := false;
+            AdoConn.ConnectConnStr(DBConnStr);
+          except
+            Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          if AdoConn.TableExists(TempTableName(GUID_3, 'FOLDER_COMPARE')) then
+            AdoConn.ExecSQL('drop table '+TempTableName(GUID_3, 'FOLDER_COMPARE'));
+          AdoConn.ExecSQL('create table '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' ( ' + #13#10 +
+            '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+            '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
+            'PROBLEM nvarchar(50), ' + #13#10 +
+            'FOLDER nvarchar(250) );');
           _CompareFolders(AdoConn);
         finally
           FreeAndNil(AdoConn);
