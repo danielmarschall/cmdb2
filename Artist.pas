@@ -105,8 +105,6 @@ type
     procedure SearchBtnClick(Sender: TObject);
     procedure ttCommunicationNewRecord(DataSet: TDataSet);
     procedure ttArtistEventNewRecord(DataSet: TDataSet);
-    procedure ttCommissionAMOUNT_LOCALGetText(Sender: TField; var Text: string;
-      DisplayText: Boolean);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure Timer1Timer(Sender: TObject);
     procedure ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -222,20 +220,9 @@ begin
   DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
 
-var
-  localCur: string;
-
 procedure TArtistForm.ttCommissionAfterScroll(DataSet: TDataSet);
 begin
   sbCommission.Caption := CmDbShowRows(DataSet);
-end;
-
-procedure TArtistForm.ttCommissionAMOUNT_LOCALGetText(Sender: TField;
-  var Text: string; DisplayText: Boolean);
-begin
-  if localCur = '' then
-    localCur := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-  Text := FormatFloat('#,##0.00', Sender.AsFloat) + ' ' + localCur;
 end;
 
 procedure TArtistForm.ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -853,6 +840,7 @@ end;
 procedure TArtistForm.Init;
 var
   ttArtist: TAdoDataSet;
+  LocalCurrency: string;
 resourcestring
   SArtistSforS = 'Artist %s for %s';
   SClientSforS = 'Client %s for %s';
@@ -868,6 +856,8 @@ begin
     FreeAndNil(ttArtist);
   end;
 
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
+
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   Panel1.Caption := Caption;
@@ -880,6 +870,7 @@ begin
     ttCommission.Last;
     dbgCommission.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommission, navCommission);
+    ttCommissionAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
     {$ENDREGION}
     {$REGION 'ttPayment / dbgPayment'}
     ttPayment.Active := false;

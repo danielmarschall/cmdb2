@@ -416,7 +416,6 @@ object CommissionForm: TCommissionForm
     end
     object ttQuotesAMOUNT_LOCAL: TBCDField
       FieldName = 'AMOUNT_LOCAL'
-      OnGetText = ttQuotesAMOUNT_LOCALGetText
       Precision = 19
     end
     object ttQuotesDESCRIPTION: TWideStringField

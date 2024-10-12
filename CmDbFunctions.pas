@@ -734,20 +734,18 @@ end;
 
 procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState; const localField: string);
+var
+  txt: string;
+  txtWidth: Integer;
 begin
-  // We strike through the deleted record, because a requery might cause a re-ordering
-  // and if the user deletes multiple lines, then they might delete wrong record!
-
   // Set the background color (optional)
   if gdSelected in State then
   begin
-    // Handle selected cell (focused or selected) background and text
     TDBGrid(Sender).Canvas.Brush.Color := clHighlight;       // Set highlight background
     TDBGrid(Sender).Canvas.Font.Color := clHighlightText;    // Set text color to highlight text
   end
   else
   begin
-    // Handle regular cell background
     TDBGrid(Sender).Canvas.Brush.Color := clWhite;
     TDBGrid(Sender).Canvas.Font.Color := clBlack;
   end;
@@ -763,11 +761,42 @@ begin
     TDBGrid(Sender).Canvas.Font.Style := [];  // Regular font style (no strikethrough)
   end;
 
-  // Finally, draw the text inside the cell
-  TDBGrid(Sender).Canvas.FillRect(Rect);  // Clear the background
-  TDBGrid(Sender).Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, Column.Field.AsWideString);
+  // Clear the background
+  TDBGrid(Sender).Canvas.FillRect(Rect);
 
-  // Optional: Reset font style after drawing
+  // Get the text of the column field
+  txt := Column.Field.AsWideString;
+
+  // Use DisplayFormat for non-numeric fields as well, if available
+  if (Column.Field is TNumericField) and (TNumericField(Column.Field).DisplayFormat <> '') then
+    txt := FormatFloat(TNumericField(Column.Field).DisplayFormat, Column.Field.AsFloat)
+  else if (Column.Field is TDateTimeField) and (TDateTimeField(Column.Field).DisplayFormat <> '') then
+    txt := FormatDateTime(TDateTimeField(Column.Field).DisplayFormat, Column.Field.AsDateTime)
+  else if (Column.Field is TSQLTimeStampField) and (TSQLTimeStampField(Column.Field).DisplayFormat <> '') then
+    txt := FormatDateTime(TSQLTimeStampField(Column.Field).DisplayFormat, Column.Field.AsDateTime)
+  else if (Column.Field is TAggregateField) and (TAggregateField(Column.Field).DisplayFormat <> '') then
+    txt := FormatFloat(TAggregateField(Column.Field).DisplayFormat, Column.Field.AsFloat);
+
+  // Do we have the OnGetText Event??
+  if Assigned(Column.Field.OnGetText) then
+    Column.Field.OnGetText(Column.Field, txt, true);
+
+  // Check if the field is numeric and has a DisplayFormat
+  if Column.Field.DataType in [ftFloat, ftCurrency, ftBCD, ftFMTBcd, ftInteger, ftSmallint, ftWord, ftLargeint] then
+  begin
+    // Calculate the width of the formatted text for right alignment
+    txtWidth := TDBGrid(Sender).Canvas.TextWidth(txt);
+
+    // Right-align the text by adjusting the Rect.Left position
+    TDBGrid(Sender).Canvas.TextRect(Rect, Rect.Right - txtWidth - 2, Rect.Top + 2, txt);
+  end
+  else
+  begin
+    // Left-align the text (default)
+    TDBGrid(Sender).Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, txt);
+  end;
+
+  // Reset font style after drawing
   TDBGrid(Sender).Canvas.Font.Style := [];
 end;
 

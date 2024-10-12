@@ -85,8 +85,6 @@ type
     procedure ShellChangeNotifierChange;
     procedure BtnFolderSelectClick(Sender: TObject);
     procedure BtnFolderOpenClick(Sender: TObject);
-    procedure ttQuotesAMOUNT_LOCALGetText(Sender: TField; var Text: string;
-      DisplayText: Boolean);
     procedure HelpBtnClick(Sender: TObject);
     procedure GoBackBtnClick(Sender: TObject);
     procedure dbgEventsKeyDown(Sender: TObject; var Key: Word;
@@ -176,17 +174,6 @@ end;
 procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
 begin
   RegnerateQuoteAnnotation;
-end;
-
-var
-  localCur: string;
-
-procedure TCommissionForm.ttQuotesAMOUNT_LOCALGetText(Sender: TField;
-  var Text: string; DisplayText: Boolean);
-begin
-  if localCur = '' then
-    localCur := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-  Text := FormatFloat('#,##0.00', Sender.AsFloat) + ' ' + localCur;
 end;
 
 procedure TCommissionForm.ttQuotesBeforeDelete(DataSet: TDataSet);
@@ -826,6 +813,7 @@ procedure TCommissionForm.Init;
 var
   i: integer;
   ttCommission: TAdoDataset;
+  LocalCurrency: string;
 resourcestring
   SCommissionSbyS = 'Commission %s by %s';
   SCommissionSforS = 'Commission %s for %s';
@@ -846,6 +834,8 @@ begin
   finally
     FreeAndNil(ttCommission);
   end;
+
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
@@ -872,6 +862,7 @@ begin
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgUploads, navUploads);
 
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuotes, navQuotes);
+    ttQuotesAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
 
     try
       SavedFolder := VariantToString(ADOConnection1.GetScalar('select FOLDER from COMMISSION where ID = ' + ADOConnection1.SQLStringEscape(CommissionId.ToString)));

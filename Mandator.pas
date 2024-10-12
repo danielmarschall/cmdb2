@@ -157,17 +157,11 @@ type
     procedure ttStatisticsBeforeInsert(DataSet: TDataSet);
     procedure ttStatisticsBeforeDelete(DataSet: TDataSet);
     procedure ttStatisticsBeforeEdit(DataSet: TDataSet);
-    procedure ttArtistsAMOUNT_TOTAL_LOCALGetText(Sender: TField;
-      var Text: string; DisplayText: Boolean);
-    procedure ttClientsAMOUNT_TOTAL_LOCALGetText(Sender: TField;
-      var Text: string; DisplayText: Boolean);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ttCommissionBeforeDelete(DataSet: TDataSet);
     procedure ttCommissionBeforeEdit(DataSet: TDataSet);
     procedure ttCommissionBeforeInsert(DataSet: TDataSet);
     procedure dbgCommissionsDblClick(Sender: TObject);
-    procedure ttCommissionAMOUNT_LOCALGetText(Sender: TField; var Text: string;
-      DisplayText: Boolean);
     procedure Timer1Timer(Sender: TObject);
     procedure ttArtistsBeforeDelete(DataSet: TDataSet);
     procedure ttClientsBeforeDelete(DataSet: TDataSet);
@@ -252,20 +246,9 @@ uses
   CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper,
   CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient, CmDbPluginShare;
 
-var
-  localCur: string;
-
 procedure TMandatorForm.ttArtistsAfterScroll(DataSet: TDataSet);
 begin
   sbArtists.Caption := CmDbShowRows(DataSet);
-end;
-
-procedure TMandatorForm.ttArtistsAMOUNT_TOTAL_LOCALGetText(Sender: TField;
-  var Text: string; DisplayText: Boolean);
-begin
-  if localCur = '' then
-    localCur := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-  Text := FormatFloat('#,##0.00', Sender.AsFloat) + ' ' + localCur;
 end;
 
 procedure TMandatorForm.ttArtistsBeforeDelete(DataSet: TDataSet);
@@ -288,14 +271,6 @@ end;
 procedure TMandatorForm.ttClientsAfterScroll(DataSet: TDataSet);
 begin
   sbClients.Caption := CmDbShowRows(DataSet);
-end;
-
-procedure TMandatorForm.ttClientsAMOUNT_TOTAL_LOCALGetText(Sender: TField;
-  var Text: string; DisplayText: Boolean);
-begin
-  if localCur = '' then
-    localCur := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-  Text := FormatFloat('#,##0.00', Sender.AsFloat) + ' ' + localCur;
 end;
 
 procedure TMandatorForm.ttClientsBeforeDelete(DataSet: TDataSet);
@@ -364,14 +339,6 @@ end;
 procedure TMandatorForm.ttCommissionAfterScroll(DataSet: TDataSet);
 begin
   sbCommissions.Caption := CmDbShowRows(DataSet);
-end;
-
-procedure TMandatorForm.ttCommissionAMOUNT_LOCALGetText(Sender: TField;
-  var Text: string; DisplayText: Boolean);
-begin
-  if localCur = '' then
-    localCur := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
-  Text := FormatFloat('#,##0.00', Sender.AsFloat) + ' ' + localCur;
 end;
 
 procedure TMandatorForm.ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -1080,6 +1047,7 @@ resourcestring
   SMandatorS = 'Mandator %s';
 var
   ttMandator: TAdoDataSet;
+  LocalCurrency: string;
 begin
   ttMandator := ADOConnection1.GetTable('select * from MANDATOR where ID = ''' + MandatorId.ToString + '''');
   try
@@ -1088,6 +1056,8 @@ begin
   finally
     FreeAndNil(ttMandator);
   end;
+
+  LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
@@ -1100,6 +1070,7 @@ begin
     ttArtists.Active := true;
     dbgArtists.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgArtists, navArtists);
+    ttArtistsAMOUNT_TOTAL_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
     {$ENDREGION}
     {$REGION 'ttClients / dbgClients'}
     ttClients.Active := false;
@@ -1107,6 +1078,7 @@ begin
     ttClients.Active := true;
     dbgClients.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgClients, navClients);
+    ttClientsAMOUNT_TOTAL_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
     {$ENDREGION}
     {$REGION 'ttCommission / dbgCommissions'}
     ttCommission.Active := false;
@@ -1115,6 +1087,7 @@ begin
     ttCommission.Last;
     dbgCommissions.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommissions, navCommissions);
+    ttCommissionAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
     {$ENDREGION}
     {$REGION 'ttPayment / dbgPayment'}
     ttPayment.Active := false;

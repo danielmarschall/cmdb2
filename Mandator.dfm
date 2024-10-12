@@ -661,7 +661,6 @@ object MandatorForm: TMandatorForm
     object ttArtistsAMOUNT_TOTAL_LOCAL: TBCDField
       FieldName = 'AMOUNT_TOTAL_LOCAL'
       ReadOnly = True
-      OnGetText = ttArtistsAMOUNT_TOTAL_LOCALGetText
       Precision = 19
     end
     object ttArtistsCOMMISSION_COUNT: TIntegerField
@@ -752,7 +751,6 @@ object MandatorForm: TMandatorForm
     object ttClientsAMOUNT_TOTAL_LOCAL: TBCDField
       FieldName = 'AMOUNT_TOTAL_LOCAL'
       ReadOnly = True
-      OnGetText = ttClientsAMOUNT_TOTAL_LOCALGetText
       Precision = 19
     end
     object ttClientsCOMMISSION_COUNT: TIntegerField
@@ -911,7 +909,6 @@ object MandatorForm: TMandatorForm
     object ttCommissionAMOUNT_LOCAL: TBCDField
       FieldName = 'AMOUNT_LOCAL'
       ReadOnly = True
-      OnGetText = ttCommissionAMOUNT_LOCALGetText
       Precision = 19
     end
     object ttCommissionUPLOAD_A: TWideStringField
