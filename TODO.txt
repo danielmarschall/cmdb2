@@ -1,14 +1,7 @@
 
 # TODO
 
-Plugin development:
-	upload check plugin:
-	- plugin to check uploads not in cmdb recorded
-	
-	folder check plugin:
-	- plugin to check if folders exist
-	- folder comparison : missing commissions (folder but no commission)
-	- folder comparison : missing folders (commission but no folder)
+upload check plugin: plugin to check uploads not in cmdb recorded
 
 General:
 - Try to copy as many things from the CMDB1 GUI as possible! Step by step until we have everything. (Tables are all checked and ok)

@@ -545,10 +545,11 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
     reg := TRegistry.Create;
     try
       reg.RootKey := HKEY_CLASSES_ROOT;
-      result := reg.KeyExists('CLSID\{EE5DE99A-4453-4C96-861C-F8832A7F59FE}') or  // Generation 3, Version 19+
-                reg.KeyExists('CLSID\{5A23DE84-1D7B-4A16-8DED-B29C09CB648D}') or  // Generation 3
-                reg.KeyExists('CLSID\{397C2819-8272-4532-AD3A-FB5E43BEAA39}') or  // Generation 2
-                reg.KeyExists('CLSID\{0C7FF16C-38E3-11d0-97AB-00C04FC2AD98}');    // Generation 1
+      result := reg.KeyExists('CLSID\{EE5DE99A-4453-4C96-861C-F8832A7F59FE}')  // Generation 3, Version 19+
+             or reg.KeyExists('CLSID\{5A23DE84-1D7B-4A16-8DED-B29C09CB648D}'); // Generation 3
+          // Generation 1 does not support LocalDB, and version 2 only supports LocalDB until SQL Server 2012.
+          // or reg.KeyExists('CLSID\{397C2819-8272-4532-AD3A-FB5E43BEAA39}')  // Generation 2
+          // or reg.KeyExists('CLSID\{0C7FF16C-38E3-11d0-97AB-00C04FC2AD98}'); // Generation 1
     finally
       FreeAndNil(reg);
     end;
@@ -596,7 +597,7 @@ begin
         DisableAllMenuItems(MainMenu1);
         Application.ProcessMessages;
 
-        // 1. VC++ Runtime (both 32bit and 64bit required according to Microsoft)
+        // 1. Visual C++ Runtime (both 32bit and 64bit required according to Microsoft)
         {$IFDEF Win64}
         WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
         Application.ProcessMessages;
