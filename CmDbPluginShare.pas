@@ -6,7 +6,7 @@ uses
   Windows, SysUtils;
 
 type
-  TCmDbPluginClickResponseAction = (craNone, craObject, craStatistics);
+  TCmDbPluginClickResponseAction = (craNone, craAbort, craObject, craStatistics);
 
   TCmDbPluginClickResponse = record
     Handled: Boolean;

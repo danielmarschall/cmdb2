@@ -66,6 +66,10 @@ begin
       StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
       StatisticsForm.Init;
     end;
+  end
+  else if resp.Action = craAbort then
+  begin
+    Abort;
   end;
 end;
 
