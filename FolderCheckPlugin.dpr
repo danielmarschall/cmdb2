@@ -101,135 +101,140 @@ begin
   end;
 end;
 
-function _ListContainsIgnoreCase(List: TStringList; const Value: string): Boolean;
-var
-  Item: string;
-begin
-  Result := False;
-  for Item in List do
-  begin
-    if SameText(Item, Value) then
-    begin
-      Result := True;
-      Exit;
-    end;
-  end;
-end;
-
-function _VariantToString(const Value: Variant): string;
-begin
-  if VarIsNull(Value) then
-    Result := ''
-  else
-    Result := VarToStr(Value);
-end;
-
-function _Stat3_CompareFolders(AdoConn: TAdoConnection): boolean;
-var
-  SQLQuery: TAdoDataset;
-  DBFolders: TStringList;
-  FSFolders: TStringList;
-  Folder: string;
-  Path: string;
-  DBFolderName: string;
-resourcestring
-  SEnterBasePath = 'Enter the commission base path which should be compared with the commission folders in the database';
-  SProblem1 = 'NotInDatabase / HasBaseCommissionFolder';
-  SProblem2 = 'InDatabase / NoBaseCommissionFolder';
-begin
-  // This query gives the most used parent folder for commissions in the database
-  Path := _VariantToString(AdoConn.GetScalar('WITH tmp_BASEFOLDER AS ( ' + #13#10 +
-                            '    SELECT ' + #13#10 +
-                            '        LEFT(FOLDER, LEN(FOLDER) - CHARINDEX(''\'', REVERSE(FOLDER))) AS BASEFOLDER ' + #13#10 +
-                            '    FROM ' + #13#10 +
-                            '        COMMISSION ' + #13#10 +
-                            ') ' + #13#10 +
-                            'SELECT top 1 ' + #13#10 +
-                            '    BASEFOLDER ' + #13#10 +
-                            'FROM ' + #13#10 +
-                            '    tmp_BASEFOLDER ' + #13#10 +
-                            'GROUP BY ' + #13#10 +
-                            '    BASEFOLDER ' + #13#10 +
-                            'ORDER BY ' + #13#10 +
-                            '    count(*) DESC;'));
-
-
-  if not InputQuery(DESC_3, SEnterBasePath, Path) then Exit(False);
-
-  AdoConn.ExecSQL('delete from '+TempTableName(GUID_3, 'FOLDER_COMPARE'));
-
-  // Liste der Verzeichnisse im Dateisystem
-  FSFolders := TStringList.Create;
-  FSFolders.Duplicates := dupIgnore;
-  FSFolders.Sorted := true;
-  try
-    // Rekursiv alle Ordner im Verzeichnis sammeln
-    for Folder in TDirectory.GetDirectories(Path, '*', TSearchOption.soTopDirectoryOnly) do
-    begin
-      FSFolders.Add(IncludeTrailingPathDelimiter(Path) + ExtractFileName(Folder));
-    end;
-
-    // SQL Abfrage, um die Verzeichnisnamen aus der Tabelle zu holen
-    SQLQuery := AdoConn.GetTable('select art.MANDATOR_ID, cm.FOLDER, cm.PROJECT_NAME, cm.ID as COMMISSION_ID ' +
-                                 'from vw_COMMISSION cm ' +
-                                 'left join ARTIST art on art.ID = cm.ARTIST_ID');
-    try
-      // Liste der Verzeichnisse aus der Datenbank erstellen
-      DBFolders := TStringList.Create;
-      DBFolders.Duplicates := dupIgnore;
-      DBFolders.Sorted := true;
-      try
-        while not SQLQuery.Eof do
-        begin
-          DBFolderName := SQLQuery.FieldByName('FOLDER').AsWideString;
-          DBFolders.Add(DBFolderName);
-
-          // 2. Ordner, die in der Datenbank, aber nicht im Dateisystem existieren
-          if not _ListContainsIgnoreCase(FSFolders, DBFolderName) then
-          begin
-            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' '+
-                            'select '''+SQLQuery.FieldByName('COMMISSION_ID').AsWideString+''', '+
-                            AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', '+
-                            '2, '+
-                            'N'''+SProblem2+''', '+
-                            AdoConn.SQLStringEscape(SQLQuery.FieldByName('PROJECT_NAME').AsWideString)+', '+
-                            AdoConn.SQLStringEscape(DBFolderName)+';');
-          end;
-
-          SQLQuery.Next;
-        end;
-
-        // 1. Ordner, die im Dateisystem, aber nicht in der Datenbank existieren
-        for Folder in FSFolders do
-        begin
-          if not _ListContainsIgnoreCase(DBFolders, Folder) then
-          begin
-            AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' '+
-                            'select newid(), '+
-                            AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', '+
-                            '1, '+
-                            'N'''+SProblem1+''', '+
-                            'null, '+
-                            AdoConn.SQLStringEscape(Folder)+';');
-          end;
-        end;
-
-      finally
-        FreeAndNil(DBFolders);
-      end;
-    finally
-      FreeAndNil(SQLQuery);
-    end;
-
-  finally
-    FreeAndNil(FSFolders);
-  end;
-
-  Exit(true);
-end;
-
 function ClickEventW(DBConnStr: PChar; MandatorGuid, StatGuid,
   ItemGuid: TGuid; ResponseData: Pointer): HRESULT; stdcall;
+
+  {$REGION 'Helper functions for Stat 3: Comparison File System folders / Database folders'}
+
+  function _ListContainsIgnoreCase(List: TStringList; const Value: string): Boolean;
+  var
+    Item: string;
+  begin
+    Result := False;
+    for Item in List do
+    begin
+      if SameText(Item, Value) then
+      begin
+        Result := True;
+        Exit;
+      end;
+    end;
+  end;
+
+  function _VariantToString(const Value: Variant): string;
+  begin
+    if VarIsNull(Value) then
+      Result := ''
+    else
+      Result := VarToStr(Value);
+  end;
+
+  function _Stat3_CompareFolders(AdoConn: TAdoConnection): boolean;
+  var
+    SQLQuery: TAdoDataset;
+    DBFolders: TStringList;
+    FSFolders: TStringList;
+    Folder: string;
+    Path: string;
+    DBFolderName: string;
+  resourcestring
+    SEnterBasePath = 'Enter the commission base path which should be compared with the commission folders in the database';
+    SProblem1 = 'NotInDatabase / HasBaseCommissionFolder';
+    SProblem2 = 'InDatabase / NoBaseCommissionFolder';
+  begin
+    // This query gives the most used parent folder for commissions in the database
+    Path := _VariantToString(AdoConn.GetScalar('WITH tmp_BASEFOLDER AS ( ' + #13#10 +
+                              '    SELECT ' + #13#10 +
+                              '        LEFT(FOLDER, LEN(FOLDER) - CHARINDEX(''\'', REVERSE(FOLDER))) AS BASEFOLDER ' + #13#10 +
+                              '    FROM ' + #13#10 +
+                              '        COMMISSION ' + #13#10 +
+                              ') ' + #13#10 +
+                              'SELECT top 1 ' + #13#10 +
+                              '    BASEFOLDER ' + #13#10 +
+                              'FROM ' + #13#10 +
+                              '    tmp_BASEFOLDER ' + #13#10 +
+                              'GROUP BY ' + #13#10 +
+                              '    BASEFOLDER ' + #13#10 +
+                              'ORDER BY ' + #13#10 +
+                              '    count(*) DESC;'));
+
+
+    if not InputQuery(DESC_3, SEnterBasePath, Path) then Exit(False);
+
+    AdoConn.ExecSQL('delete from '+TempTableName(GUID_3, 'FOLDER_COMPARE'));
+
+    // Liste der Verzeichnisse im Dateisystem
+    FSFolders := TStringList.Create;
+    FSFolders.Duplicates := dupIgnore;
+    FSFolders.Sorted := true;
+    try
+      // Rekursiv alle Ordner im Verzeichnis sammeln
+      for Folder in TDirectory.GetDirectories(Path, '*', TSearchOption.soTopDirectoryOnly) do
+      begin
+        FSFolders.Add(IncludeTrailingPathDelimiter(Path) + ExtractFileName(Folder));
+      end;
+
+      // SQL Abfrage, um die Verzeichnisnamen aus der Tabelle zu holen
+      SQLQuery := AdoConn.GetTable('select art.MANDATOR_ID, cm.FOLDER, cm.PROJECT_NAME, cm.ID as COMMISSION_ID ' +
+                                   'from vw_COMMISSION cm ' +
+                                   'left join ARTIST art on art.ID = cm.ARTIST_ID');
+      try
+        // Liste der Verzeichnisse aus der Datenbank erstellen
+        DBFolders := TStringList.Create;
+        DBFolders.Duplicates := dupIgnore;
+        DBFolders.Sorted := true;
+        try
+          while not SQLQuery.Eof do
+          begin
+            DBFolderName := SQLQuery.FieldByName('FOLDER').AsWideString;
+            DBFolders.Add(DBFolderName);
+
+            // 2. Ordner, die in der Datenbank, aber nicht im Dateisystem existieren
+            if not _ListContainsIgnoreCase(FSFolders, DBFolderName) then
+            begin
+              AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' '+
+                              'select '''+SQLQuery.FieldByName('COMMISSION_ID').AsWideString+''', '+
+                              AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', '+
+                              '2, '+
+                              'N'''+SProblem2+''', '+
+                              AdoConn.SQLStringEscape(SQLQuery.FieldByName('PROJECT_NAME').AsWideString)+', '+
+                              AdoConn.SQLStringEscape(DBFolderName)+';');
+            end;
+
+            SQLQuery.Next;
+          end;
+
+          // 1. Ordner, die im Dateisystem, aber nicht in der Datenbank existieren
+          for Folder in FSFolders do
+          begin
+            if not _ListContainsIgnoreCase(DBFolders, Folder) then
+            begin
+              AdoConn.ExecSQL('insert into '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' '+
+                              'select newid(), '+
+                              AdoConn.SQLStringEscape(SQLQuery.FieldByName('MANDATOR_ID').AsWideString)+', '+
+                              '1, '+
+                              'N'''+SProblem1+''', '+
+                              'null, '+
+                              AdoConn.SQLStringEscape(Folder)+';');
+            end;
+          end;
+
+        finally
+          FreeAndNil(DBFolders);
+        end;
+      finally
+        FreeAndNil(SQLQuery);
+      end;
+
+    finally
+      FreeAndNil(FSFolders);
+    end;
+
+    Exit(true);
+  end;
+
+  {$ENDREGION}
+
 var
   AdoConn: TADOConnection;
   Response: TCmDbPluginClickResponse;
@@ -360,7 +365,7 @@ begin
       end;
     end
     {$ENDREGION}
-    {$REGION 'Stat 3: Comparison Drive / Database folders'}
+    {$REGION 'Stat 3: Comparison File System folders / Database folders'}
     else if IsEqualGuid(StatGuid, GUID_3) then
     begin
       if IsEqualGuid(ItemGuid, GUID_NIL) then
