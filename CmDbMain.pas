@@ -39,6 +39,7 @@ type
     procedure TileHorizontally1Click(Sender: TObject);
     procedure TileVertically1Click(Sender: TObject);
   private
+    FCloseStarted: boolean;
     function BackupPath: string;
     procedure PerformBackupAndDefrag;
   public
@@ -325,6 +326,8 @@ end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  if FCloseStarted then Exit;
+  FCloseStarted := true;
   PerformBackupAndDefrag;
   try
     AdoConnection1.Disconnect;

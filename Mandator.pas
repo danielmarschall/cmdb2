@@ -980,6 +980,12 @@ end;
 procedure TMandatorForm.Edit1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  if Key = VK_RETURN then
+  begin
+    Timer1.Enabled := false;
+    Timer1Timer(Timer1);
+  end;
+
   if Key = VK_LEFT then
   begin
     Key := 0;
