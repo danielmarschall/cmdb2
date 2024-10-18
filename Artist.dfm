@@ -558,6 +558,7 @@ object ArtistForm: TArtistForm
     end
     object ttCommissionAMOUNT_LOCAL: TFloatField
       FieldName = 'AMOUNT_LOCAL'
+      ReadOnly = True
     end
     object ttCommissionMANDATOR_ID: TGuidField
       FieldName = 'MANDATOR_ID'
