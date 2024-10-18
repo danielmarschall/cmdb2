@@ -641,11 +641,16 @@ begin
   end;
 end;
 
-function TitleButtonHelper(Column: TColumn): boolean; // true=asc
+function TitleButtonHelper(Column: TColumn): boolean; // return true=asc
 var
   i: integer;
 begin
   assert(Column.Field.DataSet.Active); // if dataset is not active, then Field.FieldNo is 0, which is bad.
+
+  if Column.Grid.DataSource.DataSet.State in [dsEdit,dsInsert] then
+  begin
+    Column.Grid.DataSource.DataSet.Post;
+  end;
 
   for i := 0 to TDbGrid(Column.Grid).Columns.Count-1 do
   begin
