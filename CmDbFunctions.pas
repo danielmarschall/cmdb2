@@ -509,17 +509,24 @@ begin
 
       AdoConnection1.ExecSQL('update COMMISSION_EVENT set STATE = ''c aw sk'' where STATE = ''ack''');
 
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
-
       AdoConnection1.ExecSQL('delete from CONFIG where NAME = ''CUSTOMIZATION_ID'''); // use INSTALL_ID instead
+
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
 
       {$ENDREGION}
     end
     else if schemaVer = 2 then
     begin
+      {$REGION 'Update schema 2 => 3'}
+      InstallSql(2, 'vw_COMMISSION');
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
+      {$ENDREGION}
+    end
+    else if schemaVer = 3 then
+    begin
       // <<< Future update code goes here! >>>
 
-      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
+      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''4'' where NAME = ''DB_VERSION''');
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;
