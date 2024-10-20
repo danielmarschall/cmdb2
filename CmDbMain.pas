@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.Menus, Data.DB,
-  Data.Win.ADODB, Vcl.StdCtrls;
+  Data.Win.ADODB, Vcl.StdCtrls, Vcl.ComCtrls;
 
 type
   TMainForm = class(TForm)
@@ -27,6 +27,7 @@ type
     Cascade1: TMenuItem;
     TileHorizontally1: TMenuItem;
     TileVertically1: TMenuItem;
+    ProgressBar1: TProgressBar;
     procedure Timer1Timer(Sender: TObject);
     procedure BackupandExit1Click(Sender: TObject);
     procedure OpenDatabase1Click(Sender: TObject);
@@ -222,7 +223,7 @@ begin
         if DatabaseOpenedOnce then
         begin
           {$REGION 'Check if something has changed'}
-          CmDb_GetFullTextDump(AdoConnection1, sl);
+          CmDb_GetFullTextDump(AdoConnection1, sl, ProgressBar1);
           CheckSumNow := THashSHA2.GetHashString(sl.Text); // SHA256
           ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
           if not SameText(ChecksumThen, ChecksumNow) then

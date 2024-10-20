@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
-  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls;
+  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.ComCtrls;
 
 procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
 function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
@@ -14,7 +14,7 @@ function CmDbGetDefaultDataPath: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
-procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList);
+procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; ProgressBar1: TProgressBar);
 function VariantToInteger(Value: Variant): Integer;
 function VariantToString(const Value: Variant): string;
 function CmDbShowRows(ttQuery: TDataSet): string;
@@ -360,7 +360,7 @@ begin
   ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);
 end;
 
-procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList);
+procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; ProgressBar1: TProgressBar);
 
   function MakeLine(q: TAdoDataSet): string;
   var
@@ -385,6 +385,24 @@ procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList);
 var
   q1, q2, q3, q4, q5: TADODataSet;
 begin
+  if Assigned(ProgressBar1) then
+  begin
+    ProgressBar1.Visible := false;
+    ProgressBar1.Max :=
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from ARTIST')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from ARTIST_EVENT')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from COMMISSION')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from COMMISSION_EVENT')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from COMMUNICATION')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from CONFIG')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from MANDATOR')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from PAYMENT')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from QUOTE')) +
+      VariantToInteger(AdoConnection1.GetScalar('select count(*) from UPLOAD'));
+    ProgressBar1.Position := 0;
+    ProgressBar1.Min := 0;
+    ProgressBar1.Visible := true;
+  end;
   sl.BeginUpdate;
   try
     {$REGION 'q1: Config'}
@@ -393,6 +411,7 @@ begin
       while not q1.EOF do
       begin
         sl.Add('Config: ' + MakeLine(q1));
+        if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
         q1.Next;
       end;
     finally
@@ -405,6 +424,7 @@ begin
       while not q1.EOF do
       begin
         sl.Add('Mandator: ' + MakeLine(q1));
+        if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
         {$REGION 'q2: Artists/Clients'}
         q2 := ADOConnection1.GetTable('select * from ARTIST where MANDATOR_ID = ''' + q1.FieldByName('ID').AsWideString + ''' order by IS_ARTIST, NAME');
         try
@@ -414,6 +434,7 @@ begin
               sl.Add(#9 + 'Artist: ' + MakeLine(q2))
             else
               sl.Add(#9 + 'Client: ' + MakeLine(q2));
+            if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
             {$REGION 'q3: Artist/Client Events'}
             q3 := ADOConnection1.GetTable('select * from ARTIST_EVENT where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
             try
@@ -423,6 +444,7 @@ begin
                   sl.Add(#9#9 + 'Artist Event: ' + MakeLine(q3))
                 else
                   sl.Add(#9#9 + 'Client Event: ' + MakeLine(q3));
+                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                 q3.Next;
               end;
             finally
@@ -435,6 +457,7 @@ begin
               while not q3.EOF do
               begin
                 sl.Add(#9#9 + 'Communication: ' + MakeLine(q3));
+                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                 q3.Next;
               end;
             finally
@@ -447,6 +470,7 @@ begin
               while not q3.EOF do
               begin
                 sl.Add(#9#9 + 'Payment: ' + MakeLine(q3));
+                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                 q3.Next;
               end;
             finally
@@ -459,12 +483,14 @@ begin
               while not q3.EOF do
               begin
                 sl.Add(#9#9 + 'Commission: ' + MakeLine(q3));
+                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                 {$REGION 'q4: Commission Events'}
                 q4 := ADOConnection1.GetTable('select * from COMMISSION_EVENT where COMMISSION_ID = ''' + q3.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
                 try
                   while not q4.EOF do
                   begin
                     sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(q4));
+                    if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                     if q4.FieldByName('STATE').AsWideString = 'quote' then
                     begin
                       {$REGION 'q5: Quote'}
@@ -473,6 +499,7 @@ begin
                         while not q5.EOF do
                         begin
                           sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(q5));
+                          if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                           q5.Next;
                         end;
                       finally
@@ -488,6 +515,7 @@ begin
                         while not q5.EOF do
                         begin
                           sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(q5));
+                          if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
                           q5.Next;
                         end;
                       finally
@@ -521,6 +549,10 @@ begin
     {$ENDREGION}
   finally
     sl.EndUpdate;
+  end;
+  if Assigned(ProgressBar1) then
+  begin
+    ProgressBar1.Visible := false;
   end;
 end;
 
