@@ -105,6 +105,7 @@ begin
     begin
       Key := 0;
       Self.DataSource.DataSet.Insert;
+      if Self.CanFocus then Self.SetFocus; // so that the user can start entering stuff!
     end
     else if Key = VK_HOME then
     begin
