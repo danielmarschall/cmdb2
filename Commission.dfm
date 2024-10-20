@@ -23,7 +23,7 @@ object CommissionForm: TCommissionForm
     Top = 41
     Width = 758
     Height = 542
-    ActivePage = tsEvents
+    ActivePage = tsFiles
     Align = alClient
     TabOrder = 0
     object tsEvents: TTabSheet
@@ -256,6 +256,7 @@ object CommissionForm: TCommissionForm
         Top = 44
         Width = 744
         Height = 465
+        AutoRefresh = True
         AutoNavigate = False
         ObjectTypes = [otFolders, otNonFolders]
         Root = 'c:\'
@@ -520,14 +521,6 @@ object CommissionForm: TCommissionForm
     DataSet = ttUploads
     Left = 120
     Top = 424
-  end
-  object ShellChangeNotifier: TShellChangeNotifier
-    NotifyFilters = [nfFileNameChange, nfDirNameChange, nfSizeChange, nfWriteChange]
-    Root = 'C:\'
-    WatchSubTree = True
-    OnChange = ShellChangeNotifierChange
-    Left = 264
-    Top = 96
   end
   object Timer2: TTimer
     Enabled = False

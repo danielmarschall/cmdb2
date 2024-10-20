@@ -59,7 +59,6 @@ type
     BtnFolderSelect: TButton;
     BtnFolderOpen: TButton;
     BtnFolderSave: TButton;
-    ShellChangeNotifier: TShellChangeNotifier;
     HelpBtn: TButton;
     GoBackBtn: TButton;
     Timer2: TTimer;
@@ -83,7 +82,6 @@ type
     procedure dbgUploadsTitleClick(Column: TColumn);
     procedure ShellListViewDblClick(Sender: TObject);
     procedure BtnFolderSaveClick(Sender: TObject);
-    procedure ShellChangeNotifierChange;
     procedure BtnFolderSelectClick(Sender: TObject);
     procedure BtnFolderOpenClick(Sender: TObject);
     procedure HelpBtnClick(Sender: TObject);
@@ -490,7 +488,7 @@ end;
 
 procedure TCommissionForm.TryShowFileList(const AFolder: string='');
 begin
-  if not Assigned(ShellListView) or not Assigned(ShellChangeNotifier) then exit;
+  if not Assigned(ShellListView) then exit;
 
   if (AFolder<>'') and DirectoryExists(AFolder) then
   begin
@@ -501,7 +499,6 @@ begin
         begin
           ShellListView.Root := 'C:\'; // hack to allow that the next line works a second time
           ShellListView.Root := AFolder;
-          ShellChangeNotifier.Root := ShellListView.Root;
         end
         else
         begin
@@ -560,11 +557,6 @@ begin
   TryShowFileList(Trim(FolderEdit.Text));
   ADOConnection1.ExecSQL('update COMMISSION set FOLDER = '+ADOConnection1.SQLStringEscape(Trim(FolderEdit.Text))+' where ID = '+ADOConnection1.SQLStringEscape(CommissionId.ToString));
   SavedFolder := Trim(FolderEdit.Text);
-end;
-
-procedure TCommissionForm.ShellChangeNotifierChange;
-begin
-  TryShowFileList(SavedFolder);
 end;
 
 procedure TCommissionForm.ShellListViewDblClick(Sender: TObject);
@@ -776,35 +768,6 @@ end;
 procedure TCommissionForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
-
-
-  // TODO: There is some weird bug: After the form is freed,
-  // this event is still called. Something remains in memory!
-  // Then, you get AccessViolations in threads because the form is
-  // not in memory anymore?!
-  // Maybe this is a bug in the VCL, because the TShellChangeThread is terminated,
-  // but the destructor of TShellChangeNotifier does not wait for TShellChangeThread
-  // to have finished terminating (because the thread can wait on kernel objects!)
-  // This does not seem to help?!
-  ShellChangeNotifier.NotifyFilters := [];
-  ShellChangeNotifier.OnChange := nil; // NullChangeEvent; // not nil, because TShellChangeThread.Execute calls Synchronize without checking for nil
-  // That being said, ShellChangeNotifier is very buggy and halts the compiler often!
-  // - FindNextChangeNotification(FWaitHandle) does not check if the handle is valid
-  //   => After the close event, you can get a 0xc0000008 Exception here (invalid handle)
-  // - WaitForMultipleObjects(2, @Handles, False, INFINITE) does not check if the handles are valid
-  //   => If the root dir does not exist, you can get a 0xc0000008 Exception here (invalid handle)
-
-
-  // DOES NOT HELP! ShellChangeNotifier is TOTAL CRAP
-  // Sometimes you get a NullPointer AV as visible dialog at
-  // System.Classes "Filer.DefineProperty('Strings', ReadData, WriteData, DoWrite);"
-  // called at "DestroyComponents"...
-  // After that you cannot open a commission form again
-  // EComponentError mit Meldung 'Komponente mit der Bezeichnung CommissionForm existiert bereits'.
-  // Then, you get several Illegal Pointer Operations messages at process exit,
-  // and the EXE stays opened in the background.
-  // ShellChangeNotifier DAMAGES OUR MEMORY. SUCH A SHIT FROM EMBARCADERO!!!
-
 end;
 
 procedure TCommissionForm.FormCloseQuery(Sender: TObject;
