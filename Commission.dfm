@@ -529,4 +529,11 @@ object CommissionForm: TCommissionForm
     Left = 264
     Top = 96
   end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = Timer2Timer
+    Left = 698
+    Top = 8
+  end
 end

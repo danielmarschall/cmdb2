@@ -56,6 +56,7 @@ type
     ttConfigHIDDEN: TBooleanField;
     ttConfigREAD_ONLY: TBooleanField;
     ttTextBackupCHECKSUM: TStringField;
+    Timer2: TTimer;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -99,6 +100,11 @@ type
     procedure dbgMandatorDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure ttMandatorBeforeEdit(DataSet: TDataSet);
+    procedure dbgTextBackupDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure dbgConfigDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure Timer2Timer(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -261,6 +267,12 @@ begin
   // Nothing here
 end;
 
+procedure TMandatorsForm.dbgConfigDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'NAME');
+end;
+
 procedure TMandatorsForm.dbgConfigKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -336,6 +348,12 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TMandatorsForm.dbgTextBackupDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'BAK_ID');
 end;
 
 procedure TMandatorsForm.dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
@@ -477,6 +495,14 @@ begin
       Screen.Cursor := crDefault;
     end;
   end;
+end;
+
+procedure TMandatorsForm.Timer2Timer(Sender: TObject);
+begin
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  Timer2.Enabled := false;
+  dbgMandator.Enabled := true;
+  dbgMandator.Invalidate;
 end;
 
 function TMandatorsForm.SqlQueryConfig(const search: string): string;
@@ -645,6 +671,10 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  dbgMandator.Enabled := false;
+  Timer2.Enabled := true;
 end;
 
 procedure TMandatorsForm.ttConfigBeforeEdit(DataSet: TDataSet);

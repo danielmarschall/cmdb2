@@ -664,7 +664,7 @@ begin
     if i = Column.Index then
       TDbGrid(Column.Grid).Columns.Items[i].Color := clAqua
     else
-      TDbGrid(Column.Grid).Columns.Items[i].Color := clWhite;
+      TDbGrid(Column.Grid).Columns.Items[i].Color := clWhite; // MUST be clWhite, see comparison at InsteadOfDeleteWorkaround_DrawColumnCell
   end;
 
   // Tag =  0 means yet sorted by the OnTitleClick event.
@@ -758,8 +758,17 @@ begin
   end
   else
   begin
-    TDBGrid(Sender).Canvas.Brush.Color := clWhite;
-    TDBGrid(Sender).Canvas.Font.Color := clBlack;
+    if Column.Color = clWhite then
+    begin
+      if Column.ReadOnly or Column.Field.ReadOnly then
+        TDBGrid(Sender).Canvas.Brush.Color := clCream
+      else
+        TDBGrid(Sender).Canvas.Brush.Color := clWindow;
+    end
+    else
+    begin
+      TDBGrid(Sender).Canvas.Brush.Color := Column.Color;
+    end;
   end;
 
   // Check if the record should be struck through

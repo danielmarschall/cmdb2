@@ -93,6 +93,7 @@ type
     ttPaymentARTIST_NAME: TWideStringField;
     HelpBtn: TButton;
     GoBackBtn: TButton;
+    Timer2: TTimer;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgCommissionDblClick(Sender: TObject);
     procedure ttCommissionNewRecord(DataSet: TDataSet);
@@ -153,6 +154,7 @@ type
     procedure ttPaymentBeforeEdit(DataSet: TDataSet);
     procedure dbgPaymentDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure Timer2Timer(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -733,6 +735,14 @@ begin
   end;
 end;
 
+procedure TArtistForm.Timer2Timer(Sender: TObject);
+begin
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  Timer2.Enabled := false;
+  dbgCommission.Enabled := true;
+  dbgCommission.Invalidate;
+end;
+
 procedure TArtistForm.Edit1Change(Sender: TObject);
 begin
   Timer1.Enabled := false;
@@ -871,6 +881,7 @@ begin
     dbgCommission.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommission, navCommission);
     ttCommissionAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttCommissionAMOUNT_LOCAL.EditFormat := Trim('#,##0.00');
     {$ENDREGION}
     {$REGION 'ttPayment / dbgPayment'}
     ttPayment.Active := false;
@@ -907,6 +918,10 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  dbgCommission.Enabled := false;
+  Timer2.Enabled := true;
 end;
 
 end.

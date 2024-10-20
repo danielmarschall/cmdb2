@@ -475,6 +475,7 @@ object MandatorForm: TMandatorForm
         TitleFont.Height = -12
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
+        OnDrawColumnCell = dbgStatisticsDrawColumnCell
         OnDblClick = dbgStatisticsDblClick
         OnKeyDown = dbgStatisticsKeyDown
         OnTitleClick = dbgStatisticsTitleClick
@@ -695,6 +696,7 @@ object MandatorForm: TMandatorForm
     object ttArtistsUPLOAD_A: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'UPLOAD_A'
+      ReadOnly = True
       OnGetText = ttArtistsUPLOAD_AGetText
       Size = 8
       Calculated = True
@@ -702,6 +704,7 @@ object MandatorForm: TMandatorForm
     object ttArtistsUPLOAD_C: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'UPLOAD_C'
+      ReadOnly = True
       OnGetText = ttArtistsUPLOAD_CGetText
       Size = 8
       Calculated = True
@@ -709,6 +712,7 @@ object MandatorForm: TMandatorForm
     object ttArtistsRUN: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'RUNNING'
+      ReadOnly = True
       OnGetText = ttArtistsRUNGetText
       Size = 8
       Calculated = True
@@ -785,6 +789,7 @@ object MandatorForm: TMandatorForm
     object ttClientsUPLOAD_A: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'UPLOAD_A'
+      ReadOnly = True
       OnGetText = ttClientsUPLOAD_AGetText
       Size = 8
       Calculated = True
@@ -792,6 +797,7 @@ object MandatorForm: TMandatorForm
     object ttClientsUPLOAD_C: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'UPLOAD_C'
+      ReadOnly = True
       OnGetText = ttClientsUPLOAD_CGetText
       Size = 8
       Calculated = True
@@ -799,6 +805,7 @@ object MandatorForm: TMandatorForm
     object ttClientsRUN: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'RUNNING'
+      ReadOnly = True
       OnGetText = ttClientsRUNGetText
       Size = 8
       Calculated = True
@@ -831,13 +838,16 @@ object MandatorForm: TMandatorForm
     end
     object ttStatisticsPLUGIN: TWideStringField
       FieldName = 'PLUGIN'
+      ReadOnly = True
       Size = 50
     end
     object ttStatisticsNO: TIntegerField
       FieldName = 'NO'
+      ReadOnly = True
     end
     object ttStatisticsNAME: TWideStringField
       FieldName = 'NAME'
+      ReadOnly = True
       Size = 100
     end
   end
@@ -1047,5 +1057,12 @@ object MandatorForm: TMandatorForm
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 452
     Top = 235
+  end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = Timer2Timer
+    Left = 744
+    Top = 16
   end
 end

@@ -217,4 +217,11 @@ object StatisticsForm: TStatisticsForm
     Left = 204
     Top = 219
   end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = Timer2Timer
+    Left = 800
+    Top = 8
+  end
 end

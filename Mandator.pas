@@ -130,6 +130,7 @@ type
     HelpBtn: TButton;
     GoBackBtn: TButton;
     ttStatisticsPLUGIN: TWideStringField;
+    Timer2: TTimer;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -212,6 +213,9 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure ttArtistsBeforeEdit(DataSet: TDataSet);
     procedure dbgArtistsDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure Timer2Timer(Sender: TObject);
+    procedure dbgStatisticsDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     Edit1Sav: TStringList;
@@ -697,6 +701,12 @@ begin
   end;
 end;
 
+procedure TMandatorForm.dbgStatisticsDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
+end;
+
 procedure TMandatorForm.dbgStatisticsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -938,6 +948,14 @@ begin
   end;
 end;
 
+procedure TMandatorForm.Timer2Timer(Sender: TObject);
+begin
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  Timer2.Enabled := false;
+  dbgArtists.Enabled := true;
+  dbgartists.Invalidate;
+end;
+
 procedure TMandatorForm.Edit1Change(Sender: TObject);
 begin
   Timer1.Enabled := false;
@@ -1071,6 +1089,7 @@ begin
     dbgArtists.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgArtists, navArtists);
     ttArtistsAMOUNT_TOTAL_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttArtistsAMOUNT_TOTAL_LOCAL.EditFormat := Trim('#,##0.00');
     {$ENDREGION}
     {$REGION 'ttClients / dbgClients'}
     ttClients.Active := false;
@@ -1079,6 +1098,7 @@ begin
     dbgClients.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgClients, navClients);
     ttClientsAMOUNT_TOTAL_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttClientsAMOUNT_TOTAL_LOCAL.EditFormat := Trim('#,##0.00');
     {$ENDREGION}
     {$REGION 'ttCommission / dbgCommissions'}
     ttCommission.Active := false;
@@ -1088,6 +1108,7 @@ begin
     dbgCommissions.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgCommissions, navCommissions);
     ttCommissionAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttCommissionAMOUNT_LOCAL.EditFormat := Trim('#,##0.00');
     {$ENDREGION}
     {$REGION 'ttPayment / dbgPayment'}
     ttPayment.Active := false;
@@ -1111,6 +1132,10 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  dbgArtists.Enabled := false;
+  Timer2.Enabled := true;
 end;
 
 end.

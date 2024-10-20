@@ -62,6 +62,7 @@ type
     ShellChangeNotifier: TShellChangeNotifier;
     HelpBtn: TButton;
     GoBackBtn: TButton;
+    Timer2: TTimer;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ttQuotesNewRecord(DataSet: TDataSet);
@@ -105,6 +106,7 @@ type
     procedure ttEventsBeforeEdit(DataSet: TDataSet);
     procedure dbgEventsDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure Timer2Timer(Sender: TObject);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -473,6 +475,17 @@ begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
   DataSet.FieldByName('COMMISSION_ID').AsGuid := CommissionId;
   DataSet.FieldByName('DATE').AsDateTime := Date;
+end;
+
+procedure TCommissionForm.Timer2Timer(Sender: TObject);
+begin
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  Timer2.Enabled := false;
+  dbgEvents.Enabled := true;
+  dbgEvents.Invalidate;
+
+  // Because TabOrder does only select the tab, not the page contents
+  dbgEvents.SetFocus;
 end;
 
 procedure TCommissionForm.TryShowFileList(const AFolder: string='');
@@ -863,6 +876,7 @@ begin
 
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuotes, navQuotes);
     ttQuotesAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttQuotesAMOUNT_LOCAL.EditFormat := Trim('#,##0.00');
 
     try
       SavedFolder := VariantToString(ADOConnection1.GetScalar('select FOLDER from COMMISSION where ID = ' + ADOConnection1.SQLStringEscape(CommissionId.ToString)));
@@ -873,7 +887,10 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
-  dbgEvents.SetFocus; // Because TabOrder does only select the tab, not the page contents
+
+  // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
+  dbgEvents.Enabled := false;
+  Timer2.Enabled := true;
 end;
 
 end.

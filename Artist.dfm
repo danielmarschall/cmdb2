@@ -25,7 +25,7 @@ object ArtistForm: TArtistForm
     Top = 41
     Width = 1100
     Height = 400
-    ActivePage = tsPayment
+    ActivePage = tsCommissions
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -773,5 +773,12 @@ object ArtistForm: TArtistForm
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 476
     Top = 227
+  end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = Timer2Timer
+    Left = 776
+    Top = 16
   end
 end
