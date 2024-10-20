@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
-  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.ComCtrls;
+  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.ComCtrls, Vcl.Menus;
 
 procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
 function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
@@ -23,6 +23,7 @@ procedure SaveGridToCsv(grid: TDbGrid; const filename: string);
 function TitleButtonHelper(Column: TColumn): boolean;
 function AscDesc(asc: boolean): string;
 procedure AdoQueryRefresh(ADataset: TAdoQuery; const ALocateField: string);
+procedure DisableAllMenuItems(MainMenu: TMainMenu);
 
 procedure InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbg: TDBGrid; nav: TDBNavigator);
 procedure InsteadOfDeleteWorkaround_BeforeEdit(DataSet: TCustomADODataSet; const localField: string);
@@ -384,7 +385,9 @@ procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; 
 
 var
   q1, q2, q3, q4, q5: TADODataSet;
+  progr: integer;
 begin
+  progr := 0;
   if Assigned(ProgressBar1) then
   begin
     ProgressBar1.Visible := false;
@@ -399,8 +402,8 @@ begin
       VariantToInteger(AdoConnection1.GetScalar('select count(*) from PAYMENT')) +
       VariantToInteger(AdoConnection1.GetScalar('select count(*) from QUOTE')) +
       VariantToInteger(AdoConnection1.GetScalar('select count(*) from UPLOAD'));
-    ProgressBar1.Position := 0;
     ProgressBar1.Min := 0;
+    ProgressBar1.Position := progr;
     ProgressBar1.Visible := true;
   end;
   sl.BeginUpdate;
@@ -411,7 +414,8 @@ begin
       while not q1.EOF do
       begin
         sl.Add('Config: ' + MakeLine(q1));
-        if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+        Inc(progr);
+        if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
         q1.Next;
       end;
     finally
@@ -424,7 +428,8 @@ begin
       while not q1.EOF do
       begin
         sl.Add('Mandator: ' + MakeLine(q1));
-        if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+        Inc(progr);
+        if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
         {$REGION 'q2: Artists/Clients'}
         q2 := ADOConnection1.GetTable('select * from ARTIST where MANDATOR_ID = ''' + q1.FieldByName('ID').AsWideString + ''' order by IS_ARTIST, NAME');
         try
@@ -434,7 +439,8 @@ begin
               sl.Add(#9 + 'Artist: ' + MakeLine(q2))
             else
               sl.Add(#9 + 'Client: ' + MakeLine(q2));
-            if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+            Inc(progr);
+            if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
             {$REGION 'q3: Artist/Client Events'}
             q3 := ADOConnection1.GetTable('select * from ARTIST_EVENT where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
             try
@@ -444,7 +450,8 @@ begin
                   sl.Add(#9#9 + 'Artist Event: ' + MakeLine(q3))
                 else
                   sl.Add(#9#9 + 'Client Event: ' + MakeLine(q3));
-                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                Inc(progr);
+                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                 q3.Next;
               end;
             finally
@@ -457,7 +464,8 @@ begin
               while not q3.EOF do
               begin
                 sl.Add(#9#9 + 'Communication: ' + MakeLine(q3));
-                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                Inc(progr);
+                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                 q3.Next;
               end;
             finally
@@ -470,7 +478,8 @@ begin
               while not q3.EOF do
               begin
                 sl.Add(#9#9 + 'Payment: ' + MakeLine(q3));
-                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                Inc(progr);
+                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                 q3.Next;
               end;
             finally
@@ -483,14 +492,16 @@ begin
               while not q3.EOF do
               begin
                 sl.Add(#9#9 + 'Commission: ' + MakeLine(q3));
-                if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                Inc(progr);
+                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                 {$REGION 'q4: Commission Events'}
                 q4 := ADOConnection1.GetTable('select * from COMMISSION_EVENT where COMMISSION_ID = ''' + q3.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
                 try
                   while not q4.EOF do
                   begin
                     sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(q4));
-                    if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                    Inc(progr);
+                    if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                     if q4.FieldByName('STATE').AsWideString = 'quote' then
                     begin
                       {$REGION 'q5: Quote'}
@@ -499,7 +510,8 @@ begin
                         while not q5.EOF do
                         begin
                           sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(q5));
-                          if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                          Inc(progr);
+                          if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                           q5.Next;
                         end;
                       finally
@@ -515,7 +527,8 @@ begin
                         while not q5.EOF do
                         begin
                           sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(q5));
-                          if Assigned(ProgressBar1) then ProgressBar1.Position := ProgressBar1.Position + 1;
+                          Inc(progr);
+                          if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
                           q5.Next;
                         end;
                       finally
@@ -552,6 +565,8 @@ begin
   end;
   if Assigned(ProgressBar1) then
   begin
+    // TODO: For some reason, Pos=Max will not show a fully filled progress bar?!
+    // Even Invalidate, Refresh, PostMessages does not help
     ProgressBar1.Visible := false;
   end;
 end;
@@ -897,6 +912,24 @@ begin
     ADataset.Requery;
   finally
     if id <> '' then ADataset.Locate(ALocateField, id, []);
+  end;
+end;
+
+procedure DisableAllMenuItems(MainMenu: TMainMenu);
+var
+  i, j: Integer;
+begin
+  // Loop through all top-level menu items
+  for i := 0 to MainMenu.Items.Count - 1 do
+  begin
+    // Disable the top-level menu item
+    MainMenu.Items[i].Enabled := False;
+
+    // Loop through all submenu items and disable them as well
+    for j := 0 to MainMenu.Items[i].Count - 1 do
+    begin
+      MainMenu.Items[i].Items[j].Enabled := False;
+    end;
   end;
 end;
 

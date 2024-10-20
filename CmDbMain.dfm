@@ -36,7 +36,8 @@ object MainForm: TMainForm
     Top = 80
     Width = 393
     Height = 41
-    Position = 20
+    Smooth = True
+    Step = 1
     TabOrder = 0
     Visible = False
   end

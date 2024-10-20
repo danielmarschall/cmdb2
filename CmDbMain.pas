@@ -214,6 +214,10 @@ begin
     try
       NextBackupID := -1;
 
+      // Avoid that the user clicks something!
+      DisableAllMenuItems(MainMenu1);
+      Application.ProcessMessages;
+
       // Make some optimizations for performance
       CmDbDropTempTables(AdoConnection1);
       DefragIndexes(AdoConnection1);
@@ -619,24 +623,6 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
           // or reg.KeyExists('CLSID\{0C7FF16C-38E3-11d0-97AB-00C04FC2AD98}'); // Generation 1
     finally
       FreeAndNil(reg);
-    end;
-  end;
-
-  procedure DisableAllMenuItems(MainMenu: TMainMenu);
-  var
-    i, j: Integer;
-  begin
-    // Loop through all top-level menu items
-    for i := 0 to MainMenu.Items.Count - 1 do
-    begin
-      // Disable the top-level menu item
-      MainMenu.Items[i].Enabled := False;
-
-      // Loop through all submenu items and disable them as well
-      for j := 0 to MainMenu.Items[i].Count - 1 do
-      begin
-        MainMenu.Items[i].Items[j].Enabled := False;
-      end;
     end;
   end;
 
