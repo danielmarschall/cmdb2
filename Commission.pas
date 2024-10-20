@@ -793,6 +793,18 @@ begin
   //   => After the close event, you can get a 0xc0000008 Exception here (invalid handle)
   // - WaitForMultipleObjects(2, @Handles, False, INFINITE) does not check if the handles are valid
   //   => If the root dir does not exist, you can get a 0xc0000008 Exception here (invalid handle)
+
+
+  // DOES NOT HELP! ShellChangeNotifier is TOTAL CRAP
+  // Sometimes you get a NullPointer AV as visible dialog at
+  // System.Classes "Filer.DefineProperty('Strings', ReadData, WriteData, DoWrite);"
+  // called at "DestroyComponents"...
+  // After that you cannot open a commission form again
+  // EComponentError mit Meldung 'Komponente mit der Bezeichnung CommissionForm existiert bereits'.
+  // Then, you get several Illegal Pointer Operations messages at process exit,
+  // and the EXE stays opened in the background.
+  // ShellChangeNotifier DAMAGES OUR MEMORY. SUCH A SHIT FROM EMBARCADERO!!!
+
 end;
 
 procedure TCommissionForm.FormCloseQuery(Sender: TObject;
@@ -874,7 +886,7 @@ begin
     PageControl2.pages[i].Visible := false;
     PageControl2.pages[i].TabVisible := false;
   end;
-  Panel1.Caption := Caption;
+  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttEvents / dbgEvents'}

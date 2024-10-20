@@ -618,7 +618,7 @@ resourcestring
 begin
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
-  Panel1.Caption := Caption;
+  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   {$REGION 'Password check'}
   hashedPassword := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
   if hashedPassword <> '' then

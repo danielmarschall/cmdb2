@@ -518,7 +518,7 @@ begin
     else if schemaVer = 2 then
     begin
       {$REGION 'Update schema 2 => 3'}
-      InstallSql(2, 'vw_COMMISSION');
+      InstallSql(3, 'vw_COMMISSION');
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
       {$ENDREGION}
     end

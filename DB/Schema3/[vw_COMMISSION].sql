@@ -167,6 +167,3 @@ cast((
 from COMMISSION cm
 left join ARTIST art on art.ID = cm.ARTIST_ID
 left join QuotePayStatusAggr on QuotePayStatusAggr.COMMISSION_ID = cm.ID
-GO
-
-
