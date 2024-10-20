@@ -32,7 +32,7 @@ procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
 implementation
 
 uses
-  ShlObj, ShellApi, System.Hash, Dialogs;
+  ShlObj, ShellApi, System.Hash, Dialogs, Artist, Commission, Mandator, Statistics;
 
 const
   LOCALDB_INSTANCE_NAME = 'MSSQLLocalDB';
@@ -707,6 +707,11 @@ end;
 // There is no delete SQL query to the actual view; hence, it is not possible
 // to solve this with a "instead of delete" trigger on that view!
 
+// NOTE:
+// The InsteadOfDelete* methods do some additional stuff to CmDB:
+// - Show "cream" color for read-only columns
+// - Close windows that were attached to a dataset to be deleted
+
 var
   DeletedList: TStringList;
 
@@ -730,18 +735,147 @@ end;
 procedure InsteadOfDeleteWorkaround_BeforeDelete(DataSet: TCustomADODataSet; const localField, baseTable, baseTableField: string);
 resourcestring
   SReallyDelete = 'Do you really want to delete this line and all connected data to it?';
+var
+  q: TADODataSet;
+  i: integer;
+  id, listname: string;
 begin
   if DeletedList.Contains(_DeletedListName(DataSet, localField)) then Abort;
   if MessageDlg(SReallyDelete, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) <> ID_YES then Abort;
-  DeletedList.Add(_DeletedListName(DataSet, localField));
+
+  // Gather some basic info required for the next steps
+  id := DataSet.FieldByName(localField).AsWideString;
+  listname := _DeletedListName(DataSet, localField);
+
+  {$REGION 'Close windows attached to this dataset'}
+  if BaseTable = 'MANDATOR' then
+  begin
+    // Delete Mandator => Close Mandator Window
+    for I := Application.MainForm.MDIChildCount-1 downto 0 do
+    begin
+      if Application.MainForm.MDIChildren[i] is TMandatorForm then
+      begin
+        if IsEqualGUID(TMandatorForm(Application.MainForm.MDIChildren[i]).MandatorId, StrToGUID(PChar(id))) then
+        begin
+          Application.MainForm.MDIChildren[i].Release;
+        end;
+      end;
+    end;
+    // Delete Mandator => Close Artist Window
+    q := Dataset.Connection.GetTable('select ID from ARTIST where MANDATOR_ID = ''' + id + '''');
+    try
+      while not q.EOF do
+      begin
+        for I := Application.MainForm.MDIChildCount-1 downto 0 do
+        begin
+          if Application.MainForm.MDIChildren[i] is TArtistForm then
+          begin
+            if IsEqualGUID(TArtistForm(Application.MainForm.MDIChildren[i]).ArtistId, q.FieldByName('ID').AsGuid) then
+            begin
+              Application.MainForm.MDIChildren[i].Release;
+            end;
+          end;
+        end;
+        q.Next;
+      end;
+    finally
+      FreeAndNil(q);
+    end;
+    // Delete Mandator => Close Commission Window
+    q := Dataset.Connection.GetTable('select COMMISSION.ID from COMMISSION left join ARTIST on ARTIST.ID = COMMISSION.ARTIST_ID where ARTIST.MANDATOR_ID = ''' + id + '''');
+    try
+      while not q.EOF do
+      begin
+        for I := Application.MainForm.MDIChildCount-1 downto 0 do
+        begin
+          if Application.MainForm.MDIChildren[i] is TCommissionForm then
+          begin
+            if IsEqualGUID(TCommissionForm(Application.MainForm.MDIChildren[i]).CommissionId, q.FieldByName('ID').AsGuid) then
+            begin
+              Application.MainForm.MDIChildren[i].Release;
+            end;
+          end;
+        end;
+        q.Next;
+      end;
+    finally
+      FreeAndNil(q);
+    end;
+    // Delete Mandator => Close Statistics Window
+    for I := Application.MainForm.MDIChildCount-1 downto 0 do
+    begin
+      if Application.MainForm.MDIChildren[i] is TStatisticsForm then
+      begin
+        if IsEqualGUID(TStatisticsForm(Application.MainForm.MDIChildren[i]).MandatorId, StrToGUID(PChar(id))) then
+        begin
+          Application.MainForm.MDIChildren[i].Release;
+        end;
+      end;
+    end;
+  end
+  else if BaseTable = 'ARTIST' then
+  begin
+    // Delete Artist => Close Artist Window
+    for I := Application.MainForm.MDIChildCount-1 downto 0 do
+    begin
+      if Application.MainForm.MDIChildren[i] is TArtistForm then
+      begin
+        if IsEqualGUID(TArtistForm(Application.MainForm.MDIChildren[i]).ArtistId, StrToGUID(PChar(id))) then
+        begin
+          Application.MainForm.MDIChildren[i].Release;
+        end;
+      end;
+    end;
+    // Delete Artist => Close Commission Windows
+    q := Dataset.Connection.GetTable('select ID from COMMISSION where ARTIST_ID = ''' + id + '''');
+    try
+      while not q.EOF do
+      begin
+        for I := Application.MainForm.MDIChildCount-1 downto 0 do
+        begin
+          if Application.MainForm.MDIChildren[i] is TCommissionForm then
+          begin
+            if IsEqualGUID(TCommissionForm(Application.MainForm.MDIChildren[i]).CommissionId, q.FieldByName('ID').AsGuid) then
+            begin
+              Application.MainForm.MDIChildren[i].Release;
+            end;
+          end;
+        end;
+        q.Next;
+      end;
+    finally
+      FreeAndNil(q);
+    end;
+  end
+  else if BaseTable = 'COMMISSION' then
+  begin
+    // Delete Commission => Close Commission Window
+    for I := Application.MainForm.MDIChildCount-1 downto 0 do
+    begin
+      if Application.MainForm.MDIChildren[i] is TCommissionForm then
+      begin
+        if IsEqualGUID(TCommissionForm(Application.MainForm.MDIChildren[i]).CommissionId, StrToGUID(PChar(id))) then
+        begin
+          Application.MainForm.MDIChildren[i].Release;
+        end;
+      end;
+    end;
+  end;
+  {$ENDREGION}
+
+  // Now delete for real
   Dataset.Connection.ExecSQL('delete from '+Dataset.Connection.SQLObjectNameEscape(basetable)+' '+
-                             'where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ''' + DataSet.FieldByName(localField).AsWideString + '''');
+                             'where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ''' + id + '''');
+
+  // Mark the dataset as deleted
+  DeletedList.Add(listname);
 
   // Jump to next line, or at previous line if we are at the end
   Dataset.Next;
   if Dataset.EOF then Dataset.Prior;
 
-  Abort; // prevent the default delete action
+  // prevent the default delete action
+  Abort;
 end;
 
 procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;

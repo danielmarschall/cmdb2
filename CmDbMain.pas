@@ -490,7 +490,7 @@ begin
     try
       for i := MDIChildCount - 1 downto 0 do
       begin
-        MDIChildren[i].Free; // No need to call OnCloseQuery, because we will destroy all data anyways
+        MDIChildren[i].Release; // No need to call OnCloseQuery, because we will destroy all data anyways
       end;
       Application.ProcessMessages;
       CmDb_RestoreDatabase(AdoConnection1, bakFileName);
