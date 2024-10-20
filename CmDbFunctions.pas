@@ -14,6 +14,7 @@ function CmDbGetDefaultDataPath: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
+procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList);
 function VariantToInteger(Value: Variant): Integer;
 function VariantToString(const Value: Variant): string;
 function CmDbShowRows(ttQuery: TDataSet): string;
@@ -359,6 +360,170 @@ begin
   ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);
 end;
 
+procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList);
+
+  function MakeLine(q: TAdoDataSet): string;
+  var
+    i: integer;
+  const
+    SEPARATOR = '; ';
+  begin
+    result := '';
+    for i := 0 to q.Fields.Count-1 do
+    begin
+      if q.Fields[i].FieldName = 'ID' then continue;
+      if q.Fields[i].FieldName.EndsWith('_ID') then continue;
+      if q.Fields[i].FieldName = 'IS_ARTIST' then continue;
+      if q.Fields[i].FieldName = 'NAME' then
+        result := q.Fields[i].AsWideString + SEPARATOR
+      else if q.Fields[i].AsWideString <> '' then
+        result := result + q.Fields[i].FieldName + '=' + q.Fields[i].AsWideString + SEPARATOR;
+    end;
+    result := Copy(result, 1, Length(result)-Length(SEPARATOR));
+  end;
+
+var
+  q1, q2, q3, q4, q5: TADODataSet;
+begin
+  sl.BeginUpdate;
+  try
+    {$REGION 'q1: Config'}
+    q1 := ADOConnection1.GetTable('select * from CONFIG order by NAME');
+    try
+      while not q1.EOF do
+      begin
+        sl.Add('Config: ' + MakeLine(q1));
+        q1.Next;
+      end;
+    finally
+      FreeAndNil(q1);
+    end;
+    {$ENDREGION}
+    {$REGION 'q1: Mandators'}
+    q1 := ADOConnection1.GetTable('select * from MANDATOR order by NAME');
+    try
+      while not q1.EOF do
+      begin
+        sl.Add('Mandator: ' + MakeLine(q1));
+        {$REGION 'q2: Artists/Clients'}
+        q2 := ADOConnection1.GetTable('select * from ARTIST where MANDATOR_ID = ''' + q1.FieldByName('ID').AsWideString + ''' order by IS_ARTIST, NAME');
+        try
+          while not q2.EOF do
+          begin
+            if q2.FieldByName('IS_ARTIST').AsBoolean then
+              sl.Add(#9 + 'Artist: ' + MakeLine(q2))
+            else
+              sl.Add(#9 + 'Client: ' + MakeLine(q2));
+            {$REGION 'q3: Artist/Client Events'}
+            q3 := ADOConnection1.GetTable('select * from ARTIST_EVENT where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
+            try
+              while not q3.EOF do
+              begin
+                if q2.FieldByName('IS_ARTIST').AsBoolean then
+                  sl.Add(#9#9 + 'Artist Event: ' + MakeLine(q3))
+                else
+                  sl.Add(#9#9 + 'Client Event: ' + MakeLine(q3));
+                q3.Next;
+              end;
+            finally
+              FreeAndNil(q3);
+            end;
+            {$ENDREGION}
+            {$REGION 'q3: Artist/Client Communication'}
+            q3 := ADOConnection1.GetTable('select * from COMMUNICATION where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by CHANNEL');
+            try
+              while not q3.EOF do
+              begin
+                sl.Add(#9#9 + 'Communication: ' + MakeLine(q3));
+                q3.Next;
+              end;
+            finally
+              FreeAndNil(q3);
+            end;
+            {$ENDREGION}
+            {$REGION 'q3: Artist/Client Payment'}
+            q3 := ADOConnection1.GetTable('select * from PAYMENT where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by DATE');
+            try
+              while not q3.EOF do
+              begin
+                sl.Add(#9#9 + 'Payment: ' + MakeLine(q3));
+                q3.Next;
+              end;
+            finally
+              FreeAndNil(q3);
+            end;
+            {$ENDREGION}
+            {$REGION 'q3: Commissions'}
+            q3 := ADOConnection1.GetTable('select * from COMMISSION where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by NAME');
+            try
+              while not q3.EOF do
+              begin
+                sl.Add(#9#9 + 'Commission: ' + MakeLine(q3));
+                {$REGION 'q4: Commission Events'}
+                q4 := ADOConnection1.GetTable('select * from COMMISSION_EVENT where COMMISSION_ID = ''' + q3.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
+                try
+                  while not q4.EOF do
+                  begin
+                    sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(q4));
+                    if q4.FieldByName('STATE').AsWideString = 'quote' then
+                    begin
+                      {$REGION 'q5: Quote'}
+                      q5 := ADOConnection1.GetTable('select * from QUOTE where EVENT_ID = ''' + q4.FieldByName('ID').AsWideString + ''' order by NO');
+                      try
+                        while not q5.EOF do
+                        begin
+                          sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(q5));
+                          q5.Next;
+                        end;
+                      finally
+                        FreeAndNil(q5);
+                      end;
+                      {$ENDREGION}
+                    end;
+                    if q4.FieldByName('STATE').AsWideString.StartsWith('upload') then
+                    begin
+                      {$REGION 'q5: Upload'}
+                      q5 := ADOConnection1.GetTable('select * from UPLOAD where EVENT_ID = ''' + q4.FieldByName('ID').AsWideString + ''' order by NO');
+                      try
+                        while not q5.EOF do
+                        begin
+                          sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(q5));
+                          q5.Next;
+                        end;
+                      finally
+                        FreeAndNil(q5);
+                      end;
+                      {$ENDREGION}
+                    end;
+                    q4.Next;
+                  end;
+                finally
+                  FreeAndNil(q4);
+                end;
+                {$ENDREGION}
+                q3.Next;
+              end;
+            finally
+              FreeAndNil(q3);
+            end;
+            {$ENDREGION}
+            q2.Next;
+          end;
+        finally
+          FreeAndNil(q2);
+        end;
+        {$ENDREGION}
+        q1.Next;
+      end;
+    finally
+      FreeAndNil(q1);
+    end;
+    {$ENDREGION}
+  finally
+    sl.EndUpdate;
+  end;
+end;
+
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
 resourcestring
   SSchemaDUnknown = 'Schema %d is unknown. The database is probably newer than the software version.';
@@ -512,13 +677,16 @@ begin
       AdoConnection1.ExecSQL('delete from CONFIG where NAME = ''CUSTOMIZATION_ID'''); // use INSTALL_ID instead
 
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
-
       {$ENDREGION}
     end
     else if schemaVer = 2 then
     begin
       {$REGION 'Update schema 2 => 3'}
       InstallSql(3, 'vw_COMMISSION');
+      if AdoConnection1.ViewExists('vw_TEXT_BACKUP_GENERATE') then
+      begin
+        AdoConnection1.DropTableOrView('vw_TEXT_BACKUP_GENERATE');
+      end;
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
       {$ENDREGION}
     end

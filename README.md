@@ -73,7 +73,7 @@ The backup files include:
 - `cmdb2_backup_*.zip` which contains:
 
 	* `cmdb2_backup_*.bak` which is the actual file that can be restored
-	* `cmdb2_backup_*.csv` which is a protocol in text form that can be compared with diff-tools.
+	* `cmdb2_backup_*.txt` which is a protocol in text form that can be compared with diff-tools.
 
 Everytime you exit CMDB2, the program will check if you have made changes somewhere in the database, and if you did so, it creates a backup of the database and giving it a sequential number.
 
