@@ -15,6 +15,7 @@ object MainForm: TMainForm
   WindowMenu = Window1
   OnClose = FormClose
   OnCreate = FormCreate
+  OnPaint = FormPaint
   TextHeight = 15
   object WaitLabel: TLabel
     Left = 16

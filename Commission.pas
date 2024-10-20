@@ -776,6 +776,23 @@ end;
 procedure TCommissionForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
+
+
+  // TODO: There is some weird bug: After the form is freed,
+  // this event is still called. Something remains in memory!
+  // Then, you get AccessViolations in threads because the form is
+  // not in memory anymore?!
+  // Maybe this is a bug in the VCL, because the TShellChangeThread is terminated,
+  // but the destructor of TShellChangeNotifier does not wait for TShellChangeThread
+  // to have finished terminating (because the thread can wait on kernel objects!)
+  // This does not seem to help?!
+  ShellChangeNotifier.NotifyFilters := [];
+  ShellChangeNotifier.OnChange := nil; // NullChangeEvent; // not nil, because TShellChangeThread.Execute calls Synchronize without checking for nil
+  // That being said, ShellChangeNotifier is very buggy and halts the compiler often!
+  // - FindNextChangeNotification(FWaitHandle) does not check if the handle is valid
+  //   => After the close event, you can get a 0xc0000008 Exception here (invalid handle)
+  // - WaitForMultipleObjects(2, @Handles, False, INFINITE) does not check if the handles are valid
+  //   => If the root dir does not exist, you can get a 0xc0000008 Exception here (invalid handle)
 end;
 
 procedure TCommissionForm.FormCloseQuery(Sender: TObject;

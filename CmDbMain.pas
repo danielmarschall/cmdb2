@@ -38,10 +38,13 @@ type
     procedure Cascade1Click(Sender: TObject);
     procedure TileHorizontally1Click(Sender: TObject);
     procedure TileVertically1Click(Sender: TObject);
+    procedure FormPaint(Sender: TObject);
   private
     FCloseStarted: boolean;
     function BackupPath: string;
     procedure PerformBackupAndDefrag;
+    class procedure ZeichneHintergrundschrift(text1_normal,
+      text2_kursiv: string; minScale: double); static;
   public
     CmDbZipPassword: string;
     DatabaseOpenedOnce: boolean;
@@ -340,6 +343,11 @@ begin
   Caption := Application.Title;
 end;
 
+procedure TMainForm.FormPaint(Sender: TObject);
+begin
+  ZeichneHintergrundschrift('CMDB2', '', 0.55);
+end;
+
 procedure TMainForm.Cascade1Click(Sender: TObject);
 begin
   // Cascade all MDI child forms
@@ -412,6 +420,68 @@ end;
 procedure TMainForm.OpenDatabase1Click(Sender: TObject);
 begin
   OpenMandatorsForm;
+end;
+
+class procedure TMainForm.ZeichneHintergrundschrift(text1_normal, text2_kursiv: string; minScale: double);
+var
+  coraFontColor: TColor;
+  frm: TForm;
+
+  procedure _ChangeToText1(size: integer);
+  begin
+    frm.Canvas.Font.Color := coraFontColor;
+    frm.Canvas.Font.Name := 'Arial';
+    frm.Canvas.Font.Height := -size;
+    frm.Canvas.Font.Style := [fsBold];
+  end;
+
+  procedure _ChangeToText2(size: integer);
+  begin
+    frm.Canvas.Font.Color := coraFontColor;
+    frm.Canvas.Font.Name := 'Arial';
+    frm.Canvas.Font.Height := -size;
+    frm.Canvas.Font.Style := [fsBold, fsItalic];
+  end;
+
+var
+  x1, x2, y1, y2, w1, w2, h1, h2, size: Int64;
+begin
+  frm := Application.MainForm;
+
+  coraFontColor := $151515; //IncreaseColorLightness(frm.Color, 20);
+
+  frm.Canvas.Lock;
+  try
+    size := 10;
+    repeat
+      _ChangeToText1(size);
+      w1 := frm.Canvas.TextWidth(text1_normal);
+      _ChangeToText2(size);
+      w2 := frm.Canvas.TextWidth(text2_kursiv);
+      Inc(size);
+      if size > 1000 then exit; // irgendwas läuft schief. Notbremse ziehen.
+    until (w1+w2)/frm.ClientWidth > minScale;
+
+    _ChangeToText1(size);
+    w1 := frm.Canvas.TextWidth(text1_normal);
+    h1 := frm.Canvas.TextHeight(text1_normal);
+
+    _ChangeToText2(size);
+    w2 := frm.Canvas.TextWidth(text2_kursiv);
+    h2 := frm.Canvas.TextHeight(text2_kursiv);
+
+    x1 := frm.ClientWidth div 2 - (w1+w2) div 2;
+    y1 := frm.ClientHeight div 2 - h1 div 2;
+    x2 := x1 + w1;
+    y2 := frm.ClientHeight div 2 - h2 div 2;
+
+    _ChangeToText1(size);
+    frm.Canvas.TextOut(x1, y1, text1_normal);
+    _ChangeToText2(size);
+    frm.Canvas.TextOut(x2, y2, text2_kursiv);
+  finally
+    frm.Canvas.Unlock;
+  end;
 end;
 
 procedure TMainForm.RestoreBackup1Click(Sender: TObject);
