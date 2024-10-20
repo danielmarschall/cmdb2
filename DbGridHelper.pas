@@ -86,9 +86,27 @@ end;
 
 procedure TDBGridHelper.HandleOtherControlKeyDown(var Key: Word; Shift: TShiftState);
 begin
-  if Shift = [] then
+  if Shift = [ssCtrl] then
   begin
-    if Key = VK_HOME then
+    if Key = VK_DELETE then
+    begin
+      Key := 0;
+      Self.DataSource.DataSet.Delete;
+    end;
+  end
+  else if Shift = [] then
+  begin
+    if (Key = VK_ESCAPE) and (Self.DataSource.DataSet.State in [dsEdit,dsInsert]) then
+    begin
+      Key := 0;
+      Self.DataSource.DataSet.Cancel;
+    end
+    else if Key = VK_INSERT then
+    begin
+      Key := 0;
+      Self.DataSource.DataSet.Insert;
+    end
+    else if Key = VK_HOME then
     begin
       Key := 0;
       Self.DataSource.Dataset.First;
