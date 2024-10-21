@@ -1,5 +1,6 @@
 
 --1. prüfen, hat customer ('cancel c') oder artist ('cancel a') cancelled?
+-- OK!
 select art.NAME, cm.NAME, ev.* from cmdb2.dbo.COMMISSION_EVENT ev
 left join cmdb2.dbo.COMMISSION cm on ev.COMMISSION_ID = cm.ID
 left join cmdb2.dbo.ARTIST art on cm.ARTIST_ID = art.ID

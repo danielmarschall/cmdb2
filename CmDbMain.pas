@@ -573,7 +573,7 @@ begin
       Application.ProcessMessages;
       try
         CmDb_RestoreDatabase(AdoConnection1, bakFileName);
-        OpenDatabase1.Click;
+        OpenMandatorsForm;
       finally
         EnableAllMenuItems(MainMenu1);
         Application.ProcessMessages;
@@ -727,7 +727,7 @@ begin
     try
       CmDb_ConnectViaLocalDb(ADOConnection1, CmDbDefaultDatabaseName);
       CmDb_InstallOrUpdateSchema(ADOConnection1);
-      OpenDatabase1.Click;
+      OpenMandatorsForm;
     finally
       Screen.Cursor := crDefault;
       WaitLabel.Visible := false;
