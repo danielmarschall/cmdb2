@@ -365,201 +365,235 @@ procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; 
 
   function MakeLine(q: TAdoDataSet): string;
   var
+    sb: TStringBuilder;
     i: integer;
   const
     SEPARATOR = '; ';
   begin
-    result := '';
-    for i := 0 to q.Fields.Count-1 do
-    begin
-      if q.Fields[i].FieldName = 'ID' then continue;
-      if q.Fields[i].FieldName.EndsWith('_ID') then continue;
-      if q.Fields[i].FieldName = 'IS_ARTIST' then continue;
-      if q.Fields[i].FieldName = 'NAME' then
-        result := q.Fields[i].AsWideString + SEPARATOR
-      else if q.Fields[i].AsWideString <> '' then
-        result := result + q.Fields[i].FieldName + '=' + q.Fields[i].AsWideString + SEPARATOR;
+    sb := TStringBuilder.Create;
+    try
+      for i := 0 to q.Fields.Count-1 do
+      begin
+        if q.Fields[i].FieldName = 'ID' then continue;
+        if q.Fields[i].FieldName.EndsWith('_ID') then continue;
+        if q.Fields[i].FieldName.StartsWith('__') then continue;
+        if q.Fields[i].FieldName = 'IS_ARTIST' then continue;
+        if q.Fields[i].FieldName = 'NAME' then
+          sb.Append(q.Fields[i].AsWideString + SEPARATOR)
+        else if q.Fields[i].AsWideString <> '' then
+          sb.Append(q.Fields[i].FieldName + '=' + q.Fields[i].AsWideString + SEPARATOR);
+      end;
+      result := sb.ToString;
+      result := Copy(result, 1, Length(result)-2);
+    finally
+      sb.Free;
     end;
-    result := Copy(result, 1, Length(result)-Length(SEPARATOR));
   end;
 
 var
-  q1, q2, q3, q4, q5: TADODataSet;
+  qConfig, qMandator, qArtist, qArtistEvent, qCommission, qCommunication, qPayment, qCommissionEvent, qQuote, qUpload: TADODataSet;
   progr: integer;
+
+  procedure IncPos;
+  begin
+    Inc(progr);
+    if Assigned(ProgressBar1) and (progr mod 100 = 0) then ProgressBar1.Position := progr;
+  end;
+
 begin
   progr := 0;
-  if Assigned(ProgressBar1) then
-  begin
-    ProgressBar1.Visible := false;
-    ProgressBar1.Max :=
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from ARTIST')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from ARTIST_EVENT')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from COMMISSION')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from COMMISSION_EVENT')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from COMMUNICATION')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from CONFIG')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from MANDATOR')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from PAYMENT')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from QUOTE')) +
-      VariantToInteger(AdoConnection1.GetScalar('select count(*) from UPLOAD'));
-    ProgressBar1.Min := 0;
-    ProgressBar1.Position := progr;
-    ProgressBar1.Visible := true;
-  end;
   sl.BeginUpdate;
   try
-    {$REGION 'q1: Config'}
-    q1 := ADOConnection1.GetTable('select * from CONFIG order by NAME');
-    try
-      while not q1.EOF do
-      begin
-        sl.Add('Config: ' + MakeLine(q1));
-        Inc(progr);
-        if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-        q1.Next;
-      end;
-    finally
-      FreeAndNil(q1);
+    {$REGION 'Query database (the order is cruicial!)}
+    qConfig := ADOConnection1.GetTable(
+      'select cnf.NAME as __CNF_NAME, cnf.* ' +
+      'from CONFIG cnf ' +
+      'order by cnf.NAME');
+    qMandator := ADOConnection1.GetTable(
+      'select man.ID as __MAN_ID, man.* ' +
+      'from MANDATOR man ' +
+      'order by man.NAME, man.ID');
+    qArtist := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, art.* ' +
+      'from ARTIST art ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID');
+    qArtistEvent := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, ev.ID as __EV_ID, ev.* ' +
+      'from ARTIST_EVENT ev ' +
+      'left join ARTIST art on art.ID = ev.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, ev.DATE, ev.STATE, ev.ID');
+    qPayment := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, pay.ID as __PAY_ID, pay.* ' +
+      'from PAYMENT pay ' +
+      'left join ARTIST art on art.ID = pay.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, pay.DATE, pay.ID');
+    qCommunication := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, comm.ID as __COMM_ID, comm.* ' +
+      'from COMMUNICATION comm ' +
+      'left join ARTIST art on art.ID = comm.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, comm.CHANNEL, comm.ADDRESS, comm.ID');
+    qCommission := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, cm.ID as __CM_ID, cm.* ' +
+      'from COMMISSION cm ' +
+      'left join ARTIST art on art.ID = cm.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, cm.NAME, cm.ID');
+    qCommissionEvent := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, cm.ID as __CM_ID, ev.ID as __EV_ID, ev.* ' +
+      'from COMMISSION_EVENT ev ' +
+      'left join COMMISSION cm on cm.ID = ev.COMMISSION_ID ' +
+      'left join ARTIST art on art.ID = cm.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, cm.NAME, cm.ID, ev.DATE, ev.STATE, ev.ID');
+    qQuote := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, cm.ID as __CM_ID, ev.ID as __EV_ID, q.ID as __Q_ID, q.* ' +
+      'from QUOTE q ' +
+      'left join COMMISSION_EVENT ev on ev.ID = q.EVENT_ID ' +
+      'left join COMMISSION cm on cm.ID = ev.COMMISSION_ID ' +
+      'left join ARTIST art on art.ID = cm.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, cm.NAME, cm.ID, ev.DATE, ev.STATE, ev.ID, q.NO, q.ID');
+    qUpload := AdoConnection1.GetTable(
+      'select man.ID as __MAN_ID, art.ID as __ART_ID, cm.ID as __CM_ID, ev.ID as __EV_ID, up.ID as __UP_ID, up.* ' +
+      'from UPLOAD up ' +
+      'left join COMMISSION_EVENT ev on ev.ID = up.EVENT_ID ' +
+      'left join COMMISSION cm on cm.ID = ev.COMMISSION_ID ' +
+      'left join ARTIST art on art.ID = cm.ARTIST_ID ' +
+      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
+      'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, cm.NAME, cm.ID, ev.DATE, ev.STATE, ev.ID, up.NO, up.ID');
+    {$ENDREGION}
+
+    if Assigned(ProgressBar1) then
+    begin
+      ProgressBar1.Visible := false;
+      ProgressBar1.Max := qArtist.RecordCount +
+                          qArtistEvent.RecordCount +
+                          qCommission.RecordCount +
+                          qCommissionEvent.RecordCount +
+                          qCommunication.RecordCount +
+                          qConfig.RecordCount +
+                          qMandator.RecordCount +
+                          qPayment.RecordCount +
+                          qQuote.RecordCount +
+                          qUpload.RecordCount;
+      ProgressBar1.Min := 0;
+      ProgressBar1.Position := progr;
+      ProgressBar1.Visible := true;
+    end;
+
+    {$REGION 'Config'}
+    while not qConfig.EOF do
+    begin
+      sl.Add('Config: ' + MakeLine(qConfig)); IncPos;
+      qConfig.Next;
     end;
     {$ENDREGION}
-    {$REGION 'q1: Mandators'}
-    q1 := ADOConnection1.GetTable('select * from MANDATOR order by NAME');
-    try
-      while not q1.EOF do
+    {$REGION 'Mandator'}
+    while not qMandator.EOF do
+    begin
+      sl.Add('Mandator: ' + MakeLine(qMandator)); IncPos;
+      {$REGION 'Artist/Client'}
+      while not qArtist.EOF and
+            IsEqualGUID(qArtist.FieldByName('__MAN_ID').AsGuid, qMandator.FieldByName('__MAN_ID').AsGuid) do
       begin
-        sl.Add('Mandator: ' + MakeLine(q1));
-        Inc(progr);
-        if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-        {$REGION 'q2: Artists/Clients'}
-        q2 := ADOConnection1.GetTable('select * from ARTIST where MANDATOR_ID = ''' + q1.FieldByName('ID').AsWideString + ''' order by IS_ARTIST, NAME');
-        try
-          while not q2.EOF do
-          begin
-            if q2.FieldByName('IS_ARTIST').AsBoolean then
-              sl.Add(#9 + 'Artist: ' + MakeLine(q2))
-            else
-              sl.Add(#9 + 'Client: ' + MakeLine(q2));
-            Inc(progr);
-            if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-            {$REGION 'q3: Artist/Client Events'}
-            q3 := ADOConnection1.GetTable('select * from ARTIST_EVENT where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
-            try
-              while not q3.EOF do
-              begin
-                if q2.FieldByName('IS_ARTIST').AsBoolean then
-                  sl.Add(#9#9 + 'Artist Event: ' + MakeLine(q3))
-                else
-                  sl.Add(#9#9 + 'Client Event: ' + MakeLine(q3));
-                Inc(progr);
-                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                q3.Next;
-              end;
-            finally
-              FreeAndNil(q3);
-            end;
-            {$ENDREGION}
-            {$REGION 'q3: Artist/Client Communication'}
-            q3 := ADOConnection1.GetTable('select * from COMMUNICATION where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by CHANNEL');
-            try
-              while not q3.EOF do
-              begin
-                sl.Add(#9#9 + 'Communication: ' + MakeLine(q3));
-                Inc(progr);
-                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                q3.Next;
-              end;
-            finally
-              FreeAndNil(q3);
-            end;
-            {$ENDREGION}
-            {$REGION 'q3: Artist/Client Payment'}
-            q3 := ADOConnection1.GetTable('select * from PAYMENT where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by DATE');
-            try
-              while not q3.EOF do
-              begin
-                sl.Add(#9#9 + 'Payment: ' + MakeLine(q3));
-                Inc(progr);
-                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                q3.Next;
-              end;
-            finally
-              FreeAndNil(q3);
-            end;
-            {$ENDREGION}
-            {$REGION 'q3: Commissions'}
-            q3 := ADOConnection1.GetTable('select * from COMMISSION where ARTIST_ID = ''' + q2.FieldByName('ID').AsWideString + ''' order by NAME');
-            try
-              while not q3.EOF do
-              begin
-                sl.Add(#9#9 + 'Commission: ' + MakeLine(q3));
-                Inc(progr);
-                if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                {$REGION 'q4: Commission Events'}
-                q4 := ADOConnection1.GetTable('select * from COMMISSION_EVENT where COMMISSION_ID = ''' + q3.FieldByName('ID').AsWideString + ''' order by DATE, STATE');
-                try
-                  while not q4.EOF do
-                  begin
-                    sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(q4));
-                    Inc(progr);
-                    if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                    if q4.FieldByName('STATE').AsWideString = 'quote' then
-                    begin
-                      {$REGION 'q5: Quote'}
-                      q5 := ADOConnection1.GetTable('select * from QUOTE where EVENT_ID = ''' + q4.FieldByName('ID').AsWideString + ''' order by NO');
-                      try
-                        while not q5.EOF do
-                        begin
-                          sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(q5));
-                          Inc(progr);
-                          if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                          q5.Next;
-                        end;
-                      finally
-                        FreeAndNil(q5);
-                      end;
-                      {$ENDREGION}
-                    end;
-                    if q4.FieldByName('STATE').AsWideString.StartsWith('upload') then
-                    begin
-                      {$REGION 'q5: Upload'}
-                      q5 := ADOConnection1.GetTable('select * from UPLOAD where EVENT_ID = ''' + q4.FieldByName('ID').AsWideString + ''' order by NO');
-                      try
-                        while not q5.EOF do
-                        begin
-                          sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(q5));
-                          Inc(progr);
-                          if Assigned(ProgressBar1) then ProgressBar1.Position := progr;
-                          q5.Next;
-                        end;
-                      finally
-                        FreeAndNil(q5);
-                      end;
-                      {$ENDREGION}
-                    end;
-                    q4.Next;
-                  end;
-                finally
-                  FreeAndNil(q4);
-                end;
-                {$ENDREGION}
-                q3.Next;
-              end;
-            finally
-              FreeAndNil(q3);
-            end;
-            {$ENDREGION}
-            q2.Next;
-          end;
-        finally
-          FreeAndNil(q2);
+        if qArtist.FieldByName('IS_ARTIST').AsBoolean then
+          sl.Add(#9 + 'Artist: ' + MakeLine(qArtist))
+        else
+          sl.Add(#9 + 'Client: ' + MakeLine(qArtist));
+        IncPos;
+        {$REGION 'Artist Event'}
+        while not qArtistEvent.EOF and
+              IsEqualGUID(qArtistEvent.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
+        begin
+          if qArtist.FieldByName('IS_ARTIST').AsBoolean then
+            sl.Add(#9#9 + 'Artist Event: ' + MakeLine(qArtistEvent))
+          else
+            sl.Add(#9#9 + 'Client Event: ' + MakeLine(qArtistEvent));
+          IncPos;
+          qArtistEvent.Next;
         end;
         {$ENDREGION}
-        q1.Next;
+        {$REGION 'Communication'}
+        while not qCommunication.EOF and
+              IsEqualGUID(qCommunication.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
+        begin
+          sl.Add(#9#9 + 'Communication: ' + MakeLine(qCommunication)); IncPos;
+          qCommunication.Next;
+        end;
+        {$ENDREGION}
+        {$REGION 'Payment'}
+        while not qPayment.EOF and
+              IsEqualGUID(qPayment.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
+        begin
+          sl.Add(#9#9 + 'Payment: ' + MakeLine(qPayment)); IncPos;
+          qPayment.Next;
+        end;
+        {$ENDREGION}
+        {$REGION 'Artist Event'}
+        while not qArtistEvent.EOF and
+              IsEqualGUID(qArtistEvent.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
+        begin
+          if qArtist.FieldByName('IS_ARTIST').AsBoolean then
+            sl.Add(#9#9 + 'Artist Event: ' + MakeLine(qArtistEvent))
+          else
+            sl.Add(#9#9 + 'Client Event: ' + MakeLine(qArtistEvent));
+          IncPos;
+          qArtistEvent.Next;
+        end;
+        {$ENDREGION}
+        {$REGION 'Commission'}
+        while not qCommission.EOF and
+              IsEqualGUID(qCommission.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
+        begin
+          sl.Add(#9#9 + 'Commission: ' + MakeLine(qCommission)); IncPos;
+          {$REGION 'Commission Event'}
+          while not qCommissionEvent.EOF and
+                IsEqualGUID(qCommissionEvent.FieldByName('__CM_ID').AsGuid, qCommission.FieldByName('__CM_ID').AsGuid) do
+          begin
+            sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(qCommissionEvent)); IncPos;
+            {$REGION 'Quote'}
+            while not qQuote.EOF and
+                  IsEqualGUID(qQuote.FieldByName('__EV_ID').AsGuid, qCommissionEvent.FieldByName('__EV_ID').AsGuid) do
+            begin
+              sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(qQuote)); IncPos;
+              qQuote.Next;
+            end;
+            {$ENDREGION}
+            {$REGION 'Upload'}
+            while not qUpload.EOF and
+                  IsEqualGUID(qUpload.FieldByName('__EV_ID').AsGuid, qCommissionEvent.FieldByName('__EV_ID').AsGuid) do
+            begin
+              sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(qUpload)); IncPos;
+              qUpload.Next;
+            end;
+            {$ENDREGION}
+            qCommissionEvent.Next;
+          end;
+          {$ENDREGION}
+          qCommission.Next;
+        end;
+        {$ENDREGION}
+        qArtist.Next;
       end;
-    finally
-      FreeAndNil(q1);
+      {$ENDREGION}
+      qMandator.Next;
     end;
     {$ENDREGION}
+
+    FreeAndNil(qUpload);
+    FreeAndNil(qQuote);
+    FreeAndNil(qCommissionEvent);
+    FreeAndNil(qCommission);
+    FreeAndNil(qCommunication);
+    FreeAndNil(qPayment);
+    FreeAndNil(qArtistEvent);
+    FreeAndNil(qArtist);
+    FreeAndNil(qMandator);
+    FreeAndNil(qConfig);
   finally
     sl.EndUpdate;
   end;
@@ -568,8 +602,10 @@ begin
     // TODO: For some reason, Pos=Max will not show a fully filled progress bar?!
     // Even Invalidate, Refresh, PostMessages does not help
     ProgressBar1.Visible := false;
+    //Assert(ProgressBar1.Position = ProgressBar1.Max);
   end;
 end;
+
 
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
 resourcestring
