@@ -11,14 +11,14 @@ function CmDb_GetPasswordHash(AdoConnection1: TAdoConnection; const password: st
 function CmDb_DatabasePasswordcheck(AdoConnection1: TAdoConnection): boolean;
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
-function CmDbGetDefaultDataPath: string;
+function CmDb_GetDefaultDataPath: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
 procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
 function VariantToInteger(Value: Variant): Integer;
 function VariantToString(const Value: Variant): string;
-function CmDbShowRows(ttQuery: TDataSet): string;
+function CmDb_ShowRows(ttQuery: TDataSet): string;
 function GetBuildTimestamp(const ExeFile: string): TDateTime;
 procedure SaveGridToCsv(grid: TDbGrid; const filename: string);
 function TitleButtonHelper(Column: TColumn): boolean;
@@ -280,7 +280,7 @@ begin
   end;
 end;
 
-function CmDbGetDefaultDataPath: string;
+function CmDb_GetDefaultDataPath: string;
 
   function GetUserDirectory: string;
   var
@@ -319,8 +319,8 @@ begin
     'RESTORE DATABASE '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+' ' +
     'FROM DISK = N'+AdoConnection1.SQLStringEscape(BakFileName)+' ' +
     'WITH ' +
-    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameData)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + TempDbName + '.mdf')+', ' +
-    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameLog)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + TempDbName + '.ldf')+', ' +
+    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameData)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDb_GetDefaultDataPath) + TempDbName + '.mdf')+', ' +
+    '    MOVE N'+AdoConnection1.SQLStringEscape(LogicalNameLog)+' TO N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDb_GetDefaultDataPath) + TempDbName + '.ldf')+', ' +
     '    REPLACE, ' +
     '    RECOVERY;');
 
@@ -388,7 +388,7 @@ begin
     '  ON PRIMARY ' +
     '  ( ' +
     '      NAME = N'+AdoConnection1.SQLStringEscape(LogicalNameData)+', '+
-    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + DatabaseName + '.mdf')+', '+
+    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDb_GetDefaultDataPath) + DatabaseName + '.mdf')+', '+
     '      SIZE = 10MB, ' +
     '      MAXSIZE = UNLIMITED, ' +
     '      FILEGROWTH = 5MB ' +
@@ -396,7 +396,7 @@ begin
     '  LOG ON ' +
     '  ( ' +
     '      NAME = N'+AdoConnection1.SQLStringEscape(LogicalNameLog)+', '+
-    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + DatabaseName + '.ldf')+', ' +
+    '      FILENAME = N'+AdoConnection1.SQLStringEscape(IncludeTrailingPathDelimiter(CmDb_GetDefaultDataPath) + DatabaseName + '.ldf')+', ' +
     '      SIZE = 5MB, ' +
     '      MAXSIZE = 50MB, ' +
     '      FILEGROWTH = 1MB ' +
@@ -814,7 +814,7 @@ begin
     Result := VarToStr(Value);
 end;
 
-function CmDbShowRows(ttQuery: TDataSet): string;
+function CmDb_ShowRows(ttQuery: TDataSet): string;
 resourcestring
   SDRow = '%s row';
   SDRows = '%s rows';
@@ -1053,7 +1053,7 @@ end;
 
 procedure InsteadOfDeleteWorkaround_BeforeDelete(DataSet: TCustomADODataSet; const localField, baseTable, baseTableField: string);
 resourcestring
-  SReallyDelete = 'Do you really want to delete this line and all connected data to it?';
+  SReallyDelete = 'Do you really want to delete this line and all data connected to it?';
 var
   q: TADODataSet;
   i: integer;

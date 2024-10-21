@@ -190,7 +190,7 @@ uses
 
 procedure TArtistForm.ttArtistEventAfterScroll(DataSet: TDataSet);
 begin
-  sbArtistEvent.Caption := CmDbShowRows(DataSet);
+  sbArtistEvent.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TArtistForm.ttArtistEventBeforeDelete(DataSet: TDataSet);
@@ -224,7 +224,7 @@ end;
 
 procedure TArtistForm.ttCommissionAfterScroll(DataSet: TDataSet);
 begin
-  sbCommission.Caption := CmDbShowRows(DataSet);
+  sbCommission.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TArtistForm.ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -245,7 +245,7 @@ end;
 
 procedure TArtistForm.ttCommunicationAfterScroll(DataSet: TDataSet);
 begin
-  sbCommunication.Caption := CmDbShowRows(DataSet);
+  sbCommunication.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TArtistForm.ttCommunicationBeforeDelete(DataSet: TDataSet);
@@ -266,7 +266,7 @@ end;
 
 procedure TArtistForm.ttPaymentAfterScroll(DataSet: TDataSet);
 begin
-  sbPayment.Caption := CmDbShowRows(DataSet);
+  sbPayment.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TArtistForm.ttPaymentBeforeDelete(DataSet: TDataSet);

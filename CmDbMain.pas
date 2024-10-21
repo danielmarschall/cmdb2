@@ -179,7 +179,7 @@ end;
 function TMainForm.BackupPath: string;
 begin
   Result := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
-  if Result = '' then Result := CmDbGetDefaultDataPath;
+  if Result = '' then Result := CmDb_GetDefaultDataPath;
 end;
 
 procedure TMainForm.BackupandExit1Click(Sender: TObject);
@@ -527,8 +527,8 @@ begin
               end;
             end;
             if bakFileName = '' then raise Exception.Create(SInvalidBackupFile);
-            zip.Extract(bakFileName, CmDbGetDefaultDataPath, false);
-            bakFileName := IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + bakFileName;
+            zip.Extract(bakFileName, CmDb_GetDefaultDataPath, false);
+            bakFileName := IncludeTrailingPathDelimiter(CmDb_GetDefaultDataPath) + bakFileName;
             deleteBakFileAfterwards := true;
             if zip.Password <> '' then CmDbZipPassword := zip.Password;
             break;

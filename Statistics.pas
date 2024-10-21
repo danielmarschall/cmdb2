@@ -226,7 +226,7 @@ end;
 
 procedure TStatisticsForm.ttQueryAfterScroll(DataSet: TDataSet);
 begin
-  sbQuery.Caption := CmDbShowRows(DataSet);
+  sbQuery.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TStatisticsForm.ttQueryBeforeDelete(DataSet: TDataSet);

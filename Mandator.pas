@@ -252,7 +252,7 @@ uses
 
 procedure TMandatorForm.ttArtistsAfterScroll(DataSet: TDataSet);
 begin
-  sbArtists.Caption := CmDbShowRows(DataSet);
+  sbArtists.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorForm.ttArtistsBeforeDelete(DataSet: TDataSet);
@@ -274,7 +274,7 @@ end;
 
 procedure TMandatorForm.ttClientsAfterScroll(DataSet: TDataSet);
 begin
-  sbClients.Caption := CmDbShowRows(DataSet);
+  sbClients.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorForm.ttClientsBeforeDelete(DataSet: TDataSet);
@@ -342,7 +342,7 @@ end;
 
 procedure TMandatorForm.ttCommissionAfterScroll(DataSet: TDataSet);
 begin
-  sbCommissions.Caption := CmDbShowRows(DataSet);
+  sbCommissions.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorForm.ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -363,7 +363,7 @@ end;
 
 procedure TMandatorForm.ttPaymentAfterScroll(DataSet: TDataSet);
 begin
-  sbPayment.Caption := CmDbShowRows(DataSet);
+  sbPayment.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorForm.ttPaymentBeforeDelete(DataSet: TDataSet);
@@ -451,7 +451,7 @@ end;
 
 procedure TMandatorForm.ttStatisticsAfterScroll(DataSet: TDataSet);
 begin
-  sbStatistics.Caption := CmDbShowRows(DataSet);
+  sbStatistics.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorForm.ttStatisticsBeforeDelete(DataSet: TDataSet);

@@ -132,7 +132,7 @@ uses
 
 procedure TMandatorsForm.ttConfigAfterScroll(DataSet: TDataSet);
 begin
-  sbConfig.Caption := CmDbShowRows(DataSet);
+  sbConfig.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorsForm.ttConfigBeforeDelete(DataSet: TDataSet);
@@ -200,7 +200,7 @@ end;
 
 procedure TMandatorsForm.ttMandatorAfterScroll(DataSet: TDataSet);
 begin
-  sbMandator.Caption := CmDbShowRows(DataSet);
+  sbMandator.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorsForm.ttMandatorBeforeDelete(DataSet: TDataSet);
@@ -220,7 +220,7 @@ end;
 
 procedure TMandatorsForm.ttTextBackupAfterScroll(DataSet: TDataSet);
 begin
-  sbTextBackup.Caption := CmDbShowRows(DataSet);
+  sbTextBackup.Caption := CmDb_ShowRows(DataSet);
 end;
 
 procedure TMandatorsForm.ttTextBackupBeforeDelete(DataSet: TDataSet);
