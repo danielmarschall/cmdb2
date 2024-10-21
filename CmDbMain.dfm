@@ -31,16 +31,6 @@ object MainForm: TMainForm
     ParentFont = False
     Visible = False
   end
-  object ProgressBar1: TProgressBar
-    Left = 16
-    Top = 80
-    Width = 393
-    Height = 41
-    Smooth = True
-    Step = 1
-    TabOrder = 0
-    Visible = False
-  end
   object Timer1: TTimer
     Interval = 10
     OnTimer = Timer1Timer
@@ -55,6 +45,13 @@ object MainForm: TMainForm
       object RestoreBackup1: TMenuItem
         Caption = 'Restore Backup...'
         OnClick = RestoreBackup1Click
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Showtextdump1: TMenuItem
+        Caption = 'Show text dump'
+        OnClick = Showtextdump1Click
       end
       object N2: TMenuItem
         Caption = '-'

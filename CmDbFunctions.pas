@@ -4,17 +4,18 @@ interface
 
 uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
-  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.ComCtrls, Vcl.Menus;
+  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.Menus;
 
-procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
-function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
+procedure CmDb_DropTempTables(AdoConnection1: TAdoConnection);
+function CmDb_GetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
+function CmDb_DatabasePasswordcheck(AdoConnection1: TAdoConnection): boolean;
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function CmDbGetDefaultDataPath: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
-procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; ProgressBar1: TProgressBar);
+procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
 function VariantToInteger(Value: Variant): Integer;
 function VariantToString(const Value: Variant): string;
 function CmDbShowRows(ttQuery: TDataSet): string;
@@ -24,6 +25,7 @@ function TitleButtonHelper(Column: TColumn): boolean;
 function AscDesc(asc: boolean): string;
 procedure AdoQueryRefresh(ADataset: TAdoQuery; const ALocateField: string);
 procedure DisableAllMenuItems(MainMenu: TMainMenu);
+procedure EnableAllMenuItems(MainMenu: TMainMenu);
 
 procedure InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbg: TDBGrid; nav: TDBNavigator);
 procedure InsteadOfDeleteWorkaround_BeforeEdit(DataSet: TCustomADODataSet; const localField: string);
@@ -34,12 +36,12 @@ procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
 implementation
 
 uses
-  ShlObj, ShellApi, System.Hash, Dialogs, Artist, Commission, Mandator, Statistics;
+  ShlObj, ShellApi, System.Hash, Dialogs, CmDbMain, Artist, Commission, Mandator, Statistics;
 
 const
   LOCALDB_INSTANCE_NAME = 'MSSQLLocalDB';
 
-procedure CmDbDropTempTables(AdoConnection1: TAdoConnection);
+procedure CmDb_DropTempTables(AdoConnection1: TAdoConnection);
 var
   q: TAdoDataSet;
 begin
@@ -55,12 +57,56 @@ begin
   end;
 end;
 
-function CmDbGetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
+function CmDb_GetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
 var
   salt: string;
 begin
   salt := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
   result := THashSHA2.GetHashString(salt + password);
+end;
+
+function CmDb_DatabasePasswordcheck(AdoConnection1: TAdoConnection): boolean;
+var
+  hashedPassword: string;
+  enteredPassword: string;
+resourcestring
+  SEnterPassword = 'Enter password:';
+begin
+  hashedPassword := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
+  if hashedPassword <> '' then
+  begin
+    // If a ZIP has been compressed previously, try its password first
+    if SameText(CmDb_GetPasswordHash(AdoConnection1, MainForm.CmDbZipPassword), hashedPassword) then
+    begin
+      Exit(true);
+    end;
+
+    // Otherwise, ask the user for the password
+    while true do
+    begin
+      if InputQuery(Application.Title, #0{password star} + SEnterPassword, enteredPassword) then
+      begin
+        if SameText(CmDb_GetPasswordHash(AdoConnection1, enteredPassword), hashedPassword) then
+        begin
+          if MainForm.CmDbZipPassword = '' then
+            MainForm.CmDbZipPassword := enteredPassword;
+          Exit(true);
+        end
+        else
+        begin
+          enteredPassword := '';
+        end;
+      end
+      else
+      begin
+        Exit(false);
+      end;
+    end;
+  end
+  else
+  begin
+    Exit(true);
+  end;
 end;
 
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
@@ -361,7 +407,7 @@ begin
   ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);
 end;
 
-procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; ProgressBar1: TProgressBar);
+procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
 
   function MakeLine(q: TAdoDataSet): string;
   var
@@ -392,16 +438,7 @@ procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStringList; 
 
 var
   qConfig, qMandator, qArtist, qArtistEvent, qCommission, qCommunication, qPayment, qCommissionEvent, qQuote, qUpload: TADODataSet;
-  progr: integer;
-
-  procedure IncPos;
-  begin
-    Inc(progr);
-    if Assigned(ProgressBar1) and (progr mod 100 = 0) then ProgressBar1.Position := progr;
-  end;
-
 begin
-  progr := 0;
   sl.BeginUpdate;
   try
     {$REGION 'Query database (the order is cruicial!)}
@@ -467,35 +504,17 @@ begin
       'order by man.NAME, man.ID, art.IS_ARTIST, art.NAME, art.ID, cm.NAME, cm.ID, ev.DATE, ev.STATE, ev.ID, up.NO, up.ID');
     {$ENDREGION}
 
-    if Assigned(ProgressBar1) then
-    begin
-      ProgressBar1.Visible := false;
-      ProgressBar1.Max := qArtist.RecordCount +
-                          qArtistEvent.RecordCount +
-                          qCommission.RecordCount +
-                          qCommissionEvent.RecordCount +
-                          qCommunication.RecordCount +
-                          qConfig.RecordCount +
-                          qMandator.RecordCount +
-                          qPayment.RecordCount +
-                          qQuote.RecordCount +
-                          qUpload.RecordCount;
-      ProgressBar1.Min := 0;
-      ProgressBar1.Position := progr;
-      ProgressBar1.Visible := true;
-    end;
-
     {$REGION 'Config'}
     while not qConfig.EOF do
     begin
-      sl.Add('Config: ' + MakeLine(qConfig)); IncPos;
+      sl.Add('Config: ' + MakeLine(qConfig));
       qConfig.Next;
     end;
     {$ENDREGION}
     {$REGION 'Mandator'}
     while not qMandator.EOF do
     begin
-      sl.Add('Mandator: ' + MakeLine(qMandator)); IncPos;
+      sl.Add('Mandator: ' + MakeLine(qMandator));
       {$REGION 'Artist/Client'}
       while not qArtist.EOF and
             IsEqualGUID(qArtist.FieldByName('__MAN_ID').AsGuid, qMandator.FieldByName('__MAN_ID').AsGuid) do
@@ -504,7 +523,6 @@ begin
           sl.Add(#9 + 'Artist: ' + MakeLine(qArtist))
         else
           sl.Add(#9 + 'Client: ' + MakeLine(qArtist));
-        IncPos;
         {$REGION 'Artist Event'}
         while not qArtistEvent.EOF and
               IsEqualGUID(qArtistEvent.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
@@ -513,7 +531,6 @@ begin
             sl.Add(#9#9 + 'Artist Event: ' + MakeLine(qArtistEvent))
           else
             sl.Add(#9#9 + 'Client Event: ' + MakeLine(qArtistEvent));
-          IncPos;
           qArtistEvent.Next;
         end;
         {$ENDREGION}
@@ -521,7 +538,7 @@ begin
         while not qCommunication.EOF and
               IsEqualGUID(qCommunication.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
-          sl.Add(#9#9 + 'Communication: ' + MakeLine(qCommunication)); IncPos;
+          sl.Add(#9#9 + 'Communication: ' + MakeLine(qCommunication));
           qCommunication.Next;
         end;
         {$ENDREGION}
@@ -529,7 +546,7 @@ begin
         while not qPayment.EOF and
               IsEqualGUID(qPayment.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
-          sl.Add(#9#9 + 'Payment: ' + MakeLine(qPayment)); IncPos;
+          sl.Add(#9#9 + 'Payment: ' + MakeLine(qPayment));
           qPayment.Next;
         end;
         {$ENDREGION}
@@ -541,7 +558,6 @@ begin
             sl.Add(#9#9 + 'Artist Event: ' + MakeLine(qArtistEvent))
           else
             sl.Add(#9#9 + 'Client Event: ' + MakeLine(qArtistEvent));
-          IncPos;
           qArtistEvent.Next;
         end;
         {$ENDREGION}
@@ -549,17 +565,17 @@ begin
         while not qCommission.EOF and
               IsEqualGUID(qCommission.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
-          sl.Add(#9#9 + 'Commission: ' + MakeLine(qCommission)); IncPos;
+          sl.Add(#9#9 + 'Commission: ' + MakeLine(qCommission));
           {$REGION 'Commission Event'}
           while not qCommissionEvent.EOF and
                 IsEqualGUID(qCommissionEvent.FieldByName('__CM_ID').AsGuid, qCommission.FieldByName('__CM_ID').AsGuid) do
           begin
-            sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(qCommissionEvent)); IncPos;
+            sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(qCommissionEvent));
             {$REGION 'Quote'}
             while not qQuote.EOF and
                   IsEqualGUID(qQuote.FieldByName('__EV_ID').AsGuid, qCommissionEvent.FieldByName('__EV_ID').AsGuid) do
             begin
-              sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(qQuote)); IncPos;
+              sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(qQuote));
               qQuote.Next;
             end;
             {$ENDREGION}
@@ -567,7 +583,7 @@ begin
             while not qUpload.EOF and
                   IsEqualGUID(qUpload.FieldByName('__EV_ID').AsGuid, qCommissionEvent.FieldByName('__EV_ID').AsGuid) do
             begin
-              sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(qUpload)); IncPos;
+              sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(qUpload));
               qUpload.Next;
             end;
             {$ENDREGION}
@@ -596,13 +612,6 @@ begin
     FreeAndNil(qConfig);
   finally
     sl.EndUpdate;
-  end;
-  if Assigned(ProgressBar1) then
-  begin
-    // TODO: For some reason, Pos=Max will not show a fully filled progress bar?!
-    // Even Invalidate, Refresh, PostMessages does not help
-    ProgressBar1.Visible := false;
-    //Assert(ProgressBar1.Position = ProgressBar1.Max);
   end;
 end;
 
@@ -951,20 +960,61 @@ begin
   end;
 end;
 
+type
+  TMenuState = record
+    ItemEnabled: Boolean;   // Status des Top-Level-Menüitems
+    SubItemsEnabled: TArray<Boolean>; // Status der Sub-Menüitems
+  end;
+
+var
+  MenuStates: array of TMenuState;  // Liste zum Speichern der Aktivierungszustände
+
 procedure DisableAllMenuItems(MainMenu: TMainMenu);
 var
   i, j: Integer;
+  MenuState: TMenuState;
 begin
+  SetLength(MenuStates, MainMenu.Items.Count);  // Größe des Arrays auf die Anzahl der Menüeinträge setzen
+
   // Loop through all top-level menu items
   for i := 0 to MainMenu.Items.Count - 1 do
   begin
-    // Disable the top-level menu item
-    MainMenu.Items[i].Enabled := False;
+    // Speichere den Zustand des Top-Level-Menüeintrags
+    MenuState.ItemEnabled := MainMenu.Items[i].Enabled;
 
-    // Loop through all submenu items and disable them as well
+    // Speichere den Zustand der Sub-Menüeinträge
+    SetLength(MenuState.SubItemsEnabled, MainMenu.Items[i].Count);
     for j := 0 to MainMenu.Items[i].Count - 1 do
     begin
+      // Speichere den Zustand jedes Untermenüeintrags
+      MenuState.SubItemsEnabled[j] := MainMenu.Items[i].Items[j].Enabled;
+
+      // Deaktivieren des Sub-Menüeintrags
       MainMenu.Items[i].Items[j].Enabled := False;
+    end;
+
+    // Speichere den Zustand in unserer Liste
+    MenuStates[i] := MenuState;
+
+    // Deaktivieren des Top-Level-Menüeintrags
+    MainMenu.Items[i].Enabled := False;
+  end;
+end;
+
+procedure EnableAllMenuItems(MainMenu: TMainMenu);
+var
+  i, j: Integer;
+begin
+  // Loop through all top-level menu items and restore their state
+  for i := 0 to MainMenu.Items.Count - 1 do
+  begin
+    // Stelle den Zustand des Top-Level-Menüeintrags wieder her
+    MainMenu.Items[i].Enabled := MenuStates[i].ItemEnabled;
+
+    // Stelle den Zustand der Sub-Menüeinträge wieder her
+    for j := 0 to MainMenu.Items[i].Count - 1 do
+    begin
+      MainMenu.Items[i].Items[j].Enabled := MenuStates[i].SubItemsEnabled[j];
     end;
   end;
 end;

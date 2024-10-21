@@ -15,7 +15,8 @@ uses
   Help in 'Help.pas' {HelpForm},
   CmDbPluginClient in 'CmDbPluginClient.pas',
   CmDbPluginShare in 'CmDbPluginShare.pas',
-  EncryptedZipFile in 'EncryptedZipFile.pas';
+  EncryptedZipFile in 'EncryptedZipFile.pas',
+  Memo in 'Memo.pas' {MemoForm};
 
 {$R *.res}
 

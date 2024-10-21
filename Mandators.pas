@@ -188,7 +188,7 @@ begin
   else if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') and (ttConfigVALUE.AsWideString <> '') then
   begin
     oldHashed := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
-    ADOConnection1.ExecSQL('update CONFIG set VALUE = '+ADOConnection1.SQLStringEscape(CmDbGetPasswordHash(AdoConnection1, ttConfigVALUE.AsWideString))+' where NAME = ''PASSWORD_HASHED'';');
+    ADOConnection1.ExecSQL('update CONFIG set VALUE = '+ADOConnection1.SQLStringEscape(CmDb_GetPasswordHash(AdoConnection1, ttConfigVALUE.AsWideString))+' where NAME = ''PASSWORD_HASHED'';');
     if oldHashed = '' then
       ShowMessage(SPasswordProtectionEnabled)
     else
@@ -610,41 +610,15 @@ begin
 end;
 
 procedure TMandatorsForm.Init;
-var
-  hashedPassword: string;
-  enteredPassword: string;
-resourcestring
-  SEnterPassword = 'Enter password:';
 begin
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
   Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
-  {$REGION 'Password check'}
-  hashedPassword := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
-  if hashedPassword <> '' then
+  if not CmDb_DatabasePasswordcheck(AdoConnection1) then
   begin
-    while true do
-    begin
-      if InputQuery(Application.Title, #0{password star} + SEnterPassword, enteredPassword) then
-      begin
-        if SameText(CmDbGetPasswordHash(AdoConnection1, enteredPassword), hashedPassword) then
-        begin
-          MainForm.CmDbZipPassword := enteredPassword;
-          break;
-        end
-        else
-        begin
-          enteredPassword := '';
-        end;
-      end
-      else
-      begin
-        Close;
-        Exit;
-      end;
-    end;
+    Close;
+    Exit;
   end;
-  {$ENDREGION}
   MainForm.DatabaseOpenedOnce := true;
   Screen.Cursor := crHourGlass;
   try

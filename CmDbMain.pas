@@ -27,7 +27,8 @@ type
     Cascade1: TMenuItem;
     TileHorizontally1: TMenuItem;
     TileVertically1: TMenuItem;
-    ProgressBar1: TProgressBar;
+    Showtextdump1: TMenuItem;
+    N3: TMenuItem;
     procedure Timer1Timer(Sender: TObject);
     procedure BackupandExit1Click(Sender: TObject);
     procedure OpenDatabase1Click(Sender: TObject);
@@ -40,6 +41,7 @@ type
     procedure TileHorizontally1Click(Sender: TObject);
     procedure TileVertically1Click(Sender: TObject);
     procedure FormPaint(Sender: TObject);
+    procedure Showtextdump1Click(Sender: TObject);
   private
     FCloseStarted: boolean;
     function BackupPath: string;
@@ -67,7 +69,7 @@ uses
   Mandators, AdoConnHelper, StrUtils, Help, CmDbPluginClient,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
   ShellApi, System.UITypes, System.Hash, DateUtils,
-  EncryptedZipFile, System.Zip;
+  EncryptedZipFile, System.Zip, Memo;
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
@@ -219,7 +221,7 @@ begin
       Application.ProcessMessages;
 
       // Make some optimizations for performance
-      CmDbDropTempTables(AdoConnection1);
+      CmDb_DropTempTables(AdoConnection1);
       DefragIndexes(AdoConnection1);
 
       sl := TStringList.Create;
@@ -227,7 +229,7 @@ begin
         if DatabaseOpenedOnce then
         begin
           {$REGION 'Check if something has changed'}
-          CmDb_GetFullTextDump(AdoConnection1, sl, ProgressBar1);
+          CmDb_GetFullTextDump(AdoConnection1, sl);
           CheckSumNow := THashSHA2.GetHashString(sl.Text); // SHA256
           ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
           if not SameText(ChecksumThen, ChecksumNow) then
@@ -528,6 +530,7 @@ begin
             zip.Extract(bakFileName, CmDbGetDefaultDataPath, false);
             bakFileName := IncludeTrailingPathDelimiter(CmDbGetDefaultDataPath) + bakFileName;
             deleteBakFileAfterwards := true;
+            if zip.Password <> '' then CmDbZipPassword := zip.Password;
             break;
           except
             on E: EZipInvalidPassword do
@@ -564,8 +567,17 @@ begin
         MDIChildren[i].Release; // No need to call OnCloseQuery, because we will destroy all data anyways
       end;
       Application.ProcessMessages;
-      CmDb_RestoreDatabase(AdoConnection1, bakFileName);
-      OpenDatabase1.Click;
+
+      // Avoid that the user clicks something!
+      DisableAllMenuItems(MainMenu1);
+      Application.ProcessMessages;
+      try
+        CmDb_RestoreDatabase(AdoConnection1, bakFileName);
+        OpenDatabase1.Click;
+      finally
+        EnableAllMenuItems(MainMenu1);
+        Application.ProcessMessages;
+      end;
     finally
       if deleteBakFileAfterwards then
         DeleteFile(bakFileName);
@@ -729,6 +741,37 @@ begin
       Exit;
     end;
   end;
+end;
+
+procedure TMainForm.Showtextdump1Click(Sender: TObject);
+var
+  sl: TStrings;
+resourcestring
+  SPleaseWait = 'Please wait... create text dump...';
+  STextdump = 'Text dump';
+begin
+  if not CmDb_DatabasePasswordcheck(AdoConnection1) then exit;
+  if Assigned(MemoForm) then
+  begin
+    RestoreMdiChild(MemoForm);
+    MemoForm.Memo1.Clear;
+  end
+  else
+  begin
+    MemoForm := TMemoForm.Create(self);
+  end;
+  MemoForm.Caption := SPleaseWait;
+  Screen.Cursor := crHourGlass;
+  sl := TStringList.Create;
+  try
+    CmDb_GetFullTextDump(AdoConnection1, sl);
+    MemoForm.Memo1.Lines.AddStrings(sl);
+  finally
+    FreeAndNil(sl);
+    Screen.Cursor := crDefault;
+  end;
+  MemoForm.Caption := STextDump;
+  MemoForm.Show;
 end;
 
 end.
