@@ -47,7 +47,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
-; Die Dinger werden von Delphi kompiliert
 Source: "..\bin64\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 Source: "..\bin64\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 Source: "..\bin64\CurConv.64.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode

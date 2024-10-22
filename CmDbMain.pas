@@ -44,7 +44,7 @@ type
     procedure Showtextdump1Click(Sender: TObject);
   private
     FCloseStarted: boolean;
-    function BackupPath: string;
+    function RealBackupPath: string;
     procedure PerformBackupAndDefrag;
     class procedure ZeichneHintergrundschrift(text1_normal,
       text2_kursiv: string; minScale: double); static;
@@ -176,10 +176,10 @@ begin
   end;
 end;
 
-function TMainForm.BackupPath: string;
+function TMainForm.RealBackupPath: string;
 begin
   Result := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''BACKUP_PATH'';'));
-  if Result = '' then Result := CmDb_GetDefaultDataPath;
+  if Result = '' then Result := CmDb_GetDefaultBackupPath;
 end;
 
 procedure TMainForm.BackupandExit1Click(Sender: TObject);
@@ -234,6 +234,7 @@ begin
           ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
           if not SameText(ChecksumThen, ChecksumNow) then
           begin
+            // TODO: For the very first backup, these values are "1+1" instead of "0+1". Is there any solution? (see https://github.com/danielmarschall/cmdb2/issues/4)
             NextBackupID := VariantToInteger(AdoConnection1.GetScalar('SELECT IDENT_CURRENT(''BACKUP'') + IDENT_INCR(''BACKUP'');'));
           end;
           {$ENDREGION}
@@ -243,7 +244,7 @@ begin
         begin
           {$REGION '1. Make a SQL Backup'}
           DBName := AdoConnection1.DatabaseName;
-          BackupFileName := IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.bak';
+          BackupFileName := IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + '.bak';
           if AdoConnection1.SupportsBackupCompression then
             AdoConnection1.ExecSQL('BACKUP DATABASE ' + ADOConnection1.SQLDatabaseNameEscape(DBName) + ' TO DISK = ' + ADOConnection1.SQLStringEscape(BackupFileName) + ' with format, compression;')
           else
@@ -251,7 +252,7 @@ begin
           {$ENDREGION}
 
           {$REGION '2. Write the Text Dump and Protocol Entry'}
-          sl.SaveToFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
+          sl.SaveToFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
           ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
           {$ENDREGION}
 
@@ -262,20 +263,20 @@ begin
             else
               zip := TEncryptedZipFile.Create(CmDbZipPassword);
             try
-              zip.Open(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_ZIP_EXT, TZipMode.zmWrite);
+              zip.Open(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_ZIP_EXT, TZipMode.zmWrite);
               try
-                zip.Add(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_BAK_EXT);
-                zip.Add(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
+                zip.Add(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_BAK_EXT);
+                zip.Add(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
               finally
                 zip.Close;
               end;
-              DeleteFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_BAK_EXT);
-              DeleteFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
+              DeleteFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_BAK_EXT);
+              DeleteFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
             finally
               FreeAndNil(zip);
             end;
           except
-            DeleteFile(IncludeTrailingPathDelimiter(BackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_ZIP_EXT);
+            DeleteFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_ZIP_EXT);
           end;
           {$ENDREGION}
         end;
@@ -497,7 +498,7 @@ resourcestring
   SZipPassword = 'ZIP Password';
   SPleaseWaitRestore = 'Please wait... Restore database...';
 begin
-  OpenDialog1.InitialDir := BackupPath;
+  OpenDialog1.InitialDir := RealBackupPath;
   if OpenDialog1.Execute(Handle) then
   begin
     if string.EndsText('.bak', OpenDialog1.FileName) then
@@ -527,8 +528,8 @@ begin
               end;
             end;
             if bakFileName = '' then raise Exception.Create(SInvalidBackupFile);
-            zip.Extract(bakFileName, CmDb_GetDefaultDataPath, false);
-            bakFileName := IncludeTrailingPathDelimiter(CmDb_GetDefaultDataPath) + bakFileName;
+            zip.Extract(bakFileName, CmDb_GetTempPath, false);
+            bakFileName := IncludeTrailingPathDelimiter(CmDb_GetTempPath) + bakFileName;
             deleteBakFileAfterwards := true;
             if zip.Password <> '' then CmDbZipPassword := zip.Password;
             break;

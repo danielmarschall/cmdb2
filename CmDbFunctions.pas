@@ -12,6 +12,8 @@ function CmDb_DatabasePasswordcheck(AdoConnection1: TAdoConnection): boolean;
 procedure DefragIndexes(AdoConnection: TAdoConnection; FragmentierungSchwellenWert: integer=10);
 function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params: string; WorkingDirectory: string; ncmdShow: Integer; wait: boolean): Integer;
 function CmDb_GetDefaultDataPath: string;
+function CmDb_GetDefaultBackupPath: string;
+function CmDb_GetTempPath: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
@@ -280,21 +282,32 @@ begin
   end;
 end;
 
-function CmDb_GetDefaultDataPath: string;
-
-  function GetUserDirectory: string;
-  var
-    Path: array [0..MAX_PATH] of Char;
-  begin
-    // Use SHGetFolderPath to get the user profile directory
-    if Succeeded(SHGetFolderPath(0, CSIDL_PROFILE, 0, 0, @Path[0])) then
-      Result := Path
-    else
-      Result := ''; // Return an empty string if it fails
-  end;
-
+function _GetUserDirectory: string;
+var
+  Path: array [0..MAX_PATH] of Char;
 begin
-  result := IncludeTrailingPathDelimiter(GetUserDirectory) + 'CMDB2';
+  // Use SHGetFolderPath to get the user profile directory
+  if Succeeded(SHGetFolderPath(0, CSIDL_PROFILE, 0, 0, @Path[0])) then
+    Result := Path
+  else
+    Result := ''; // Return an empty string if it fails
+end;
+
+function CmDb_GetDefaultDataPath: string;
+begin
+  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2\Data';
+  ForceDirectories(result);
+end;
+
+function CmDb_GetDefaultBackupPath: string;
+begin
+  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2\Backup';
+  ForceDirectories(result);
+end;
+
+function CmDb_GetTempPath: string;
+begin
+  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2\Temp';
   ForceDirectories(result);
 end;
 
