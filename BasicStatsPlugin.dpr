@@ -4,6 +4,7 @@ uses
   System.SysUtils,
   System.Classes,
   Adodb,
+  Variants,
   AdoConnHelper,
   Windows,
   ShellApi,
@@ -31,6 +32,14 @@ resourcestring
   DESC_5 = 'Things I am waiting for (Art, Payment, Upload)';
   DESC_6 = 'Things I need to do (Art, Payment, Upload)';
   DESC_4 = 'Top artists/clients';
+
+function _VariantToString(const Value: Variant): string;
+begin
+  if VarIsNull(Value) then
+    Result := ''
+  else
+    Result := VarToStr(Value);
+end;
 
 function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
 var
@@ -114,6 +123,7 @@ var
   AdoConn: TADOConnection;
   q: TADODataSet;
   Response: TCmDbPluginClickResponse;
+  LocalCurrency: string;
 begin
   if ResponseData = nil then Exit(E_PLUGIN_BAD_ARGS);
   try
@@ -167,6 +177,8 @@ begin
         Response.SqlInitialOrder := '__STATUS_ORDER, ART_STATUS, FOLDER';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := 'COMMISSION';
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := '';
       end
       else
       begin
@@ -207,6 +219,7 @@ begin
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
                           'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
                           'group by man.ID, year(cm.START_DATE), art.IS_ARTIST');
+          LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
         finally
           FreeAndNil(AdoConn);
         end;
@@ -215,9 +228,11 @@ begin
         Response.StatId := StatGuid;
         Response.StatName := DESC_2;
         Response.SqlTable := TempTableName(GUID_2, 'SUM_YEARS');
-        Response.SqlInitialOrder := 'YEAR desc, DIRECTION';
+        Response.SqlInitialOrder := 'YEAR, DIRECTION';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := '';
+        Response.ScrollToEnd := true;
+        Response.DisplayEditFormats := 'AMOUNT_LOCAL||#,##0.00 '+LocalCurrency+'||#,##0.00||MEAN_SINGLE||#,##0.00 '+LocalCurrency+'||#,##0.00';
       end
       else
       begin
@@ -240,6 +255,7 @@ begin
           try
             if not q.Eof then
             begin
+              LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
               Response.Handled := true;
               Response.Action := craStatistics;
               Response.StatId := GUID_2A;
@@ -248,6 +264,8 @@ begin
               Response.SqlInitialOrder := 'START_DATE';
               Response.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and year(START_DATE)='+q.FieldByName('YEAR').AsWideString+' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
               Response.BaseTableDelete := 'COMMISSION';
+              Response.ScrollToEnd := false;
+              Response.DisplayEditFormats := 'AMOUNT_LOCAL||#,##0.00 '+LocalCurrency+'||#,##0.00';
             end;
           finally
             FreeAndNil(q);
@@ -295,6 +313,7 @@ begin
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
                           'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
                           'group by man.ID, year(cm.START_DATE), month(cm.START_DATE), art.IS_ARTIST');
+          LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
         finally
           FreeAndNil(AdoConn);
         end;
@@ -303,9 +322,11 @@ begin
         Response.StatId := StatGuid;
         Response.StatName := DESC_3;
         Response.SqlTable := TempTableName(GUID_3, 'SUM_MONTHS');
-        Response.SqlInitialOrder := 'MONTH desc, DIRECTION';
+        Response.SqlInitialOrder := 'MONTH, DIRECTION';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := '';
+        Response.ScrollToEnd := true;
+        Response.DisplayEditFormats := 'AMOUNT_LOCAL||#,##0.00 '+LocalCurrency+'||#,##0.00||MEAN_SINGLE||#,##0.00 '+LocalCurrency+'||#,##0.00';
       end
       else
       begin
@@ -328,6 +349,7 @@ begin
           try
             if not q.Eof then
             begin
+              LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
               Response.Handled := true;
               Response.Action := craStatistics;
               Response.StatId := GUID_3A;
@@ -336,6 +358,8 @@ begin
               Response.SqlInitialOrder := 'START_DATE';
               Response.SqlAdditionalFilter := '__DIRECTION='''+q.FieldByName('DIRECTION').AsWideString+''' and cast(cast(year(START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(START_DATE))) + cast(month(START_DATE) as nvarchar(2)) as nvarchar(7)) = '''+q.FieldByName('MONTH').AsWideString+''' and __MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
               Response.BaseTableDelete := 'COMMISSION';
+              Response.ScrollToEnd := false;
+              Response.DisplayEditFormats := 'AMOUNT_LOCAL||#,##0.00 '+LocalCurrency+'||#,##0.00';
             end;
           finally
             FreeAndNil(q);
@@ -431,6 +455,8 @@ begin
         Response.SqlInitialOrder := 'TASK, SUBJECT';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := ''; // not possible, because there are multiple base items
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := '';
       end
       else
       begin
@@ -538,6 +564,8 @@ begin
         Response.SqlInitialOrder := 'TASK, SUBJECT';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := ''; // not possible, because there are multiple base items
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := '';
       end
       else
       begin
@@ -603,6 +631,7 @@ begin
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
                           'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') ' + #13#10 +
                           'group by man.ID, art.ID, art.NAME');
+          LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
         finally
           FreeAndNil(AdoConn);
         end;
@@ -614,6 +643,8 @@ begin
         Response.SqlInitialOrder := 'COUNT_COMMISSIONS desc, AMOUNT_LOCAL desc';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := 'ARTIST';
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := 'AMOUNT_LOCAL||#,##0.00 '+LocalCurrency+'||#,##0.00||MEAN_SINGLE||#,##0.00 '+LocalCurrency+'||#,##0.00';
       end
       else
       begin

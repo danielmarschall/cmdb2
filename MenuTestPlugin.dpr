@@ -141,6 +141,8 @@ begin
         Response.SqlInitialOrder := '';
         Response.SqlAdditionalFilter := '';
         Response.BaseTableDelete := '';
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := '';
       end
       else if IsEqualGUID(ItemGuid, GUID_1A) then
       begin

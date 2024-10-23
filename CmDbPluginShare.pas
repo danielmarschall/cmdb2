@@ -21,6 +21,8 @@ type
     SqlInitialOrder: string;
     SqlAdditionalFilter: string;
     BaseTableDelete: string;
+    ScrollToEnd: boolean;
+    DisplayEditFormats: string; // Format example: AMOUNT||#,##0.00 USD||#,##0.00||AMOUNT_LOCAL||#,##0.00 EUR||#,##0.00||...
     // Read/Write functions
     procedure WriteToMemory(const Memory: Pointer);
     procedure ReadFromMemory(const Memory: Pointer);
@@ -129,6 +131,8 @@ begin
       Self.SqlInitialOrder := _ReadWideString(Ptr);// SqlInitialOrder lesen
       Self.SqlAdditionalFilter := _ReadWideString(Ptr); // SqlAdditionalFilter lesen
       Self.BaseTableDelete := _ReadWideString(Ptr); // BaseTableDelete lesen
+      Self.ScrollToEnd := _ReadWideString(Ptr) = '1';
+      Self.DisplayEditFormats := _ReadWideString(Ptr);
     end;
   end;
 end;
@@ -159,6 +163,11 @@ begin
       _WriteWideString(Ptr, Self.SqlInitialOrder);// SqlInitialOrder
       _WriteWideString(Ptr, Self.SqlAdditionalFilter); // SqlAdditionalFilter
       _WriteWideString(Ptr, Self.BaseTableDelete); // BaseTableDelete
+      if ScrollToEnd then
+        _WriteWideString(Ptr, '1')
+      else
+        _WriteWideString(Ptr, '0');
+      _WriteWideString(Ptr, Self.DisplayEditFormats);
     end;
   end;
 end;

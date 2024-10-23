@@ -55,16 +55,10 @@ begin
     else
     begin
       StatisticsForm := TStatisticsForm.Create(Application.MainForm);
-      StatisticsForm.StatisticsId := resp.StatId;
-      StatisticsForm.StatisticsName := resp.StatName;
-      StatisticsForm.SqlTable := resp.SqlTable;
-      StatisticsForm.SqlInitialOrder := resp.SqlInitialOrder;
-      StatisticsForm.SqlAdditionalFilter := resp.SqlAdditionalFilter;
-      StatisticsForm.BaseTableDelete := resp.BaseTableDelete;
       StatisticsForm.MandatorId := MandatorId;
       StatisticsForm.ADOConnection1.Connected := false;
       StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
-      StatisticsForm.Init;
+      StatisticsForm.Init(resp);
     end;
   end
   else if resp.Action = craAbort then
@@ -93,6 +87,7 @@ begin
     @VtsPluginID := GetProcAddress(FDLLHandle, 'VtsPluginID');
     GetMem(AuthorInfo, 4096);
     try
+      ZeroMemory(AuthorInfo, 4096);
       if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer, AuthorInfo)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
         raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugin', [FPluginDllFilename]);
       VerInfo.ReadFromMemory(AuthorInfo);
@@ -147,6 +142,7 @@ begin
 
   GetMem(ResponseData, 4096);
   try
+    ZeroMemory(ResponseData, 4096);
     if Failed(ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData)) then
       raise Exception.CreateFmt('Call to %s failed in %s', ['ClickEventW', FPluginDllFilename]);
     Result.ReadFromMemory(ResponseData);

@@ -28,6 +28,14 @@ resourcestring
   DESC_2 = 'Commission folders not existing';
   DESC_3 = 'Comparison File System folders / Database folders';
 
+function _VariantToString(const Value: Variant): string;
+begin
+  if VarIsNull(Value) then
+    Result := ''
+  else
+    Result := VarToStr(Value);
+end;
+
 function VtsPluginID(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
 var
   AuthorInfo: TVtsPluginAuthorInfo;
@@ -119,14 +127,6 @@ function ClickEventW(DBConnStr: PChar; MandatorGuid, StatGuid,
         Exit;
       end;
     end;
-  end;
-
-  function _VariantToString(const Value: Variant): string;
-  begin
-    if VarIsNull(Value) then
-      Result := ''
-    else
-      Result := VarToStr(Value);
   end;
 
   function _Stat3_CompareFolders(AdoConn: TAdoConnection): boolean;
@@ -281,6 +281,8 @@ begin
         Response.SqlInitialOrder := 'ARTIST, NAME';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := 'COMMISSION';
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := '';
       end
       else
       begin
@@ -355,6 +357,8 @@ begin
         Response.SqlInitialOrder := 'ARTIST, NAME';
         Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
         Response.BaseTableDelete := 'COMMISSION';
+        Response.ScrollToEnd := false;
+        Response.DisplayEditFormats := '';
       end
       else
       begin
@@ -406,6 +410,8 @@ begin
           Response.SqlInitialOrder := 'PROBLEM, FOLDER';
           Response.SqlAdditionalFilter := '__MANDATOR_ID = ''' + MandatorGuid.ToString + '''';
           Response.BaseTableDelete := 'COMMISSION';
+          Response.ScrollToEnd := false;
+          Response.DisplayEditFormats := '';
         end;
       end
       else
