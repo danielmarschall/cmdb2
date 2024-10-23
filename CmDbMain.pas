@@ -674,7 +674,7 @@ begin
         {$ELSE}
         WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
         Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x86.exe'), '/install /norestart', '', SW_NORMAL, True);
+        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x86.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
         {$ENDIF}
 
         // 2. LocalDB
@@ -713,7 +713,7 @@ begin
       ShellExecute(Handle, 'open', PChar(ParamStr(0)), '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
       {$ENDREGION}
     end
-    else if MessageDlg(SRequireComponents, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) = mrYes then
+    else if MessageBox(Application.Handle, PChar(SRequireComponents), PChar(Application.Title), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) = ID_YES then
     begin
       ShellExecute(Handle, 'runas', PChar(ParamStr(0)), '/installredist', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
     end;

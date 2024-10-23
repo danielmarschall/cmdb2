@@ -1073,7 +1073,7 @@ var
   id, listname: string;
 begin
   if DeletedList.Contains(_DeletedListName(DataSet, localField)) then Abort;
-  if MessageDlg(SReallyDelete, TMsgDlgType.mtConfirmation, mbYesNoCancel, 0) <> ID_YES then Abort;
+  if MessageBox(Application.Handle, PChar(SReallyDelete), PChar(Application.Title), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) <> ID_YES then Abort;
 
   // Gather some basic info required for the next steps
   id := DataSet.FieldByName(localField).AsWideString;

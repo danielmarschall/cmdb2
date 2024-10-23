@@ -191,7 +191,7 @@ begin
         except
           on E: Exception do
           begin
-            MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+            MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
           end;
         end;
       until FindNext(SearchRec) <> 0;
@@ -223,7 +223,7 @@ begin
           except
             on E: Exception do
             begin
-              MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+              MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
             end;
           end;
         until FindNext(SearchRec) <> 0;
@@ -258,7 +258,7 @@ begin
         except
           on E: Exception do
           begin
-            MessageDlg(E.Message, TMsgDlgType.mtWarning, [mbOk], 0);
+            MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
           end;
         end;
       until FindNext(SearchRec) <> 0;
