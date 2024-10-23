@@ -103,6 +103,24 @@ begin
   end;
 end;
 
+function _ReadBool(var Src: PByte): Boolean;
+begin
+  // Das Byte lesen und True bei 1, False bei 0 zurückgeben
+  Result := PByte(Src)^ = 1;
+  Inc(Src, 1);  // Weiter zur nächsten Speicherposition nach dem Byte
+end;
+
+procedure _WriteBool(var Dest: PByte; const Value: Boolean);
+begin
+  // Speichert 1 für True und 0 für False
+  if Value then
+    PByte(Dest)^ := 1
+  else
+    PByte(Dest)^ := 0;
+
+  Inc(Dest, 1);  // Weiter zur nächsten Speicherposition nach dem Byte
+end;
+
 { TCmDbPluginClickResponse }
 
 procedure TCmDbPluginClickResponse.ReadFromMemory(const Memory: Pointer);
@@ -131,7 +149,7 @@ begin
       Self.SqlInitialOrder := _ReadWideString(Ptr);// SqlInitialOrder lesen
       Self.SqlAdditionalFilter := _ReadWideString(Ptr); // SqlAdditionalFilter lesen
       Self.BaseTableDelete := _ReadWideString(Ptr); // BaseTableDelete lesen
-      Self.ScrollToEnd := _ReadWideString(Ptr) = '1';
+      Self.ScrollToEnd := _ReadBool(Ptr);
       Self.DisplayEditFormats := _ReadWideString(Ptr);
     end;
   end;
@@ -163,10 +181,7 @@ begin
       _WriteWideString(Ptr, Self.SqlInitialOrder);// SqlInitialOrder
       _WriteWideString(Ptr, Self.SqlAdditionalFilter); // SqlAdditionalFilter
       _WriteWideString(Ptr, Self.BaseTableDelete); // BaseTableDelete
-      if ScrollToEnd then
-        _WriteWideString(Ptr, '1')
-      else
-        _WriteWideString(Ptr, '0');
+      _WriteBool(Ptr, Self.ScrollToEnd);
       _WriteWideString(Ptr, Self.DisplayEditFormats);
     end;
   end;

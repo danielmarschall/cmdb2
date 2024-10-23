@@ -556,8 +556,9 @@ object ArtistForm: TArtistForm
       ReadOnly = True
       Size = 4000
     end
-    object ttCommissionAMOUNT_LOCAL: TFloatField
+    object ttCommissionAMOUNT_LOCAL: TBcdField
       FieldName = 'AMOUNT_LOCAL'
+      Precision = 19
       ReadOnly = True
     end
     object ttCommissionMANDATOR_ID: TGuidField

@@ -63,7 +63,7 @@ type
     ttCommunicationCHANNEL: TWideStringField;
     ttCommunicationADDRESS: TWideStringField;
     ttCommunicationANNOTATION: TWideStringField;
-    ttCommissionAMOUNT_LOCAL: TFloatField;
+    ttCommissionAMOUNT_LOCAL: TBcdField;
     ttCommissionMANDATOR_ID: TGuidField;
     ttCommissionIS_ARTIST: TBooleanField;
     ttCommissionARTIST_NAME: TWideStringField;
