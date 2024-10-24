@@ -234,8 +234,7 @@ begin
           ChecksumThen := VariantToString(ADOConnection1.GetScalar('select top 1 CHECKSUM from [BACKUP] order by BAK_ID desc'));
           if not SameText(ChecksumThen, ChecksumNow) then
           begin
-            // TODO: For the very first backup, these values are "1+1" instead of "0+1". Is there any solution? (see https://github.com/danielmarschall/cmdb2/issues/4)
-            NextBackupID := VariantToInteger(AdoConnection1.GetScalar('SELECT IDENT_CURRENT(''BACKUP'') + IDENT_INCR(''BACKUP'');'));
+            NextBackupID := VariantToInteger(AdoConnection1.GetScalar('select isnull(max(BAK_ID),0)+1 from [BACKUP];'));
           end;
           {$ENDREGION}
         end;
@@ -253,7 +252,7 @@ begin
 
           {$REGION '2. Write the Text Dump and Protocol Entry'}
           sl.SaveToFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_TXT_EXT);
-          ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_DATE, BAK_LINES, CHECKSUM) VALUES (getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
+          ADOConnection1.ExecSQL('INSERT INTO [BACKUP] (BAK_ID, BAK_DATE, BAK_LINES, CHECKSUM) VALUES ('+IntToStr(NextBackupID)+', getdate(), '+IntToStr(sl.Count)+', '+AdoConnection1.SQLStringEscape(ChecksumNow)+')');
           {$ENDREGION}
 
           {$REGION 'Password-Encrypt ZIP file'}

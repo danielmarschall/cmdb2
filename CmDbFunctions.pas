@@ -797,9 +797,25 @@ begin
     end
     else if schemaVer = 3 then
     begin
+      {$REGION 'Update schema 3 => 4'}
+      // Remove Identity from BACKUP table, because the next value cannot be predicted due to Microsoft's crap decision
+      // see https://github.com/danielmarschall/cmdb2/issues/4
+      AdoConnection1.ExecSQL('EXEC sp_rename ''BACKUP'', ''BACKUP_OLD'';');
+      AdoConnection1.ExecSQL('EXEC sp_rename ''PK_BACKUP'', ''PK_BACKUP_OLD'';');
+      InstallSql(4, 'BACKUP');
+      AdoConnection1.ExecSQL('insert into [BACKUP] select * from BACKUP_OLD;');
+      AdoConnection1.ExecSQL('drop table BACKUP_OLD;');
+      InstallSql(4, 'vw_BACKUP');
+
+      // Update to Schema version 4
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''4'' where NAME = ''DB_VERSION''');
+      {$ENDREGION}
+    end
+    else if schemaVer = 4 then
+    begin
       // <<< Future update code goes here! >>>
 
-      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''4'' where NAME = ''DB_VERSION''');
+      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''5'' where NAME = ''DB_VERSION''');
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;
