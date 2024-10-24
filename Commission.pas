@@ -105,6 +105,7 @@ type
     procedure dbgEventsDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -781,6 +782,11 @@ begin
     ttUploads.Post;
 end;
 
+procedure TCommissionForm.FormCreate(Sender: TObject);
+begin
+  PageControl1.ActivePageIndex := 0;
+end;
+
 procedure TCommissionForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -843,7 +849,6 @@ begin
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
-  PageControl1.ActivePageIndex := 0;
   for i := 0 to PageControl2.PageCount-1 do
   begin
     PageControl2.pages[i].Visible := false;

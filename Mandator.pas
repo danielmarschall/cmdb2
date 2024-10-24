@@ -1024,6 +1024,7 @@ end;
 procedure TMandatorForm.FormCreate(Sender: TObject);
 begin
   Edit1Sav := TStringList.Create;
+  PageControl1.ActivePageIndex := 0;
 end;
 
 procedure TMandatorForm.FormDestroy(Sender: TObject);
@@ -1081,7 +1082,6 @@ begin
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
-  PageControl1.ActivePageIndex := 0;
   Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   Screen.Cursor := crHourGlass;
   try

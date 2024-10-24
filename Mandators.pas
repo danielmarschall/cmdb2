@@ -579,6 +579,7 @@ end;
 procedure TMandatorsForm.FormCreate(Sender: TObject);
 begin
   Edit1Sav := TStringList.Create;
+  PageControl1.ActivePageIndex := 0;
 end;
 
 procedure TMandatorsForm.FormDestroy(Sender: TObject);
@@ -615,7 +616,6 @@ end;
 procedure TMandatorsForm.Init;
 begin
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
-  PageControl1.ActivePageIndex := 0;
   Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   if not CmDb_DatabasePasswordcheck(AdoConnection1) then
   begin
