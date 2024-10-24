@@ -833,6 +833,7 @@ object MandatorForm: TMandatorForm
     Top = 96
     object ttStatisticsID: TGuidField
       FieldName = 'ID'
+      ReadOnly = True
       FixedChar = True
       Size = 38
     end
@@ -870,28 +871,34 @@ object MandatorForm: TMandatorForm
     Top = 88
     object ttCommissionID: TGuidField
       FieldName = 'ID'
+      ReadOnly = True
       FixedChar = True
       Size = 38
     end
     object ttCommissionARTIST_ID: TGuidField
       FieldName = 'ARTIST_ID'
+      ReadOnly = True
       FixedChar = True
       Size = 38
     end
     object ttCommissionIS_ARTIST: TBooleanField
       FieldKind = fkCalculated
       FieldName = 'IS_ARTIST'
+      ReadOnly = True
       Calculated = True
     end
     object ttCommissionNAME: TWideStringField
       FieldName = 'NAME'
+      ReadOnly = True
       Size = 100
     end
     object ttCommissionLEGACY_ID: TIntegerField
       FieldName = 'LEGACY_ID'
+      ReadOnly = True
     end
     object ttCommissionFOLDER: TWideStringField
       FieldName = 'FOLDER'
+      ReadOnly = True
       Size = 200
     end
     object ttCommissionPROJECT_NAME: TWideStringField
@@ -933,11 +940,13 @@ object MandatorForm: TMandatorForm
     end
     object ttCommissionMANDATOR_ID: TGuidField
       FieldName = 'MANDATOR_ID'
+      ReadOnly = True
       FixedChar = True
       Size = 38
     end
     object ttCommissionARTIST_NAME: TWideStringField
       FieldName = 'ARTIST_NAME'
+      ReadOnly = True
       Size = 50
     end
   end

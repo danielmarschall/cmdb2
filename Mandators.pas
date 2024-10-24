@@ -656,7 +656,7 @@ end;
 
 procedure TMandatorsForm.ttConfigBeforeEdit(DataSet: TDataSet);
 begin
-  if ttConfigREAD_ONLY.AsBoolean then Abort;
+  if ttConfigREAD_ONLY.AsBoolean then Abort; // Note: Unfortunately, we probably cannot make this cell cream colored!
 end;
 
 end.

@@ -242,7 +242,6 @@ end;
 procedure TStatisticsForm.ttQueryBeforeEdit(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, '__ID');
-  Abort;
 end;
 
 procedure TStatisticsForm.ttQueryBeforeInsert(DataSet: TDataSet);
@@ -462,6 +461,7 @@ procedure TStatisticsForm.Init(resp: TCmDbPluginClickResponse);
 
 var
   ttMandator: TAdoDataSet;
+  i: Integer;
 resourcestring
   SSForS = '%s for %s';
 begin
@@ -501,6 +501,10 @@ begin
     dbgQuery.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuery, navQuery);
     SetFormats(resp.DisplayEditFormats);
+    for i := 0 to ttQuery.FieldCount-1 do
+    begin
+      ttQuery.Fields[i].ReadOnly := true;
+    end;
     if resp.ScrollToEnd then ttQuery.Last;
     {$ENDREGION}
   finally

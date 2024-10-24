@@ -15,6 +15,7 @@ object CommissionForm: TCommissionForm
   Visible = True
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
   TextHeight = 15
@@ -23,7 +24,7 @@ object CommissionForm: TCommissionForm
     Top = 41
     Width = 758
     Height = 542
-    ActivePage = tsFiles
+    ActivePage = tsEvents
     Align = alClient
     TabOrder = 0
     object tsEvents: TTabSheet

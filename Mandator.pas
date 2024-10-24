@@ -353,7 +353,6 @@ end;
 procedure TMandatorForm.ttCommissionBeforeEdit(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
-  Abort;
 end;
 
 procedure TMandatorForm.ttCommissionBeforeInsert(DataSet: TDataSet);
@@ -463,7 +462,7 @@ end;
 
 procedure TMandatorForm.ttStatisticsBeforeEdit(DataSet: TDataSet);
 begin
-  Abort;
+  InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
 procedure TMandatorForm.ttStatisticsBeforeInsert(DataSet: TDataSet);
