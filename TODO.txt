@@ -1,9 +1,6 @@
 
 # TODO
 
-Statistics:
-- upload check plugin: plugin to check uploads not in cmdb recorded
-
 Ideas for the future:
 - Let users define additional commission event picklist values, and artist event picklist values
 - Allow drag'n'drop to the commission files shell view
