@@ -57,7 +57,7 @@ The database grid has the following columns:
 ## Artist/Client window tab "Communication"
 
 The database grid has the following columns:
-- Column `CHANNEL`: You can enter anything here, and additionally select from the picklist `PICKLIST_COMMUNICATION`. Typical things are "E-Mail-Adress", "Postal address", "Discord", "Telegram", but you can also use it to enter any other personal things.
+- Column `CHANNEL`: You can enter anything here, and additionally select from the picklist `PICKLIST_COMMUNICATION`. Typical things are "E-Mail-Address", "Postal address", "Discord", "Telegram", but you can also use it to enter any other personal things.
 - Column `ADDRESS`: Set the "address" or "thing" referenced by the channel.
 - Column `ANNOTATION`: Here you can enter any useful information.
 

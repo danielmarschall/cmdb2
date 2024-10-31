@@ -106,6 +106,7 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure ttUploadsBeforePost(DataSet: TDataSet);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -320,6 +321,11 @@ procedure TCommissionForm.ttUploadsBeforeEdit(DataSet: TDataSet);
 begin
   if ttEvents.State in [dsEdit, dsInsert] then ttEvents.Post;
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
+end;
+
+procedure TCommissionForm.ttUploadsBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('URL').AsWideString := StringReplace(DataSet.FieldByName('URL').AsWideString, '?upload-successful', '', []);
 end;
 
 procedure TCommissionForm.ttUploadsNewRecord(DataSet: TDataSet);

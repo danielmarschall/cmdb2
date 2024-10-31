@@ -478,6 +478,7 @@ object CommissionForm: TCommissionForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeEdit = ttUploadsBeforeEdit
+    BeforePost = ttUploadsBeforePost
     AfterPost = ttUploadsAfterPost
     BeforeDelete = ttUploadsBeforeDelete
     OnNewRecord = ttUploadsNewRecord
