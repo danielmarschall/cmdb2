@@ -155,6 +155,8 @@ type
     procedure dbgPaymentDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
+    procedure ttCommunicationBeforePost(DataSet: TDataSet);
+    procedure ttCommissionBeforePost(DataSet: TDataSet);
   private
     Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -209,6 +211,7 @@ var
 resourcestring
   SInvalidEventType = 'Invalid event type. Please pick one from the list.';
 begin
+  DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
   for i := 0 to dbgArtistEvent.Columns.Count-1 do
     if dbgArtistEvent.Columns.Items[i].Field.FieldName = 'STATE' then
       if dbgArtistEvent.Columns.Items[i].PickList.IndexOf(Dataset.FieldByName('STATE').AsWideString) = -1 then
@@ -237,6 +240,11 @@ begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
+procedure TArtistForm.ttCommissionBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
+end;
+
 procedure TArtistForm.ttCommissionNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
@@ -256,6 +264,13 @@ end;
 procedure TArtistForm.ttCommunicationBeforeEdit(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
+end;
+
+procedure TArtistForm.ttCommunicationBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('CHANNEL').AsWideString := Trim(DataSet.FieldByName('CHANNEL').AsWideString);
+  DataSet.FieldByName('ADDRESS').AsWideString := Trim(DataSet.FieldByName('ADDRESS').AsWideString);
+  DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
 end;
 
 procedure TArtistForm.ttCommunicationNewRecord(DataSet: TDataSet);
@@ -290,6 +305,9 @@ resourcestring
 const
   CacheMaxAge = 24*60*60;
 begin
+  DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
+  DataSet.FieldByName('PAYPROV').AsWideString := Trim(DataSet.FieldByName('PAYPROV').AsWideString);
+
   if Length(ttPaymentCURRENCY.AsWideString) <> 3 then
     raise Exception.Create(SInvalidCurrency)
   else

@@ -217,6 +217,8 @@ type
     procedure Timer2Timer(Sender: TObject);
     procedure dbgStatisticsDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure ttArtistsBeforePost(DataSet: TDataSet);
+    procedure ttClientsBeforePost(DataSet: TDataSet);
   private
     Edit1Sav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -265,6 +267,11 @@ begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
+procedure TMandatorForm.ttArtistsBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
+end;
+
 procedure TMandatorForm.ttArtistsNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
@@ -285,6 +292,11 @@ end;
 procedure TMandatorForm.ttClientsBeforeEdit(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
+end;
+
+procedure TMandatorForm.ttClientsBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
 end;
 
 procedure TMandatorForm.ttClientsNewRecord(DataSet: TDataSet);

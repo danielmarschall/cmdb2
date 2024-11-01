@@ -507,6 +507,7 @@ object ArtistForm: TArtistForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeEdit = ttCommissionBeforeEdit
+    BeforePost = ttCommissionBeforePost
     BeforeDelete = ttCommissionBeforeDelete
     AfterScroll = ttCommissionAfterScroll
     OnNewRecord = ttCommissionNewRecord
@@ -556,10 +557,10 @@ object ArtistForm: TArtistForm
       ReadOnly = True
       Size = 4000
     end
-    object ttCommissionAMOUNT_LOCAL: TBcdField
+    object ttCommissionAMOUNT_LOCAL: TBCDField
       FieldName = 'AMOUNT_LOCAL'
-      Precision = 19
       ReadOnly = True
+      Precision = 19
     end
     object ttCommissionMANDATOR_ID: TGuidField
       FieldName = 'MANDATOR_ID'
@@ -704,6 +705,7 @@ object ArtistForm: TArtistForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeEdit = ttCommunicationBeforeEdit
+    BeforePost = ttCommunicationBeforePost
     BeforeDelete = ttCommunicationBeforeDelete
     AfterScroll = ttCommunicationAfterScroll
     OnNewRecord = ttCommunicationNewRecord

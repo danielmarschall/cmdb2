@@ -204,6 +204,8 @@ resourcestring
 const
   CacheMaxAge = 24*60*60;
 begin
+  DataSet.FieldByName('DESCRIPTION').AsWideString := Trim(DataSet.FieldByName('DESCRIPTION').AsWideString);
+
   if Length(ttQuotesCURRENCY.AsWideString) <> 3 then
     raise Exception.Create(SInvalidCurrency)
   else
@@ -325,7 +327,9 @@ end;
 
 procedure TCommissionForm.ttUploadsBeforePost(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('URL').AsWideString := StringReplace(DataSet.FieldByName('URL').AsWideString, '?upload-successful', '', []);
+  DataSet.FieldByName('PAGE').AsWideString := Trim(DataSet.FieldByName('PAGE').AsWideString);
+  DataSet.FieldByName('URL').AsWideString := Trim(StringReplace(DataSet.FieldByName('URL').AsWideString, '?upload-successful', '', []));
+  DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
 end;
 
 procedure TCommissionForm.ttUploadsNewRecord(DataSet: TDataSet);
@@ -455,6 +459,8 @@ resourcestring
   SAnnotationSetNotAllowed = 'Annotations for Quotes and Uploads are automatically filled. Please remove the annotation you have entered.';
   SAnnotationEditNotAllowed = 'Annotations for Quotes and Uploads are automatically filled. You must not edit them.';
 begin
+  DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
+
   for i := 0 to dbgEvents.Columns.Count-1 do
     if dbgEvents.Columns.Items[i].Field.FieldName = 'STATE' then
       if dbgEvents.Columns.Items[i].PickList.IndexOf(Dataset.FieldByName('STATE').AsWideString) = -1 then

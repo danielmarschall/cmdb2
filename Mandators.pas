@@ -105,6 +105,7 @@ type
     procedure dbgConfigDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
+    procedure ttTextBackupBeforePost(DataSet: TDataSet);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -171,6 +172,8 @@ resourcestring
   SPasswordChanged = 'Password changed';
   SDirectoryDoesNotExist = 'Directory does not exist! Please enter a valid directory, or leave the value blank for the user directory.';
 begin
+  DataSet.FieldByName('VALUE').AsWideString := Trim(DataSet.FieldByName('VALUE').AsWideString);
+
   if (ttConfigNAME.AsWideString = 'BACKUP_PATH') then
   begin
     if (ttConfigVALUE.AsWideString <> '') and not DirectoryExists(ttConfigVALUE.AsWideString) then
@@ -210,6 +213,7 @@ end;
 
 procedure TMandatorsForm.ttMandatorBeforeEdit(DataSet: TDataSet);
 begin
+  DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
@@ -231,6 +235,11 @@ end;
 procedure TMandatorsForm.ttTextBackupBeforeInsert(DataSet: TDataSet);
 begin
   Abort;
+end;
+
+procedure TMandatorsForm.ttTextBackupBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
 end;
 
 procedure TMandatorsForm.SearchBtnClick(Sender: TObject);

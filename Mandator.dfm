@@ -637,6 +637,7 @@ object MandatorForm: TMandatorForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeEdit = ttArtistsBeforeEdit
+    BeforePost = ttArtistsBeforePost
     BeforeDelete = ttArtistsBeforeDelete
     AfterScroll = ttArtistsAfterScroll
     OnNewRecord = ttArtistsNewRecord
@@ -730,6 +731,7 @@ object MandatorForm: TMandatorForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeEdit = ttClientsBeforeEdit
+    BeforePost = ttClientsBeforePost
     BeforeDelete = ttClientsBeforeDelete
     AfterScroll = ttClientsAfterScroll
     OnNewRecord = ttClientsNewRecord

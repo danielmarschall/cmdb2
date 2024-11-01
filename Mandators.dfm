@@ -375,6 +375,7 @@ object MandatorsForm: TMandatorsForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeInsert = ttTextBackupBeforeInsert
+    BeforePost = ttTextBackupBeforePost
     BeforeDelete = ttTextBackupBeforeDelete
     AfterScroll = ttTextBackupAfterScroll
     OnNewRecord = ttMandatorNewRecord
