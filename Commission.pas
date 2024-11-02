@@ -49,7 +49,6 @@ type
     ttUploadsURL: TWideStringField;
     ttUploadsPROHIBIT: TBooleanField;
     ttUploadsANNOTATION: TWideStringField;
-    ttUploadsLEGACY_ID: TIntegerField;
     ttQuotesNO: TIntegerField;
     ttQuotesIS_FREE: TBooleanField;
     tsFiles: TTabSheet;

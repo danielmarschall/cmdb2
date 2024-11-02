@@ -73,7 +73,6 @@ type
     ttCommissionID: TGuidField;
     ttCommissionARTIST_ID: TGuidField;
     ttCommissionNAME: TWideStringField;
-    ttCommissionLEGACY_ID: TIntegerField;
     ttCommissionFOLDER: TWideStringField;
     ttCommissionPROJECT_NAME: TWideStringField;
     ttCommissionSTART_DATE: TDateTimeField;

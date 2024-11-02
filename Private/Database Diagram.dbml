@@ -5,7 +5,6 @@
       <Column Name="MANDATOR_ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
       <Column Name="NAME" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="IS_ARTIST" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="ARTIST_ARTIST_EVENT" Member="ARTIST_EVENT" ThisKey="ID" OtherKey="ARTIST_ID" Type="ARTIST_EVENT" />
       <Association Name="ARTIST_COMMISSION" Member="COMMISSION" ThisKey="ID" OtherKey="ARTIST_ID" Type="COMMISSION" />
       <Association Name="ARTIST_COMMUNICATION" Member="COMMUNICATION" ThisKey="ID" OtherKey="ARTIST_ID" Type="COMMUNICATION" />
@@ -22,7 +21,6 @@
       <Column Name="URL" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
       <Column Name="PROHIBIT" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="COMMISSION_EVENT_UPLOAD" Member="COMMISSION_EVENT" ThisKey="EVENT_ID" OtherKey="ID" Type="COMMISSION_EVENT" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
@@ -33,7 +31,6 @@
       <Column Name="DATE" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="STATE" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
       <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(250)" CanBeNull="true" />
-      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="ARTIST_ARTIST_EVENT" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
@@ -51,7 +48,6 @@
       <Column Name="ID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="ARTIST_ID" Type="System.Guid" DbType="UniqueIdentifier" CanBeNull="true" />
       <Column Name="NAME" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="FOLDER" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
       <Association Name="COMMISSION_COMMISSION_EVENT" Member="COMMISSION_EVENT" ThisKey="ID" OtherKey="COMMISSION_ID" Type="COMMISSION_EVENT" />
       <Association Name="ARTIST_COMMISSION" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" />
@@ -76,7 +72,6 @@
       <Column Name="CHANNEL" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="ADDRESS" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
       <Column Name="ANNOTATION" Type="System.String" DbType="NVarChar(150)" CanBeNull="true" />
-      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="ARTIST_COMMUNICATION" Member="ARTIST" ThisKey="ARTIST_ID" OtherKey="ID" Type="ARTIST" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
@@ -119,7 +114,6 @@
       <Column Name="AMOUNT_LOCAL" Type="System.Decimal" DbType="Money" CanBeNull="true" />
       <Column Name="IS_FREE" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Column Name="DESCRIPTION" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="LEGACY_ID" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="COMMISSION_EVENT_QUOTE" Member="COMMISSION_EVENT" ThisKey="EVENT_ID" OtherKey="ID" Type="COMMISSION_EVENT" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>

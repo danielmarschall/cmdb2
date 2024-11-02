@@ -45,6 +45,7 @@ const
 
 type
   // Note: This technique should be used by all DLL based ViaThinkSoft plugin architectures, not just CMDB2
+  // see https://www.viathinksoft.de/std/viathinksoft-std-0018-dll-plugin-info.html
   TVtsPluginID = function(lpTypeOut: PGUID; lpIdOut: PGUID; lpVerOut: PDWORD; lpAuthorInfo: Pointer): HRESULT; stdcall;
 
 const

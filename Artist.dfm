@@ -574,9 +574,6 @@ object ArtistForm: TArtistForm
       FieldName = 'ARTIST_NAME'
       Size = 50
     end
-    object ttCommissionLEGACY_ID: TIntegerField
-      FieldName = 'LEGACY_ID'
-    end
     object ttCommissionFOLDER: TWideStringField
       FieldName = 'FOLDER'
       Size = 200

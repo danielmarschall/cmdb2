@@ -813,9 +813,30 @@ begin
     end
     else if schemaVer = 4 then
     begin
+      {$REGION 'Update schema 4 => 5'}
+      // Remove LEGACY_ID fields which came from the non-public CMDB1 migration
+      AdoConnection1.ExecSQL('alter table ARTIST drop column LEGACY_ID;');
+      AdoConnection1.ExecSQL('alter table ARTIST_EVENT drop column LEGACY_ID;');
+      AdoConnection1.ExecSQL('alter table COMMISSION drop column LEGACY_ID;');
+      AdoConnection1.ExecSQL('alter table COMMUNICATION	drop column LEGACY_ID;');
+      AdoConnection1.ExecSQL('alter table QUOTE	drop column LEGACY_ID;');
+      AdoConnection1.ExecSQL('alter table UPLOAD drop column LEGACY_ID;');
+      InstallSql(3, 'vw_COMMISSION'); // must come before vw_ARTIST
+      InstallSql(1, 'vw_ARTIST');
+      InstallSql(1, 'vw_ARTIST_EVENT');
+      InstallSql(1, 'vw_COMMUNICATION');
+      InstallSql(1, 'vw_QUOTE');
+      InstallSql(1, 'vw_UPLOAD');
+
+      // Update to Schema version 5
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''5'' where NAME = ''DB_VERSION''');
+      {$ENDREGION}
+    end
+    else if schemaVer = 5 then
+    begin
       // <<< Future update code goes here! >>>
 
-      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''5'' where NAME = ''DB_VERSION''');
+      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''6'' where NAME = ''DB_VERSION''');
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;

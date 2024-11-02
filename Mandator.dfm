@@ -894,10 +894,6 @@ object MandatorForm: TMandatorForm
       ReadOnly = True
       Size = 100
     end
-    object ttCommissionLEGACY_ID: TIntegerField
-      FieldName = 'LEGACY_ID'
-      ReadOnly = True
-    end
     object ttCommissionFOLDER: TWideStringField
       FieldName = 'FOLDER'
       ReadOnly = True

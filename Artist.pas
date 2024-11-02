@@ -67,7 +67,6 @@ type
     ttCommissionMANDATOR_ID: TGuidField;
     ttCommissionIS_ARTIST: TBooleanField;
     ttCommissionARTIST_NAME: TWideStringField;
-    ttCommissionLEGACY_ID: TIntegerField;
     ttCommissionFOLDER: TWideStringField;
     ttCommissionPROJECT_NAME: TWideStringField;
     Timer1: TTimer;

@@ -515,9 +515,6 @@ object CommissionForm: TCommissionForm
       FieldName = 'ANNOTATION'
       Size = 100
     end
-    object ttUploadsLEGACY_ID: TIntegerField
-      FieldName = 'LEGACY_ID'
-    end
   end
   object dsUploads: TDataSource
     DataSet = ttUploads
