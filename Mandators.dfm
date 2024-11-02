@@ -353,6 +353,7 @@ object MandatorsForm: TMandatorsForm
     Connection = ADOConnection1
     CursorType = ctStatic
     BeforeEdit = ttMandatorBeforeEdit
+    BeforePost = ttMandatorBeforePost
     BeforeDelete = ttMandatorBeforeDelete
     AfterScroll = ttMandatorAfterScroll
     OnNewRecord = ttMandatorNewRecord

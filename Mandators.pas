@@ -106,6 +106,7 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
     procedure ttTextBackupBeforePost(DataSet: TDataSet);
+    procedure ttMandatorBeforePost(DataSet: TDataSet);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -213,8 +214,12 @@ end;
 
 procedure TMandatorsForm.ttMandatorBeforeEdit(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
+end;
+
+procedure TMandatorsForm.ttMandatorBeforePost(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
 end;
 
 procedure TMandatorsForm.ttMandatorNewRecord(DataSet: TDataSet);
