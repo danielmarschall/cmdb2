@@ -1,5 +1,7 @@
 program CmDb2;
 
+{$R *.dres}
+
 uses
   Vcl.Forms,
   CmDbMain in 'CmDbMain.pas' {MainForm},

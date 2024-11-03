@@ -181,6 +181,206 @@
             <Form>MemoForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <RcItem Include="DB\Schema1\[ARTIST].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_ARTIST</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[ARTIST_EVENT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_ARTIST_EVENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema4\[BACKUP].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL4_BACKUP</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[BACKUP].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_BACKUP</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[COMMISSION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_COMMISSION</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[COMMISSION_EVENT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_COMMISSION_EVENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[COMMUNICATION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_COMMUNICATION</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[CONFIG].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_CONFIG</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[DEFAULT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_DEFAULT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[MANDATOR].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_MANDATOR</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[PAYMENT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_PAYMENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[QUOTE].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_QUOTE</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[STATISTICS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_STATISTICS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[STATISTICS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_STATISTICS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[TEXT_BACKUP].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_TEXT_BACKUP</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[UPLOAD].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_UPLOAD</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_ARTIST].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_ARTIST</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_ARTIST_EVENT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_ARTIST_EVENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema4\[vw_BACKUP].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL4_VW_BACKUP</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[vw_BACKUP].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_VW_BACKUP</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema3\[vw_COMMISSION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL3_VW_COMMISSION</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_COMMISSION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_COMMISSION</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[vw_COMMISSION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_VW_COMMISSION</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_COMMISSION_EVENT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_COMMISSION_EVENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_COMMUNICATION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_COMMUNICATION</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_CONFIG].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_CONFIG</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[vw_CONFIG].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_VW_CONFIG</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_MANDATOR].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_MANDATOR</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_PAYMENT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_PAYMENT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_QUOTE].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_QUOTE</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_STAT_RUNNING_COMMISSIONS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_STAT_RUNNING_COMMISSIONS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_STAT_SUM_MONTHS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_STAT_SUM_MONTHS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_STAT_SUM_YEARS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_STAT_SUM_YEARS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_STAT_TEXT_EXPORT].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_STAT_TEXT_EXPORT</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_STAT_TOP_ARTISTS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_STAT_TOP_ARTISTS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[vw_STATISTICS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_VW_STATISTICS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_STATISTICS].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_STATISTICS</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_TEXT_BACKUP].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_TEXT_BACKUP</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema2\[vw_TEXT_BACKUP_GENERATE].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL2_VW_TEXT_BACKUP_GENERATE</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema1\[vw_UPLOAD].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL1_VW_UPLOAD</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -209,9 +409,255 @@
             <Deployment Version="4">
                 <DeployFile LocalName="CmDb2.64.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="CmDb2.64.exe" Configuration="Release" Class="ProjectOutput"/>
+                <DeployFile LocalName="DB\Schema1\[ARTIST].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[ARTIST_EVENT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[COMMISSION].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[COMMISSION_EVENT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[COMMUNICATION].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[CONFIG].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[DEFAULT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[MANDATOR].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[PAYMENT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[QUOTE].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[STATISTICS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[TEXT_BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[UPLOAD].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_ARTIST].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_ARTIST_EVENT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_COMMISSION].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_COMMISSION_EVENT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_COMMUNICATION].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_CONFIG].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_MANDATOR].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_PAYMENT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_QUOTE].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_STATISTICS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_STAT_RUNNING_COMMISSIONS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_STAT_SUM_MONTHS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_STAT_SUM_YEARS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_STAT_TEXT_EXPORT].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_STAT_TOP_ARTISTS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_TEXT_BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema1\[vw_UPLOAD].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[STATISTICS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[vw_BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[vw_COMMISSION].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[vw_CONFIG].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[vw_STATISTICS].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema2\[vw_TEXT_BACKUP_GENERATE].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema3\[vw_COMMISSION].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema4\[BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema4\[vw_BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="bin32\CmDb2.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="bin32\CmDb2.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
+                        <RemoteName>CmDb2.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin64\CmDb2.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>CmDb2.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

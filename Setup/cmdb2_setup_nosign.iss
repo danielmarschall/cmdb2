@@ -58,7 +58,6 @@ Source: "..\bin32\CurConv.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signo
 Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\HelpStyle.css"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\DB\*"; DestDir: "{app}\DB"; Flags: ignoreversion recursesubdirs
 
 ; sic: 32bit Redist must also be installed on Win64
 Source: "..\Redist\VC_redist.x64.exe"; DestName: "VC_redist.x64.exe"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: Is64BitInstallMode

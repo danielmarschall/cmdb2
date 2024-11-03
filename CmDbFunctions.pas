@@ -628,7 +628,6 @@ begin
   end;
 end;
 
-
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
 resourcestring
   SSchemaDUnknown = 'Schema %d is unknown. The database is probably newer than the software version.';
@@ -637,14 +636,17 @@ resourcestring
   procedure InstallSql(targetSchema: integer; fil: string);
   var
     sl: TStringList;
+    SQLStream: TResourceStream;
   begin
     try
       sl := TStringList.Create;
+      SQLStream := TResourceStream.Create(HInstance, 'SQL'+IntToStr(TargetSchema)+'_'+fil, RT_RCDATA);
       try
-        sl.LoadFromFile(ExtractFilePath(ParamStr(0))+'\..\DB\Schema'+IntToStr(targetSchema)+'\'+'['+fil+'].sql');
+        sl.LoadFromStream(SQLStream);
         AdoConnection1.ExecSQL(sl.Text);
       finally
         FreeAndNil(sl);
+        FreeAndNil(SQLStream);
       end;
     except
       on E: Exception do
