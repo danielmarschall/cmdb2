@@ -271,11 +271,6 @@
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>SQL1_VW_ARTIST_EVENT</ResourceId>
         </RcItem>
-        <RcItem Include="DB\Schema4\[vw_BACKUP].sql">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>SQL4_VW_BACKUP</ResourceId>
-        </RcItem>
         <RcItem Include="DB\Schema2\[vw_BACKUP].sql">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -355,11 +350,6 @@
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>SQL1_VW_STAT_TOP_ARTISTS</ResourceId>
-        </RcItem>
-        <RcItem Include="DB\Schema2\[vw_STATISTICS].sql">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>SQL2_VW_STATISTICS</ResourceId>
         </RcItem>
         <RcItem Include="DB\Schema1\[vw_STATISTICS].sql">
             <ContainerId>ResourceItem</ContainerId>
@@ -619,12 +609,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="DB\Schema2\[vw_STATISTICS].sql" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win64">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="DB\Schema2\[vw_TEXT_BACKUP_GENERATE].sql" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
@@ -638,12 +622,6 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="DB\Schema4\[BACKUP].sql" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win64">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="DB\Schema4\[vw_BACKUP].sql" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

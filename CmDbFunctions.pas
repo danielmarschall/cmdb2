@@ -726,7 +726,7 @@ begin
       begin
         AdoConnection1.DropTableOrView('STATISTICS');
         InstallSql(2, 'STATISTICS');
-        InstallSql(2, 'vw_STATISTICS');
+        InstallSql(1{sic}, 'vw_STATISTICS');
       end;
 
       if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
@@ -807,7 +807,7 @@ begin
       InstallSql(4, 'BACKUP');
       AdoConnection1.ExecSQL('insert into [BACKUP] select * from BACKUP_OLD;');
       AdoConnection1.ExecSQL('drop table BACKUP_OLD;');
-      InstallSql(4, 'vw_BACKUP');
+      InstallSql(2{sic}, 'vw_BACKUP');
 
       // Update to Schema version 4
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''4'' where NAME = ''DB_VERSION''');
@@ -823,12 +823,12 @@ begin
       AdoConnection1.ExecSQL('alter table COMMUNICATION	drop column LEGACY_ID;');
       AdoConnection1.ExecSQL('alter table QUOTE	drop column LEGACY_ID;');
       AdoConnection1.ExecSQL('alter table UPLOAD drop column LEGACY_ID;');
-      InstallSql(3, 'vw_COMMISSION'); // must come before vw_ARTIST
-      InstallSql(1, 'vw_ARTIST');
-      InstallSql(1, 'vw_ARTIST_EVENT');
-      InstallSql(1, 'vw_COMMUNICATION');
-      InstallSql(1, 'vw_QUOTE');
-      InstallSql(1, 'vw_UPLOAD');
+      InstallSql(3{sic}, 'vw_COMMISSION'); // must come before vw_ARTIST
+      InstallSql(1{sic}, 'vw_ARTIST');
+      InstallSql(1{sic}, 'vw_ARTIST_EVENT');
+      InstallSql(1{sic}, 'vw_COMMUNICATION');
+      InstallSql(1{sic}, 'vw_QUOTE');
+      InstallSql(1{sic}, 'vw_UPLOAD');
 
       // Update to Schema version 5
       AdoConnection1.ExecSQL('update CONFIG set VALUE = ''5'' where NAME = ''DB_VERSION''');
