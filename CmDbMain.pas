@@ -29,6 +29,7 @@ type
     TileVertically1: TMenuItem;
     Showtextdump1: TMenuItem;
     N3: TMenuItem;
+    ProgressBar1: TProgressBar;
     procedure Timer1Timer(Sender: TObject);
     procedure BackupandExit1Click(Sender: TObject);
     procedure OpenDatabase1Click(Sender: TObject);
@@ -221,8 +222,11 @@ begin
       Application.ProcessMessages;
 
       // Make some optimizations for performance
-      CmDb_DropTempTables(AdoConnection1);
-      DefragIndexes(AdoConnection1);
+      if DatabaseOpenedOnce then
+      begin
+        CmDb_DropTempTables(AdoConnection1);
+        DefragIndexes(AdoConnection1);
+      end;
 
       sl := TStringList.Create;
       try
@@ -638,11 +642,53 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
     end;
   end;
 
+  type
+    TGetLocalOrDownloadedExeResult = record
+      filename: string;
+      isTemp: boolean;
+    end;
+
+  function _GetLocalOrDownloadedExe(const ExeRelName, ProductName: string): TGetLocalOrDownloadedExeResult;
+  var
+    LocalExe, DownloadUrl: string;
+  begin
+    LocalExe := ExtractFilePath(ParamStr(0)) + '..\Redist\' + ExeRelName;
+    DownloadUrl := 'https://github.com/danielmarschall/cmdb2/raw/refs/heads/master/Redist/' + ExeRelName;
+    if FileExists(LocalExe) then
+    begin
+      result.filename := LocalExe;
+      result.isTemp := false;
+    end
+    else
+    begin
+      WaitLabel.Caption := 'Downloading '+ProductName+'...';
+      Application.ProcessMessages;
+      result.filename := IncludeTrailingPathDelimiter(CmDb_GetTempPath) + ExtractFileName(LocalExe);
+      result.isTemp := true;
+      ProgressBar1.Visible := true;
+      try
+        ProgressBar1.Min := 0;
+        ProgressBar1.Position := 0;
+        WinInet_DownloadFile(DownloadUrl, result.filename, ProgressBar1);
+      finally
+        ProgressBar1.Visible := false;
+      end;
+    end;
+    WaitLabel.Caption := 'Installing '+ProductName+'...';
+    Application.ProcessMessages;
+  end;
+
+  procedure _DeleteIfTemporary(f: TGetLocalOrDownloadedExeResult);
+  begin
+    if f.isTemp and FileExists(f.filename) then DeleteFile(f.filename);
+  end;
+
 resourcestring
   SRequireComponents = 'CMDB2 requires some Microsoft SQL Server components to be installed. Install them now?';
 var
   _IsLocalDbInstalled: boolean;
   _SqlServerClientDriverInstalled: boolean;
+  tmpDF: TGetLocalOrDownloadedExeResult;
 begin
   Timer1.Enabled := false;
 
@@ -664,29 +710,30 @@ begin
 
         // 1. Visual C++ Runtime (both 32bit and 64bit required according to Microsoft)
         {$IFDEF Win64}
-        WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
-        Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x86.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
-        WaitLabel.Caption := 'Installing Visual C++ Redistributable (64 Bit)...';
-        Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x64.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
+        tmpDF := _GetLocalOrDownloadedExe('VC_redist.x86.exe', 'Visual C++ Redistributable (32 Bit)');
+        ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
+        _DeleteIfTemporary(tmpDF);
+
+        tmpDF := _GetLocalOrDownloadedExe('VC_redist.x64.exe', 'Visual C++ Redistributable (64 Bit)');
+        ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
+        _DeleteIfTemporary(tmpDF);
         {$ELSE}
-        WaitLabel.Caption := 'Installing Visual C++ Redistributable (32 Bit)...';
-        Application.ProcessMessages;
-        ShellExecuteWait(Handle, 'runas', PChar(ExtractFilePath(ParamStr(0))+'..\Redist\VC_redist.x86.exe'), '/install /quiet /norestart', '', SW_NORMAL, True);
+        tmpDF := _GetLocalOrDownloadedExe('VC_redist.x86.exe', 'Visual C++ Redistributable (32 Bit)');
+        ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
+        _DeleteIfTemporary(tmpDF);
         {$ENDIF}
 
         // 2. LocalDB
         if not _IsLocalDbInstalled then
         begin
           {$IFDEF Win64}
-          WaitLabel.Caption := 'Installing SQL Server LocalDB (64 Bit)...';
-          Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\SqlLocalDB.x64.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x64.msi', 'SQL Server LocalDB (64 Bit)');
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
           {$ELSE}
-          WaitLabel.Caption := 'Installing SQL Server LocalDB (32 Bit)...';
-          Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\SqlLocalDB.x86.msi" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x86.msi', 'SQL Server LocalDB (32 Bit)');
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
           {$ENDIF}
         end;
 
@@ -694,13 +741,13 @@ begin
         if not _SqlServerClientDriverInstalled then
         begin
           {$IFDEF Win64}
-          WaitLabel.Caption := 'Installing SQL Server OLE DB Provider (64 Bit)...';
-          Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\msoledbsql19.x64.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          tmpDF := _GetLocalOrDownloadedExe('msoledbsql19.x64.msi', 'SQL Server OLE DB Provider (64 Bit)');
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
           {$ELSE}
-          WaitLabel.Caption := 'Installing SQL Server OLE DB Provider (32 Bit)...';
-          Application.ProcessMessages;
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+ExtractFilePath(ParamStr(0))+'..\Redist\msoledbsql19.x86.msi" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          tmpDF := _GetLocalOrDownloadedExe('msoledbsql19.x86.msi', 'SQL Server OLE DB Provider (32 Bit)');
+          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
           {$ENDIF}
         end;
       finally

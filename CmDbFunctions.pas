@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Forms, Variants, Graphics, Classes, DBGrids, AdoDb, AdoConnHelper, SysUtils,
-  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.Menus;
+  Db, DateUtils, Vcl.Grids, System.UITypes, VCL.DBCtrls, Vcl.Menus, Vcl.ComCtrls;
 
 procedure CmDb_DropTempTables(AdoConnection1: TAdoConnection);
 function CmDb_GetPasswordHash(AdoConnection1: TAdoConnection; const password: string): string;
@@ -35,10 +35,13 @@ procedure InsteadOfDeleteWorkaround_BeforeDelete(DataSet: TCustomADODataSet; con
 procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState; const localField: string);
 
+procedure WinInet_DownloadFile(const URL, FileName: string; pb: TProgressBar);
+
 implementation
 
 uses
-  ShlObj, ShellApi, System.Hash, Dialogs, CmDbMain, Artist, Commission, Mandator, Statistics;
+  ShlObj, ShellApi, System.Hash, Dialogs, WinInet,
+  CmDbMain, Artist, Commission, Mandator, Statistics;
 
 const
   LOCALDB_INSTANCE_NAME = 'MSSQLLocalDB';
@@ -1324,6 +1327,124 @@ begin
 
   // Reset font style after drawing
   TDBGrid(Sender).Canvas.Font.Style := [];
+end;
+
+procedure WinInet_DownloadFile(const URL, FileName: string; pb: TProgressBar);
+
+  const
+    USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+    MaxRedirects = 5;
+
+  function GetRedirectLocation(hRequest: HINTERNET): string;
+  var
+    Buffer: array[0..1023] of Char;
+    BufferLength, HeaderIndex: DWORD;
+  begin
+    Result := '';
+    BufferLength := SizeOf(Buffer);
+    HeaderIndex := 0;
+
+    // Query the "Location" header to get the new URL for redirection
+    if HttpQueryInfo(hRequest, HTTP_QUERY_LOCATION, @Buffer, BufferLength, HeaderIndex) then
+      Result := string(Buffer);
+  end;
+
+  function GetStatusCode(hRequest: HINTERNET): DWORD;
+  var
+    StatusCode: DWORD;
+    StatusCodeLen: DWORD;
+    HeaderIndex: DWORD;
+  begin
+    StatusCode := 0;
+    StatusCodeLen := SizeOf(StatusCode);
+    HeaderIndex := 0;
+
+    // Query the status code from the HTTP response
+    if HttpQueryInfo(hRequest, HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER, @StatusCode, StatusCodeLen, HeaderIndex) then
+      Result := StatusCode
+    else
+      Result := 0;
+  end;
+
+var
+  AUrl: string;
+  hSession, hRequest: HINTERNET;
+  Buffer: array[0..1023] of Byte;
+  BufferLen: DWORD;
+  FileStream: TFileStream;
+  FileSize, TotalRead: DWORD;
+  dwSize: DWORD;
+  reserved: DWORD;
+  StatusCode: DWORD;
+  RedirectCount: integer;
+begin
+  AUrl := Url;
+
+  hSession := InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
+  if not Assigned(hSession) then
+    raise Exception.Create('Error initializing WinInet: ' + SysErrorMessage(GetLastError));
+  try
+    RedirectCount := 0;
+    while true do
+    begin
+      hRequest := InternetOpenUrl(hSession, PChar(AURL), nil, 0, INTERNET_FLAG_RELOAD or INTERNET_FLAG_NO_CACHE_WRITE, 0);
+      if not Assigned(hRequest) then
+        raise Exception.Create('Error opening request: ' + SysErrorMessage(GetLastError));
+      try
+        StatusCode := GetStatusCode(hRequest);
+        if (StatusCode >= 300) and (StatusCode < 400) then
+        begin
+          Inc(RedirectCount);
+
+          // Stop following redirects if we exceed the maximum number of allowed redirects.
+          if RedirectCount > MaxRedirects then
+          begin
+            raise Exception.Create('Error: Too many redirects');
+          end;
+
+          // Get the "Location" header for the new URL
+          AURL := GetRedirectLocation(hRequest);
+        end
+        else if (StatusCode = 200) then
+        begin
+          dwSize := SizeOf(FileSize);
+          reserved := 0;
+          if pb <> nil then
+          begin
+            if HttpQueryInfo(hRequest, HTTP_QUERY_CONTENT_LENGTH or HTTP_QUERY_FLAG_NUMBER, @FileSize, dwSize, reserved) then
+              pb.Max := FileSize div 1024 // Number of KiB
+            else
+              pb.Max := 0;
+          end;
+
+          FileStream := TFileStream.Create(FileName, fmCreate);
+          try
+            TotalRead := 0;
+            repeat
+              // Lese Daten von der URL
+              InternetReadFile(hRequest, @Buffer, SizeOf(Buffer), BufferLen);
+              if BufferLen > 0 then
+              begin
+                FileStream.Write(Buffer, BufferLen);
+                TotalRead := TotalRead + BufferLen;
+                if pb <> nil then pb.Position := TotalRead div 1024;
+              end;
+            until BufferLen = 0;
+          finally
+            FileStream.Free;
+          end;
+
+          break;
+        end
+        else
+          raise Exception.CreateFmt('HTTP Error %d with GET request %s', [StatusCode, aurl]);
+      finally
+        InternetCloseHandle(hRequest);
+      end;
+    end;
+  finally
+    InternetCloseHandle(hSession);
+  end;
 end;
 
 initialization

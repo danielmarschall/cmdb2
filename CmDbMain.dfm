@@ -31,6 +31,14 @@ object MainForm: TMainForm
     ParentFont = False
     Visible = False
   end
+  object ProgressBar1: TProgressBar
+    Left = 16
+    Top = 88
+    Width = 521
+    Height = 41
+    TabOrder = 0
+    Visible = False
+  end
   object Timer1: TTimer
     Interval = 10
     OnTimer = Timer1Timer
