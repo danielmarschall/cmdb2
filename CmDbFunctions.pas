@@ -636,17 +636,17 @@ resourcestring
   procedure InstallSql(targetSchema: integer; fil: string);
   var
     sl: TStringList;
-    SQLStream: TResourceStream;
+    rcStream: TResourceStream;
   begin
     try
       sl := TStringList.Create;
-      SQLStream := TResourceStream.Create(HInstance, 'SQL'+IntToStr(TargetSchema)+'_'+fil, RT_RCDATA);
+      rcStream := TResourceStream.Create(HInstance, 'SQL'+IntToStr(TargetSchema)+'_'+fil, RT_RCDATA);
       try
-        sl.LoadFromStream(SQLStream);
+        sl.LoadFromStream(rcStream);
         AdoConnection1.ExecSQL(sl.Text);
       finally
         FreeAndNil(sl);
-        FreeAndNil(SQLStream);
+        FreeAndNil(rcStream);
       end;
     except
       on E: Exception do

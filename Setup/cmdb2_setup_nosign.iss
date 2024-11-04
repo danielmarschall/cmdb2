@@ -48,17 +48,13 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 Source: "..\bin64\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
-Source: "..\bin64\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
+Source: "..\bin64\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode; Excludes: "MenuTestPlugin.spl"
 Source: "..\bin64\CurConv.64.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: Is64BitInstallMode
 
 Source: "..\bin32\*.exe"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
-Source: "..\bin32\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
+Source: "..\bin32\*.spl"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode; Excludes: "MenuTestPlugin.spl"
 Source: "..\bin32\CurConv.dll"; DestDir: "{app}\bin"; Flags: ignoreversion signonce; Check: not Is64BitInstallMode
                                            
-Source: "license.rtf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\*.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\HelpStyle.css"; DestDir: "{app}"; Flags: ignoreversion
-
 ; sic: 32bit Redist must also be installed on Win64
 Source: "..\Redist\VC_redist.x64.exe"; DestName: "VC_redist.x64.exe"; DestDir: "{app}\Redist"; Flags: ignoreversion; Check: Is64BitInstallMode
 Source: "..\Redist\VC_redist.x86.exe"; DestName: "VC_redist.x86.exe"; DestDir: "{app}\Redist"; Flags: ignoreversion

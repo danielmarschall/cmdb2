@@ -386,7 +386,7 @@ begin
     HelpForm.Height := Round(Screen.Height * 0.8);
     HelpForm.Show;
   end;
-  HelpForm.ShowMarkDownHelp(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'..\'+MDFile);
+  HelpForm.ShowMarkDownHelp(MDFile);
   HelpForm.Caption := Format(SSHelp, [Caption]);
 end;
 

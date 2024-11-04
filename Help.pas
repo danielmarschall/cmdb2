@@ -52,22 +52,33 @@ end;
 procedure THelpForm.ShowMarkDownHelp(AMarkDownFile: string);
 var
   md: TMarkdownProcessor;
-  slHtml, slCss: TStringList;
-  cssFile: string;
+  slMarkdown, slHtml, slCss: TStringList;
   sHtml: string;
+  rcStream: TResourceStream;
 begin
   FDirectory := ExtractFilePath(AMarkDownFile);
   if FDirectory = '' then FDirectory := '.';
+  slMarkdown := TStringList.Create();
   slHtml := TStringList.Create();
   slCss := TStringList.Create();
   try
-    slHtml.LoadFromFile(AMarkDownFile);
-    cssFile := IncludeTrailingPathDelimiter(FDirectory) + 'HelpStyle.css'; // do not localize
-    if FileExists(cssFile) then
-      slCss.LoadFromFile(cssFile);
+    rcStream := TResourceStream.Create(HInstance, ChangeFileExt(AMarkDownFile, '_MD'), RT_RCDATA);
+    try
+      slMarkdown.LoadFromStream(rcStream);
+    finally
+      FreeAndNil(rcStream);
+    end;
+
+    rcStream := TResourceStream.Create(HInstance, 'HELPSTYLE_CSS', RT_RCDATA);
+    try
+      slCss.LoadFromStream(rcStream);
+    finally
+      FreeAndNil(rcStream);
+    end;
+
     md := TMarkdownProcessor.CreateDialect(mdCommonMark);
     try
-      sHtml := md.process(UTF8ToString(RawByteString(slHtml.Text)));
+      sHtml := md.process(UTF8ToString(RawByteString(slMarkdown.Text)));
       sHtml := sHtml.Replace('<p><img src="CmDb2_Screenshot', '<p><xx src="CmDb2_Screenshot'); // <-- thse images are only for GitHub, not for the integrated help. So invalidate them.
       //md.AllowUnsafe := true;
       ShowHTMLHelp(
@@ -84,6 +95,7 @@ begin
       FreeAndNil(md);
     end;
   finally
+    FreeAndNil(slMarkdown);
     FreeAndNil(slHtml);
     FreeAndNil(slCss);
   end;
@@ -104,7 +116,7 @@ begin
   else if SameText(ExtractFileExt(URL), '.md') then // do not localize
   begin
     if SameText(Copy(URL,1,6), 'about:') then // do not localize
-      ShowMarkDownHelp(IncludeTrailingPathDelimiter(FDirectory) + Copy(URL,7,Length(URL)))
+      ShowMarkDownHelp(Copy(URL,7,Length(URL)))
     else
       ShowMarkDownHelp(URL);
     Cancel := true;
