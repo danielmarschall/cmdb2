@@ -52,6 +52,12 @@
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
@@ -122,6 +128,12 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=ViaThinkSoft;FileDescription=Basic Stats Plugin;FileVersion=1.0.0.0;InternalName=;LegalCopyright=(C) 2024 Daniel Marschall, ViaThinkSoft;LegalTrademarks=;OriginalFilename=BasicStatsPlugin.spl;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Commission Database 2.0;ProductVersion=2.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=ViaThinkSoft;FileDescription=Basic Stats Plugin;FileVersion=1.0.0.0;InternalName=;LegalCopyright=(C) 2024 Daniel Marschall, ViaThinkSoft;LegalTrademarks=;OriginalFilename=BasicStatsPlugin.spl;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Commission Database 2.0;ProductVersion=2.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
