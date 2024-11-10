@@ -169,7 +169,7 @@ begin
     slPlugins.Insert(0, '');
     slPlugins.Insert(0, Format(S_InstallId, [InstallId]));
     slPlugins.Insert(0, '');
-    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
+    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, '1.4 / ' + FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
 
     ShowMessage(slPlugins.Text);
   finally
