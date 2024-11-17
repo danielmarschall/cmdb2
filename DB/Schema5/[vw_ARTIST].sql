@@ -60,6 +60,23 @@ tmp2_ARTIST_DEBT as (
 	select ARTIST_ID, ARTIST_NAME, CURRENCY, SUM(QUOTE_SUM) as DEBT
 	from tmp1_ARTIST_DEBT
 	group by ARTIST_ID, ARTIST_NAME, CURRENCY
+),
+tmp_PAY_STATUS as (
+	SELECT 
+		deb.ARTIST_ID,
+		isnull(STRING_AGG(
+		CASE WHEN deb.DEBT > 0 THEN N'DEBT '+cast(deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
+		WHEN deb.DEBT < 0 THEN N'CREDIT '+cast(-deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
+		ELSE null END, N' /// '), N'OKAY') as PAY_STATUS
+	FROM
+		tmp2_ARTIST_DEBT deb
+	group by deb.ARTIST_ID
+),
+tmp_RUNNING_COMMISSIONS as (
+	select cm.ARTIST_ID, COUNT(distinct cm.ID) as RUNNING_COMMISSIONS
+	from vw_COMMISSION cm
+	where not (cm.ART_STATUS = 'fin' or cm.ART_STATUS = 'idea' or cm.ART_STATUS like 'postponed%' or cm.ART_STATUS like 'on hold%' or cm.ART_STATUS like 'cancel %' or cm.ART_STATUS = 'c td initcm' or cm.ART_STATUS = 'rejected')
+	group by cm.ARTIST_ID
 )
 
 
@@ -94,29 +111,12 @@ upl.PROHIBIT_A,
 upl.PROHIBIT_C,
 cs.SUM_AMOUNT_LOCAL as AMOUNT_TOTAL_LOCAL,
 cs.COUNT_COMM as COMMISSION_COUNT,
-
-(
-	select COUNT(distinct cm.ID) as RUNNING_COMMISSIONS
-	from vw_COMMISSION cm
-	where cm.ARTIST_ID = art.ID
-	and not (cm.ART_STATUS = 'fin' or cm.ART_STATUS = 'idea' or cm.ART_STATUS like 'postponed%' or cm.ART_STATUS like 'on hold%' or cm.ART_STATUS like 'cancel %' or cm.ART_STATUS = 'c td initcm' or cm.ART_STATUS = 'rejected')
-) as COMMISSION_RUNNING,
-
+isnull(tmp_RUNNING_COMMISSIONS.RUNNING_COMMISSIONS,0) as COMMISSION_RUNNING,
 MINMAX_UPDATE_COMMISSION.MINVAL as FIRST_UPDATE_COMMISSION,
 MINMAX_UPDATE_ARTISTEVENT.MINVAL as FIRST_UPDATE_ARTISTEVENT,
 MINMAX_UPDATE_COMMISSION.MAXVAL as LAST_UPDATE_COMMISSION,
 MINMAX_UPDATE_ARTISTEVENT.MAXVAL as LAST_UPDATE_ARTISTEVENT,
-
-(
-	SELECT 
-		isnull(STRING_AGG(
-		CASE WHEN deb.DEBT > 0 THEN N'DEBT '+cast(deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
-			 WHEN deb.DEBT < 0 THEN N'CREDIT '+cast(-deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
-			 ELSE null
-		END, N' /// '), N'OKAY')
-	FROM
-		tmp2_ARTIST_DEBT deb where deb.ARTIST_ID = art.ID
-) as PAY_STATUS
+tmp_PAY_STATUS.PAY_STATUS as PAY_STATUS
 
 from ARTIST art
 left join UploadStuff upl on upl.ARTIST_ID = art.ID
@@ -149,3 +149,5 @@ left join (
 	group by 
 		ev.ARTIST_ID
 ) MINMAX_UPDATE_ARTISTEVENT on art.ID = MINMAX_UPDATE_ARTISTEVENT.ARTIST_ID
+left join tmp_RUNNING_COMMISSIONS on tmp_RUNNING_COMMISSIONS.ARTIST_ID = art.ID
+left join tmp_PAY_STATUS on tmp_PAY_STATUS.ARTIST_ID = art.ID
