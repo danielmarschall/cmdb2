@@ -384,10 +384,10 @@ begin
   else
   begin
     HelpForm := THelpForm.Create(self);
-    HelpForm.Left := Round(Screen.Width * 0.1);
-    HelpForm.Top := Round(Screen.Height * 0.1);
-    HelpForm.Width := Round(Screen.Width * 0.8);
-    HelpForm.Height := Round(Screen.Height * 0.8);
+    HelpForm.Left := Round(ClientWidth * 0.1);
+    HelpForm.Top := Round(ClientHeight * 0.1);
+    HelpForm.Width := Round(ClientWidth * 0.8);
+    HelpForm.Height := Round(ClientHeight * 0.8);
     HelpForm.Show;
   end;
   HelpForm.ShowMarkDownHelp(MDFile);
