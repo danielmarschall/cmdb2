@@ -1,5 +1,6 @@
 CREATE or ALTER view [dbo].[vw_ARTIST] as
 
+-- TODO: query is very slow!
 WITH FilteredUploads AS (
 	SELECT
 		art.ID AS ARTIST_ID,
@@ -30,7 +31,6 @@ UploadStuff as (
 		ARTIST_ID
 ),
 CommSums as (
-
 	SELECT art.ID as ARTIST_ID, COUNT(distinct cm.ID) as COUNT_COMM,
 	--SUM(q.AMOUNT) as SUM_AMOUNT,
 	SUM(q.AMOUNT_LOCAL) as SUM_AMOUNT_LOCAL
@@ -39,7 +39,6 @@ CommSums as (
 	left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID and ev.STATE = 'quote'
 	left join QUOTE q on q.EVENT_ID = ev.ID
 	group by art.ID
-
 ),
 tmp1_ARTIST_DEBT as (
 	select art.ID as ARTIST_ID, art.NAME as ARTIST_NAME, q.CURRENCY, SUM(isnull(q.AMOUNT,0)) as QUOTE_SUM
@@ -62,6 +61,8 @@ tmp2_ARTIST_DEBT as (
 	from tmp1_ARTIST_DEBT
 	group by ARTIST_ID, ARTIST_NAME, CURRENCY
 )
+
+
 select art.*,
 
 cast(isnull((
@@ -94,15 +95,18 @@ upl.PROHIBIT_C,
 cs.SUM_AMOUNT_LOCAL as AMOUNT_TOTAL_LOCAL,
 cs.COUNT_COMM as COMMISSION_COUNT,
 
--- TODO: this is slow! (1sec)
 (
-select COUNT(distinct cm.ID)
-from vw_COMMISSION cm
-where cm.ARTIST_ID = art.ID
-and not (cm.ART_STATUS = 'fin' or cm.ART_STATUS = 'idea' or cm.ART_STATUS like 'postponed%' or cm.ART_STATUS like 'on hold%' or cm.ART_STATUS like 'cancel %' or cm.ART_STATUS = 'c td initcm' or cm.ART_STATUS = 'rejected')
+	select COUNT(distinct cm.ID) as RUNNING_COMMISSIONS
+	from vw_COMMISSION cm
+	where cm.ARTIST_ID = art.ID
+	and not (cm.ART_STATUS = 'fin' or cm.ART_STATUS = 'idea' or cm.ART_STATUS like 'postponed%' or cm.ART_STATUS like 'on hold%' or cm.ART_STATUS like 'cancel %' or cm.ART_STATUS = 'c td initcm' or cm.ART_STATUS = 'rejected')
 ) as COMMISSION_RUNNING,
 
--- TODO: this is slow! (1sec)
+MINMAX_UPDATE_COMMISSION.MINVAL as FIRST_UPDATE_COMMISSION,
+MINMAX_UPDATE_ARTISTEVENT.MINVAL as FIRST_UPDATE_ARTISTEVENT,
+MINMAX_UPDATE_COMMISSION.MAXVAL as LAST_UPDATE_COMMISSION,
+MINMAX_UPDATE_ARTISTEVENT.MAXVAL as LAST_UPDATE_ARTISTEVENT,
+
 (
 	SELECT 
 		isnull(STRING_AGG(
@@ -117,3 +121,31 @@ and not (cm.ART_STATUS = 'fin' or cm.ART_STATUS = 'idea' or cm.ART_STATUS like '
 from ARTIST art
 left join UploadStuff upl on upl.ARTIST_ID = art.ID
 left join CommSums cs on cs.ARTIST_ID = art.ID
+left join (
+	select 
+		cm.ARTIST_ID,
+		MIN(ISNULL(ev.DATE, 0)) as MINVAL,
+		MAX(ISNULL(ev.DATE, 0)) as MAXVAL
+	from 
+		vw_COMMISSION cm
+	left join 
+		vw_COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID
+	where 
+		YEAR(ISNULL(ev.DATE, 0))     > 1950 -- avoid year 1900
+		AND YEAR(ISNULL(ev.DATE, 0)) < 2090 -- avoid year 2999
+	group by 
+		cm.ARTIST_ID
+) MINMAX_UPDATE_COMMISSION on art.ID = MINMAX_UPDATE_COMMISSION.ARTIST_ID
+left join (
+	select 
+		ev.ARTIST_ID,
+		MIN(ISNULL(ev.DATE, 0)) as MINVAL,
+		MAX(ISNULL(ev.DATE, 0)) as MAXVAL
+	from 
+		vw_ARTIST_EVENT ev
+	where 
+		YEAR(ISNULL(ev.DATE, 0))     > 1950 -- avoid year 1900
+		AND YEAR(ISNULL(ev.DATE, 0)) < 2090 -- avoid year 2999
+	group by 
+		ev.ARTIST_ID
+) MINMAX_UPDATE_ARTISTEVENT on art.ID = MINMAX_UPDATE_ARTISTEVENT.ARTIST_ID

@@ -73,6 +73,16 @@ object MandatorForm: TMandatorForm
           end
           item
             Expanded = False
+            FieldName = 'LAST_UPDATE'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'FIRST_UPDATE'
+            Visible = True
+          end
+          item
+            Expanded = False
             FieldName = 'UPLOAD_C'
             Visible = True
           end
@@ -170,6 +180,16 @@ object MandatorForm: TMandatorForm
           item
             Expanded = False
             FieldName = 'RUNNING'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'FIRST_UPDATE'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'LAST_UPDATE'
             Visible = True
           end
           item
@@ -726,6 +746,32 @@ object MandatorForm: TMandatorForm
       ReadOnly = True
       Size = 50
     end
+    object ttArtistsLAST_UPDATE_COMMISSION: TDateField
+      FieldName = 'LAST_UPDATE_COMMISSION'
+    end
+    object ttArtistsLAST_UPDATE_ARTISTEVENT: TDateField
+      FieldName = 'LAST_UPDATE_ARTISTEVENT'
+    end
+    object ttArtistsLAST_UPDATE: TDateField
+      FieldKind = fkCalculated
+      FieldName = 'LAST_UPDATE'
+      ReadOnly = True
+      OnGetText = ttArtistsLAST_UPDATEGetText
+      Calculated = True
+    end
+    object ttArtistsFIRST_UPDATE_COMMISSION: TDateField
+      FieldName = 'FIRST_UPDATE_COMMISSION'
+    end
+    object ttArtistsFIRST_UPDATE_ARTISTEVENT: TDateField
+      FieldName = 'FIRST_UPDATE_ARTISTEVENT'
+    end
+    object ttArtistsFIRST_UPDATE: TDateField
+      FieldKind = fkCalculated
+      FieldName = 'FIRST_UPDATE'
+      ReadOnly = True
+      OnGetText = ttArtistsFIRST_UPDATEGetText
+      Calculated = True
+    end
   end
   object ttClients: TADOQuery
     Connection = ADOConnection1
@@ -819,6 +865,32 @@ object MandatorForm: TMandatorForm
       FieldName = 'STATUS'
       ReadOnly = True
       Size = 50
+    end
+    object ttClientsLAST_UPDATE_COMMISSION: TDateField
+      FieldName = 'LAST_UPDATE_COMMISSION'
+    end
+    object ttClientsLAST_UPDATE_ARTISTEVENT: TDateField
+      FieldName = 'LAST_UPDATE_ARTISTEVENT'
+    end
+    object ttClientsLAST_UPDATE: TDateField
+      FieldKind = fkCalculated
+      FieldName = 'LAST_UPDATE'
+      ReadOnly = True
+      OnGetText = ttClientsLAST_UPDATEGetText
+      Calculated = True
+    end
+    object ttClientsFIRST_UPDATE_COMMISSION: TDateField
+      FieldName = 'FIRST_UPDATE_COMMISSION'
+    end
+    object ttClientsFIRST_UPDATE_ARTISTEVENT: TDateField
+      FieldName = 'FIRST_UPDATE_ARTISTEVENT'
+    end
+    object ttClientsFIRST_UPDATE: TDateField
+      FieldKind = fkCalculated
+      FieldName = 'FIRST_UPDATE'
+      ReadOnly = True
+      OnGetText = ttClientsFIRST_UPDATEGetText
+      Calculated = True
     end
   end
   object ttStatistics: TADOQuery

@@ -130,6 +130,18 @@ type
     GoBackBtn: TButton;
     ttStatisticsPLUGIN: TWideStringField;
     Timer2: TTimer;
+    ttArtistsLAST_UPDATE_COMMISSION: TDateField;
+    ttArtistsLAST_UPDATE_ARTISTEVENT: TDateField;
+    ttArtistsLAST_UPDATE: TDateField;
+    ttClientsLAST_UPDATE_COMMISSION: TDateField;
+    ttClientsLAST_UPDATE_ARTISTEVENT: TDateField;
+    ttClientsLAST_UPDATE: TDateField;
+    ttArtistsFIRST_UPDATE_COMMISSION: TDateField;
+    ttArtistsFIRST_UPDATE_ARTISTEVENT: TDateField;
+    ttArtistsFIRST_UPDATE: TDateField;
+    ttClientsFIRST_UPDATE_COMMISSION: TDateField;
+    ttClientsFIRST_UPDATE_ARTISTEVENT: TDateField;
+    ttClientsFIRST_UPDATE: TDateField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -218,6 +230,14 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure ttArtistsBeforePost(DataSet: TDataSet);
     procedure ttClientsBeforePost(DataSet: TDataSet);
+    procedure ttArtistsLAST_UPDATEGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure ttClientsLAST_UPDATEGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure ttArtistsFIRST_UPDATEGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure ttClientsFIRST_UPDATEGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
   private
     Edit1Sav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -271,6 +291,46 @@ begin
   DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
 end;
 
+procedure TMandatorForm.ttArtistsLAST_UPDATEGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if Sender.DataSet.FieldByName('LAST_UPDATE_COMMISSION').AsDateTime >
+     Sender.DataSet.FieldByName('LAST_UPDATE_ARTISTEVENT').AsDateTime then
+  begin
+    if Sender.DataSet.FieldByName('LAST_UPDATE_COMMISSION').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('LAST_UPDATE_COMMISSION').AsDateTime);
+  end
+  else
+  begin
+    if Sender.DataSet.FieldByName('LAST_UPDATE_ARTISTEVENT').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('LAST_UPDATE_ARTISTEVENT').AsDateTime);
+  end;
+end;
+
+procedure TMandatorForm.ttArtistsFIRST_UPDATEGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if Sender.DataSet.FieldByName('FIRST_UPDATE_COMMISSION').AsDateTime >
+     Sender.DataSet.FieldByName('FIRST_UPDATE_ARTISTEVENT').AsDateTime then
+  begin
+    if Sender.DataSet.FieldByName('FIRST_UPDATE_COMMISSION').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('FIRST_UPDATE_COMMISSION').AsDateTime);
+  end
+  else
+  begin
+    if Sender.DataSet.FieldByName('FIRST_UPDATE_ARTISTEVENT').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('FIRST_UPDATE_ARTISTEVENT').AsDateTime);
+  end;
+end;
+
 procedure TMandatorForm.ttArtistsNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
@@ -296,6 +356,46 @@ end;
 procedure TMandatorForm.ttClientsBeforePost(DataSet: TDataSet);
 begin
   DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
+end;
+
+procedure TMandatorForm.ttClientsLAST_UPDATEGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if Sender.DataSet.FieldByName('LAST_UPDATE_COMMISSION').AsDateTime >
+     Sender.DataSet.FieldByName('LAST_UPDATE_ARTISTEVENT').AsDateTime then
+  begin
+    if Sender.DataSet.FieldByName('LAST_UPDATE_COMMISSION').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('LAST_UPDATE_COMMISSION').AsDateTime);
+  end
+  else
+  begin
+    if Sender.DataSet.FieldByName('LAST_UPDATE_ARTISTEVENT').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('LAST_UPDATE_ARTISTEVENT').AsDateTime);
+  end;
+end;
+
+procedure TMandatorForm.ttClientsFIRST_UPDATEGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if Sender.DataSet.FieldByName('FIRST_UPDATE_COMMISSION').AsDateTime >
+     Sender.DataSet.FieldByName('FIRST_UPDATE_ARTISTEVENT').AsDateTime then
+  begin
+    if Sender.DataSet.FieldByName('FIRST_UPDATE_COMMISSION').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('FIRST_UPDATE_COMMISSION').AsDateTime);
+  end
+  else
+  begin
+    if Sender.DataSet.FieldByName('FIRST_UPDATE_ARTISTEVENT').IsNull then
+      Text := ''
+    else
+      Text := DateToStr(Sender.DataSet.FieldByName('FIRST_UPDATE_ARTISTEVENT').AsDateTime);
+  end;
 end;
 
 procedure TMandatorForm.ttClientsNewRecord(DataSet: TDataSet);
@@ -830,6 +930,10 @@ begin
     result := result + 'order by UPLOADS_A ' + AscDesc(SqlQueryArtistClient_asc) + ', COMMISSION_COUNT'
   else if SqlQueryArtistClient_order = 'UPLOAD_C' then
     result := result + 'order by UPLOADS_C ' + AscDesc(SqlQueryArtistClient_asc) + ', COMMISSION_COUNT'
+  else if SqlQueryArtistClient_order = 'LAST_UPDATE' then
+    result := result + 'order by iif(isnull(LAST_UPDATE_COMMISSION,0)>isnull(LAST_UPDATE_ARTISTEVENT,0),isnull(LAST_UPDATE_COMMISSION,0),isnull(LAST_UPDATE_ARTISTEVENT,0)) ' + AscDesc(SqlQueryArtistClient_asc)
+  else if SqlQueryArtistClient_order = 'FIRST_UPDATE' then
+    result := result + 'order by iif(isnull(FIRST_UPDATE_COMMISSION,0)>isnull(FIRST_UPDATE_ARTISTEVENT,0),isnull(FIRST_UPDATE_COMMISSION,0),isnull(FIRST_UPDATE_ARTISTEVENT,0)) ' + AscDesc(SqlQueryArtistClient_asc)
   else
     result := result + 'order by ' + SqlQueryArtistClient_order + ' ' + AscDesc(SqlQueryArtistClient_asc);
 end;
