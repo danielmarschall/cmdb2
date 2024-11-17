@@ -358,6 +358,7 @@ begin
       ttQuotes.Active := false;
       ttQuotes.SQL.Text := SqlQueryQuote('');
       ttQuotes.Active := true;
+      dbgQuotes.AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -374,6 +375,7 @@ begin
       ttUploads.Active := false;
       ttUploads.SQL.Text := SqlQueryUpload('');
       ttUploads.Active := true;
+      dbgUploads.AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;
