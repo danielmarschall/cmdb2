@@ -839,9 +839,20 @@ begin
     end
     else if schemaVer = 5 then
     begin
+      {$REGION 'Update schema 5 => 6'}
+      InstallSql(5, 'vw_COMMISSION'); // must come before vw_ARTIST
+      InstallSql(5, 'vw_ARTIST');
+      {$ENDREGION}
+
+      // Update to Schema version 6
+// TODO: enable as soon as version 1.5 is released!
+//      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''6'' where NAME = ''DB_VERSION''');
+    end
+    else if schemaVer = 6 then
+    begin
       // <<< Future update code goes here! >>>
 
-      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''6'' where NAME = ''DB_VERSION''');
+      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''7'' where NAME = ''DB_VERSION''');
 
       // We have reached the highest supported version and can now exit the loop.
       Exit;

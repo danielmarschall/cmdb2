@@ -410,6 +410,16 @@
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>README_MD</ResourceId>
         </RcItem>
+        <RcItem Include="DB\Schema5\[vw_ARTIST].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL5_VW_ARTIST</ResourceId>
+        </RcItem>
+        <RcItem Include="DB\Schema5\[vw_COMMISSION].sql">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL5_VW_COMMISSION</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -661,6 +671,18 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="DB\Schema4\[BACKUP].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema5\[vw_ARTIST].sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\Schema5\[vw_COMMISSION].sql" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

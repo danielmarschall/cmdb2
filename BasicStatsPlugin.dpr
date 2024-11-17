@@ -165,7 +165,7 @@ begin
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
-                          'where not (cm.ART_STATUS = ''fin'' or cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'')');
+                          'where not (cm.ART_STATUS = ''fin'' or cm.ART_STATUS = ''idea'' or cm.ART_STATUS like ''postponed%'' or cm.ART_STATUS like ''on hold%'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'')');
         finally
           FreeAndNil(AdoConn);
         end;
@@ -217,7 +217,7 @@ begin
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
                           'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
-                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS like ''postponed%'' or cm.ART_STATUS like ''on hold%'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
                           'group by man.ID, year(cm.START_DATE), art.IS_ARTIST');
           LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
         finally
@@ -311,7 +311,7 @@ begin
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
                           'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
-                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS like ''postponed%'' or cm.ART_STATUS like ''on hold%'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') and art.IS_ARTIST = 1 ' + #13#10 +
                           'group by man.ID, year(cm.START_DATE), month(cm.START_DATE), art.IS_ARTIST');
           LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
         finally
@@ -629,7 +629,7 @@ begin
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
                           'left join ARTIST art on art.ID = cm.ARTIST_ID ' + #13#10 +
                           'left join MANDATOR man on man.ID = art.MANDATOR_ID ' + #13#10 +
-                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS = ''postponed'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') ' + #13#10 +
+                          'where not (cm.ART_STATUS = ''idea'' or cm.ART_STATUS like ''postponed%'' or cm.ART_STATUS like ''on hold%'' or cm.ART_STATUS like ''cancel %'' or cm.ART_STATUS = ''c td initcm'' or cm.ART_STATUS = ''rejected'') ' + #13#10 +
                           'group by man.ID, art.ID, art.NAME');
           LocalCurrency := _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
         finally

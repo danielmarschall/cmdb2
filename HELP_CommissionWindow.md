@@ -10,7 +10,7 @@
 The database grid has the following columns:
 - Column `DATE`: The date of the event.
 - Column `STATE` is the art status (independent of the payment!) which can have the following values:
-	- `idea`: This marks the commission as idea. Nothing has yet been decided.
+	- `idea`: This marks the commission as idea (usually by the client), but nothing has yet been decided. ("Idea" usually means: far-future, project is uncertain)
 	- `c td initcm`: The client ("c") needs to do ("td") the initial commission ("initcm") description, which means they must contact the artist and tell what he wants to commish.
 	- `c aw ack`: The client ("c") awaits ("aw") that the commission is accepted/acknowledged ("ack").
 	- `quote`: A quote has been entered. **If this event is selected, a new tab "Quote" will be shown!**
@@ -23,7 +23,10 @@ The database grid has the following columns:
 	- `cancel a`: The artist ("a") has canceled the commission.
 	- `cancel c`: The client ("c") has canceled the commission.
 	- `rejected`: The commission was rejected.
-	- `postponed`: The commission has been postponed.
+	- `postponed a`: The commission has been postponed by the artist. ("Postponed" usually means: middle-future, project is uncertain)
+	- `postponed c`: The commission has been postponed by the client. ("Postponed" usually means: middle-future, project is uncertain)
+	- `on hold a`: The commission has been set "on hold" by the artist. ("On hold" usually means: near-future, project is certain)
+	- `on hold c`: The commission has been set "on hold" by the client. ("On hold" usually means: near-future, project is certain)
 	- `upload a`: The commission has been uploaded by the artist ("a"). This will change the `UPLOAD_A` column in the artist/client/commission overview. **If this event is selected, a new tab "Upload" will be shown!**
 	- `upload c`: The commission has been uploaded by the client ("c"). This will change the `UPLOAD_C` column in the artist/client/commission overview. **If this event is selected, a new tab "Upload" will be shown!**
 	- `upload x`: The commission has been uploaded by any other party ("x"). **If this event is selected, a new tab "Upload" will be shown!**

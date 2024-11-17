@@ -98,7 +98,10 @@ object CommissionForm: TCommissionForm
                 'cancel a'
                 'cancel c'
                 'rejected'
-                'postponed'
+                'postponed a'
+                'postponed c'
+                'on hold a'
+                'on hold c'
                 'upload a'
                 'upload c'
                 'upload x')
