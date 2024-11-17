@@ -806,6 +806,10 @@ begin
   else
   begin
     MemoForm := TMemoForm.Create(self);
+    MemoForm.Left := Round(ClientWidth * 0.1);
+    MemoForm.Top := Round(ClientHeight * 0.1);
+    MemoForm.Width := Round(ClientWidth * 0.8);
+    MemoForm.Height := Round(ClientHeight * 0.8);
   end;
   MemoForm.Caption := SPleaseWait;
   Screen.Cursor := crHourGlass;
