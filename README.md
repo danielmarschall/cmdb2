@@ -85,11 +85,11 @@ Backup files can be regularly purged by simply deleting the files.
 
 CMDB2 works with the "down payment" system. This allows partial payments or payments for multiple commissions at once.
 - In the commission window you create a "quote" event and enter the price of the commission
-- In the artist/client window you enter a payment. It is recommended to add the co
+- In the artist/client window you enter a payment. It is recommended to add the title of the commission to the annotation field, so you can easier see what the payment was for.
 
 The program automatically calculates how much debt or credit an artist/client has:
-- Sum of all payments - Sum of all commission quotes > 0 means there is a credit
-- Sum of all payments - Sum of all commission quotes < 0 means there is a debt
+- Sum of all payments - Sum of all commission quotes > 0 means there is a credit.
+- Sum of all payments - Sum of all commission quotes < 0 means there is a debt.
 - Sum of all payments - Sum of all commission quotes = 0 means everything has been paid for.
 
 ### How refunding works
