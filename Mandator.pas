@@ -1250,6 +1250,11 @@ begin
     Screen.Cursor := crDefault;
   end;
 
+  if (ttArtists.RecordCount = 0) and (ttClients.RecordCount > 0) then
+    PageControl1.ActivePage := tsClients
+  else
+    PageControl1.ActivePage := tsArtists;
+
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgArtists.Enabled := false;
   Timer2.Enabled := true;
