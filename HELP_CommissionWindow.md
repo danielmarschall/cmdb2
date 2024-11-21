@@ -16,7 +16,7 @@ The database grid has the following columns:
 	- `quote`: A quote has been entered. **If this event is selected, a new tab "Quote" will be shown!**
 	- `c aw sk`: The client ("c") waits ("aw") a sketch ("sk").
 	- `c td feedback`: The client ("c") needs to do ("td") a feedback report for a sketch/WIP he has received.
-	- `c aw cont`: The client ("c") waits ("aw") that the artwork is continue ("cont") after the first sketch has been approved.
+	- `c aw cont`: The client ("c") waits ("aw") that the artwork is continued ("cont") after the first sketch has been approved.
 	- `c aw hires`: The client ("c") waits ("aw") the final, high-resolution file (for digital art), or the painting shipped (for physical art).
 	- `fin`: The artwork is finished ("fin"). This sets the `END_DATE` status in the commission overview.
 	- `annot`: Annotation

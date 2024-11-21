@@ -9,7 +9,7 @@
 
 The database grid has the following columns:
 - Column `NAME` contains a name you give the commission. This is the only field you can edit.
-- Column `START_DATE` contains the start date of the commission (earliest "event" of a commission such as "aw sk"; excluded events are "quote", "annot", "upload a", "upload c", "upload x", "idea", and "c td initcm"
+- Column `START_DATE` contains the start date of the commission (earliest [event of a commission](HELP_CommissionWindow.md) such as "aw sk"; excluded events are "quote", "annot", "upload a", "upload c", "upload x", "idea", and "c td initcm")
 - Column `END_DATE` contains the end date of a commission (the "fin" event of a commission)
 - Column `ART_STATUS` contains the latest commission event such as "aw sk" or "fin"; excluded are the events "quote", "upload a", "upload c", "upload x", and "annot"
 - Column `PAY_STATUS` contains the payment status of the commission, which is `Paid`, `PART. PAID` (partially paid), or `NOT PAID`, including the amount and currency. (Can have multiple statements, if multiple currencies were used)
