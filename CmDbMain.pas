@@ -171,7 +171,7 @@ begin
     slPlugins.Insert(0, '');
     slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, '1.4 / ' + FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
 
-    ShowMessage(slPlugins.Text);
+    MessageBox(Application.Handle, PChar(slPlugins.Text), PChar(Application.Title), MB_OK or MB_ICONINFORMATION or MB_TASKMODAL);
   finally
     FreeAndNil(slPlugins);
   end;
@@ -289,7 +289,7 @@ begin
     except
       on E: Exception do
       begin
-        ShowMessageFmt(S_BackupFailed, [E.Message]);
+        MessageBox(Application.Handle, PChar(Format(S_BackupFailed, [E.Message])), PChar(Application.Title), MB_OK or MB_ICONERROR or MB_TASKMODAL);
       end;
     end;
   finally
@@ -783,7 +783,7 @@ begin
   except
     on E: Exception do
     begin
-      ShowMessage(E.Message);
+      MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONERROR or MB_TASKMODAL);
       Close;
       Exit;
     end;

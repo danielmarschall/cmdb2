@@ -148,14 +148,14 @@ begin
   begin
     if VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';')) = '' then
     begin
-      ShowMessage(SNoPasswordToRemove);
+      MessageBox(Application.Handle, PChar(SNoPasswordToRemove), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
     end
     else
     begin
       if MessageBox(Application.Handle, PChar(SReallyUnsetPassword), PChar(Application.Title), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) <> ID_YES then Abort;
       ADOConnection1.ExecSQL('update CONFIG set VALUE = '''' where NAME = ''PASSWORD_HASHED'';');
       MainForm.CmDbZipPassword := '';
-      ShowMessage(SPasswordProtectionDisabled);
+      MessageBox(Application.Handle, PChar(SPasswordProtectionDisabled), PChar(Application.Title), MB_OK or MB_ICONINFORMATION or MB_TASKMODAL);
     end;
   end;
   Abort;
@@ -196,9 +196,9 @@ begin
     oldHashed := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PASSWORD_HASHED'';'));
     ADOConnection1.ExecSQL('update CONFIG set VALUE = '+ADOConnection1.SQLStringEscape(CmDb_GetPasswordHash(AdoConnection1, ttConfigVALUE.AsWideString))+' where NAME = ''PASSWORD_HASHED'';');
     if oldHashed = '' then
-      ShowMessage(SPasswordProtectionEnabled)
+      MessageBox(Application.Handle, PChar(SPasswordProtectionEnabled), PChar(Application.Title), MB_OK or MB_ICONINFORMATION or MB_TASKMODAL)
     else
-      ShowMessage(SPasswordChanged);
+      MessageBox(Application.Handle, PChar(SPasswordChanged), PChar(Application.Title), MB_OK or MB_ICONINFORMATION or MB_TASKMODAL);
     MainForm.CmDbZipPassword := ttConfigVALUE.AsWideString;
     ttConfigVALUE.AsWideString := '';
   end;
