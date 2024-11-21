@@ -295,6 +295,7 @@ begin
       //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
       TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+      TDbGrid(Sender).AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;

@@ -460,6 +460,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+      TDbGrid(Sender).AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -505,6 +506,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+      TDbGrid(Sender).AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -543,6 +545,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+      TDbGrid(Sender).AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -581,6 +584,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+      TDbGrid(Sender).AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
     end;
