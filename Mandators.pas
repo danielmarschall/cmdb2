@@ -142,6 +142,7 @@ resourcestring
   SDeleteNotPossible = 'Delete not possible';
   SPasswordProtectionDisabled = 'Password protection disabled';
   SNoPasswordToRemove = 'Nothing to remove. Database is not password protected.';
+  SReallyUnsetPassword = 'Do you really want to disable password protection?';
 begin
   if (ttConfigNAME.AsWideString = 'NEW_PASSWORD') then
   begin
@@ -151,6 +152,7 @@ begin
     end
     else
     begin
+      if MessageBox(Application.Handle, PChar(SReallyUnsetPassword), PChar(Application.Title), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) <> ID_YES then Abort;
       ADOConnection1.ExecSQL('update CONFIG set VALUE = '''' where NAME = ''PASSWORD_HASHED'';');
       MainForm.CmDbZipPassword := '';
       ShowMessage(SPasswordProtectionDisabled);
