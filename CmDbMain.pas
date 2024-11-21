@@ -145,6 +145,7 @@ resourcestring
   S_InstalledPlugins = 'Installed plugins:';
 const
   DevelopmentYear = 2024;
+  GitHubVersion = '1.5';
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   InstallId := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
@@ -169,7 +170,7 @@ begin
     slPlugins.Insert(0, '');
     slPlugins.Insert(0, Format(S_InstallId, [InstallId]));
     slPlugins.Insert(0, '');
-    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, '1.4 / ' + FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
+    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, GitHubVersion + ' / ' + FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
 
     MessageBox(Application.Handle, PChar(slPlugins.Text), PChar(Application.Title), MB_OK or MB_ICONINFORMATION or MB_TASKMODAL);
   finally
