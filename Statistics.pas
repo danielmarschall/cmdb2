@@ -60,6 +60,7 @@ type
     SqlQueryStatistics_Order: string;
     SqlQueryStatistics_Asc: boolean;
     function SqlQueryStatistics(const search: string): string;
+    procedure SetFormats;
   protected
     MandatorName: string;
   public
@@ -70,6 +71,7 @@ type
     SqlInitialOrder: string;
     SqlAdditionalFilter: string;
     BaseTableDelete: string;
+    DisplayEditFormats: string;
     class function AddInfo(mandatorId: TGUID; sqlTable, sqlInitialOrder, sqlAdditionalFilter: string): string;
     procedure Init(resp: TCmDbPluginClickResponse);
   end;
@@ -210,6 +212,7 @@ begin
       ttQuery.SQL.Text := SqlQueryStatistics(Edit1.Text);
       ttQuery.Active := true;
       dbgQuery.HideColumnPrefix('__');
+      SetFormats;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -316,6 +319,7 @@ begin
     ds.SQL.Text := SqlQueryStatistics(Edit1.Text);
     ds.Active := true;
     TDbGrid(Column.Grid).HideColumnPrefix('__');
+    SetFormats; // for some reason, we need it only in this form, nowhere else. Because field list is dynamic? ( https://github.com/danielmarschall/cmdb2/issues/11 )
   finally
     Screen.Cursor := crDefault;
   end;
@@ -409,57 +413,56 @@ begin
   MainForm.ShowHelpWindow('HELP_Statistics.md');
 end;
 
-procedure TStatisticsForm.Init(resp: TCmDbPluginClickResponse);
+procedure TStatisticsForm.SetFormats;
+var
+  FormatParts: TArray<string>;
+  i: Integer;
+  FieldName, DisplayFormat, EditFormat: string;
+resourcestring
+  SInvalidFormatString = 'Invalid format string';
+  SInvalidFormatField = 'Field %s is not a field that supports DisplayFormat.';
+begin
+  // Split the string by '||'
+  FormatParts := DisplayEditFormats.Split(['||']);
 
-  procedure SetFormats(const FormatString: string);
-  var
-    FormatParts: TArray<string>;
-    i: Integer;
-    FieldName, DisplayFormat, EditFormat: string;
-  resourcestring
-    SInvalidFormatString = 'Invalid format string';
-    SInvalidFormatField = 'Field %s is not a field that supports DisplayFormat.';
+  // The string must have a number of parts that is a multiple of 3 (3 per field)
+  if (Length(FormatParts) mod 3) <> 0 then
+    raise Exception.Create(SInvalidFormatString);
+
+  // Iterate through the parts in groups of 3
+  for i := 0 to (Length(FormatParts) div 3) - 1 do
   begin
-    // Split the string by '||'
-    FormatParts := FormatString.Split(['||']);
+    FieldName := FormatParts[i * 3];
+    DisplayFormat := Trim(FormatParts[i * 3 + 1]);
+    EditFormat := Trim(FormatParts[i * 3 + 2]);
 
-    // The string must have a number of parts that is a multiple of 3 (3 per field)
-    if (Length(FormatParts) mod 3) <> 0 then
-      raise Exception.Create(SInvalidFormatString);
-
-    // Iterate through the parts in groups of 3
-    for i := 0 to (Length(FormatParts) div 3) - 1 do
+    // Set the formats for the field
+    if ttQuery.FieldByName(FieldName) is TNumericField then
     begin
-      FieldName := FormatParts[i * 3];
-      DisplayFormat := Trim(FormatParts[i * 3 + 1]);
-      EditFormat := Trim(FormatParts[i * 3 + 2]);
-
-      // Set the formats for the field
-      if ttQuery.FieldByName(FieldName) is TNumericField then
-      begin
-        TNumericField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
-        TNumericField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
-      end
-      else if ttQuery.FieldByName(FieldName) is TDateTimeField then
-      begin
-        TDateTimeField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
-        //TDateTimeField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
-      end
-      else if ttQuery.FieldByName(FieldName) is TSQLTimeStampField then
-      begin
-        TSQLTimeStampField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
-        //TSQLTimeStampField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
-      end
-      else if ttQuery.FieldByName(FieldName) is TAggregateField then
-      begin
-        TAggregateField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
-        //TAggregateField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
-      end
-      else
-        raise Exception.CreateFmt(SInvalidFormatField, [FieldName]);
-    end;
+      TNumericField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
+      TNumericField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
+    end
+    else if ttQuery.FieldByName(FieldName) is TDateTimeField then
+    begin
+      TDateTimeField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
+      //TDateTimeField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
+    end
+    else if ttQuery.FieldByName(FieldName) is TSQLTimeStampField then
+    begin
+      TSQLTimeStampField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
+      //TSQLTimeStampField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
+    end
+    else if ttQuery.FieldByName(FieldName) is TAggregateField then
+    begin
+      TAggregateField(ttQuery.FieldByName(FieldName)).DisplayFormat := DisplayFormat;
+      //TAggregateField(ttQuery.FieldByName(FieldName)).EditFormat := EditFormat;
+    end
+    else
+      raise Exception.CreateFmt(SInvalidFormatField, [FieldName]);
   end;
+end;
 
+procedure TStatisticsForm.Init(resp: TCmDbPluginClickResponse);
 var
   ttMandator: TAdoDataSet;
   i: Integer;
@@ -472,6 +475,7 @@ begin
   SqlInitialOrder := resp.SqlInitialOrder;
   SqlAdditionalFilter := resp.SqlAdditionalFilter;
   BaseTableDelete := resp.BaseTableDelete;
+  DisplayEditFormats := resp.DisplayEditFormats;
 
   ttMandator := ADOConnection1.GetTable('select NAME from MANDATOR where ID = ''' + MandatorId.ToString + '''');;
   try
@@ -501,7 +505,7 @@ begin
     dbgQuery.HideColumnPrefix('__');
     dbgQuery.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuery, navQuery);
-    SetFormats(resp.DisplayEditFormats);
+    SetFormats;
     for i := 0 to ttQuery.FieldCount-1 do
     begin
       ttQuery.Fields[i].ReadOnly := true;
