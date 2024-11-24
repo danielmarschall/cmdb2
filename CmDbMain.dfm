@@ -71,6 +71,7 @@ object MainForm: TMainForm
     end
     object OpenDatabase1: TMenuItem
       Caption = 'Open Database'
+      ShortCut = 16459
       OnClick = OpenDatabase1Click
     end
     object Window1: TMenuItem
