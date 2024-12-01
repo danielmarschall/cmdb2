@@ -1161,6 +1161,7 @@ begin
     not (ttArtists.State in [dsEdit,dsInsert]) and
     not (ttClients.State in [dsEdit,dsInsert]) and
     not (ttCommission.State in [dsEdit,dsInsert]) and
+    not (ttPayment.State in [dsEdit,dsInsert]) and
     not (ttStatistics.State in [dsEdit,dsInsert]) then
   begin
     Tag := 1; // tell FormKeyUp that we may close
