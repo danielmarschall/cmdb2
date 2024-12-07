@@ -106,7 +106,7 @@ begin
     //       (this is important if the dataset is not a view but a table filled by the plugin).
     //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
     TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
-    AdoQueryRefresh(ttQuery, '');
+    AdoQueryRefresh(ttQuery, '__ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -297,7 +297,7 @@ begin
       //       (this is important if the dataset is not a view but a table filled by the plugin).
       //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
       TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
+      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, '__ID');
       TDbGrid(Sender).AutoSizeColumns;
     finally
       Screen.Cursor := crDefault;
