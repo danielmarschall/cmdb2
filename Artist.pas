@@ -918,6 +918,8 @@ begin
     dbgPayment.Columns[5].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
     dbgPayment.Columns[5].DropDownRows := 15;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgPayment, navPayment);
+    ttPaymentAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttPaymentAMOUNT_LOCAL.EditFormat := Trim('#,##0.00');
     {$ENDREGION}
     {$REGION 'ttArtistEvent / dbgArtistEvent'}
     ttArtistEvent.Active := false;

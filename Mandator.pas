@@ -1244,6 +1244,8 @@ begin
     dbgPayment.Columns[6].PickList.DelimitedText := VariantToString(ADOConnection1.GetScalar('select VALUE from CONFIG where NAME = ''PICKLIST_PAYPROVIDER'''));
     dbgPayment.Columns[6].DropDownRows := 15;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgPayment, navPayment);
+    ttPaymentAMOUNT_LOCAL.DisplayFormat := Trim('#,##0.00 ' + LocalCurrency);
+    ttPaymentAMOUNT_LOCAL.EditFormat := Trim('#,##0.00');
     {$ENDREGION}
     {$REGION 'ttStatistics / dbgStatistics'}
     TCmDbPluginClient.InitAllPlugins(AdoConnection1); // re-fills STATISTICS from plugins
