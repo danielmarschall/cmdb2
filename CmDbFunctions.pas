@@ -1397,6 +1397,7 @@ begin
     RedirectCount := 0;
     while true do
     begin
+      if Assigned(Application) and Application.Terminated then Abort;
       hRequest := InternetOpenUrl(hSession, PChar(AURL), nil, 0, INTERNET_FLAG_RELOAD or INTERNET_FLAG_NO_CACHE_WRITE, 0);
       if not Assigned(hRequest) then
         raise Exception.Create('Error opening request: ' + SysErrorMessage(GetLastError));
@@ -1439,6 +1440,7 @@ begin
                 TotalRead := TotalRead + BufferLen;
                 if pb <> nil then pb.Position := TotalRead div 1024;
               end;
+              if Assigned(Application) and Application.Terminated then Abort;
             until BufferLen = 0;
           finally
             FileStream.Free;
