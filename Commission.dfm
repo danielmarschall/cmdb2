@@ -443,6 +443,7 @@ object CommissionForm: TCommissionForm
     BeforeEdit = ttEventsBeforeEdit
     BeforePost = ttEventsBeforePost
     BeforeDelete = ttEventsBeforeDelete
+    BeforeScroll = ttEventsBeforeScroll
     AfterScroll = ttEventsAfterScroll
     OnNewRecord = ttEventsNewRecord
     Parameters = <>

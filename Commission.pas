@@ -106,6 +106,7 @@ type
     procedure Timer2Timer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ttUploadsBeforePost(DataSet: TDataSet);
+    procedure ttEventsBeforeScroll(DataSet: TDataSet);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -740,7 +741,11 @@ procedure TCommissionForm.dbgUploadsDblClick(Sender: TObject);
 begin
   if ttUploads.RecordCount = 0 then exit;
   if ttUploadsURL.AsWideString = '' then exit;
-  ShellExecute(Handle, 'open', PChar(ttUploadsURL.AsWideString), '', '', SW_NORMAL);
+  if StartsText('http://', ttUploadsURL.AsWideString) or
+     StartsText('https://', ttUploadsURL.AsWideString) then
+  begin
+    ShellExecute(Handle, 'open', PChar(ttUploadsURL.AsWideString), '', '', SW_NORMAL);
+  end;
 end;
 
 procedure TCommissionForm.dbgUploadsDrawColumnCell(Sender: TObject;
@@ -904,6 +909,14 @@ begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgEvents.Enabled := false;
   Timer2.Enabled := true;
+end;
+
+procedure TCommissionForm.ttEventsBeforeScroll(DataSet: TDataSet);
+begin
+  if (ttQuotes.State=dsEdit) or ((ttQuotes.State=dsInsert) and (ttQuotesAMOUNT.AsWideString<>'')) then
+    ttQuotes.Post;
+  if (ttUploads.State=dsEdit) or ((ttUploads.State=dsInsert) and ((ttUploadsPAGE.AsWideString<>'') or (ttUploadsURL.AsWideString<>''))) then
+    ttUploads.Post;
 end;
 
 end.
