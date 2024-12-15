@@ -57,6 +57,7 @@ type
     ttConfigREAD_ONLY: TBooleanField;
     ttTextBackupCHECKSUM: TStringField;
     Timer2: TTimer;
+    openMandator: TBitBtn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -66,7 +67,6 @@ type
     procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchBtnClick(Sender: TObject);
     procedure ttTextBackupBeforeInsert(DataSet: TDataSet);
-    procedure dbgConfigDblClick(Sender: TObject);
     procedure ttConfigBeforeInsert(DataSet: TDataSet);
     procedure ttConfigBeforeDelete(DataSet: TDataSet);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -107,6 +107,7 @@ type
     procedure Timer2Timer(Sender: TObject);
     procedure ttTextBackupBeforePost(DataSet: TDataSet);
     procedure ttMandatorBeforePost(DataSet: TDataSet);
+    procedure openMandatorClick(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -276,11 +277,6 @@ procedure TMandatorsForm.csvTextBackupClick(Sender: TObject);
 begin
   if sdCsvTextBackup.Execute then
     SaveGridToCsv(dbgTextBackup, sdCsvTextBackup.FileName);
-end;
-
-procedure TMandatorsForm.dbgConfigDblClick(Sender: TObject);
-begin
-  // Nothing here
 end;
 
 procedure TMandatorsForm.dbgConfigDrawColumnCell(Sender: TObject;
@@ -671,6 +667,11 @@ begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgMandator.Enabled := false;
   Timer2.Enabled := true;
+end;
+
+procedure TMandatorsForm.openMandatorClick(Sender: TObject);
+begin
+  dbgMandatorDblClick(dbgMandator);
 end;
 
 procedure TMandatorsForm.ttConfigBeforeEdit(DataSet: TDataSet);

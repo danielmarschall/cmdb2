@@ -142,6 +142,10 @@ type
     ttClientsFIRST_UPDATE_COMMISSION: TDateField;
     ttClientsFIRST_UPDATE_ARTISTEVENT: TDateField;
     ttClientsFIRST_UPDATE: TDateField;
+    openArtist: TBitBtn;
+    openClients: TBitBtn;
+    openCommission: TBitBtn;
+    openStatistics: TBitBtn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -238,6 +242,10 @@ type
       DisplayText: Boolean);
     procedure ttClientsFIRST_UPDATEGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
+    procedure openArtistClick(Sender: TObject);
+    procedure openClientsClick(Sender: TObject);
+    procedure openCommissionClick(Sender: TObject);
+    procedure openStatisticsClick(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -1266,6 +1274,26 @@ begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgArtists.Enabled := false;
   Timer2.Enabled := true;
+end;
+
+procedure TMandatorForm.openArtistClick(Sender: TObject);
+begin
+  dbgArtistsDblClick(dbgArtists);
+end;
+
+procedure TMandatorForm.openClientsClick(Sender: TObject);
+begin
+  dbgClientsDblClick(dbgClients);
+end;
+
+procedure TMandatorForm.openCommissionClick(Sender: TObject);
+begin
+  dbgCommissionsDblClick(dbgCommissions);
+end;
+
+procedure TMandatorForm.openStatisticsClick(Sender: TObject);
+begin
+  dbgStatisticsDblClick(dbgStatistics);
 end;
 
 end.

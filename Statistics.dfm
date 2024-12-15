@@ -67,6 +67,7 @@ object StatisticsForm: TStatisticsForm
         Width = 1092
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvQuery: TButton
@@ -90,6 +91,18 @@ object StatisticsForm: TStatisticsForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshQueryClick
+        end
+        object openQuery: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openQueryClick
         end
       end
     end

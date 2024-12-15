@@ -114,6 +114,7 @@ object MandatorForm: TMandatorForm
         Width = 1036
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvArtists: TButton
@@ -137,6 +138,18 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshArtistsClick
+        end
+        object openArtist: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openArtistClick
         end
       end
     end
@@ -225,6 +238,7 @@ object MandatorForm: TMandatorForm
         Width = 1036
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvClients: TButton
@@ -248,6 +262,18 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshClientsClick
+        end
+        object openClients: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openClientsClick
         end
       end
     end
@@ -334,6 +360,7 @@ object MandatorForm: TMandatorForm
         Width = 1036
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvCommissions: TButton
@@ -358,6 +385,18 @@ object MandatorForm: TMandatorForm
           TabOrder = 1
           OnClick = refreshCommissionsClick
         end
+        object openCommission: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openCommissionClick
+        end
       end
     end
     object tsPayment: TTabSheet
@@ -369,6 +408,7 @@ object MandatorForm: TMandatorForm
         Width = 1036
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 0
         object csvPayment: TButton
@@ -523,6 +563,7 @@ object MandatorForm: TMandatorForm
         Width = 1036
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvStatistics: TButton
@@ -546,6 +587,18 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshStatisticsClick
+        end
+        object openStatistics: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openStatisticsClick
         end
       end
     end

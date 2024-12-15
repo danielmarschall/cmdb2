@@ -26,7 +26,7 @@ object MandatorsForm: TMandatorsForm
     Top = 41
     Width = 624
     Height = 288
-    ActivePage = tsMandator
+    ActivePage = tsConfig
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -73,6 +73,7 @@ object MandatorsForm: TMandatorsForm
         Width = 616
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvMandator: TButton
@@ -96,6 +97,18 @@ object MandatorsForm: TMandatorsForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshMandatorClick
+        end
+        object openMandator: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openMandatorClick
         end
       end
     end
@@ -158,6 +171,7 @@ object MandatorsForm: TMandatorsForm
         Width = 616
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvTextBackup: TButton
@@ -213,7 +227,6 @@ object MandatorsForm: TMandatorsForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDrawColumnCell = dbgConfigDrawColumnCell
-        OnDblClick = dbgConfigDblClick
         OnKeyDown = dbgConfigKeyDown
         OnTitleClick = dbgConfigTitleClick
         Columns = <
@@ -242,6 +255,7 @@ object MandatorsForm: TMandatorsForm
         Width = 616
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvConfig: TButton

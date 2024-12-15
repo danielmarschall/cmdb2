@@ -93,6 +93,8 @@ type
     HelpBtn: TButton;
     GoBackBtn: TButton;
     Timer2: TTimer;
+    openCommission: TBitBtn;
+    openCommunication: TBitBtn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgCommissionDblClick(Sender: TObject);
     procedure ttCommissionNewRecord(DataSet: TDataSet);
@@ -157,6 +159,8 @@ type
     procedure ttCommunicationBeforePost(DataSet: TDataSet);
     procedure ttCommissionBeforePost(DataSet: TDataSet);
     procedure dbgCommunicationDblClick(Sender: TObject);
+    procedure openCommissionClick(Sender: TObject);
+    procedure openCommunicationClick(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -254,6 +258,10 @@ end;
 procedure TArtistForm.ttCommunicationAfterScroll(DataSet: TDataSet);
 begin
   sbCommunication.Caption := CmDb_ShowRows(DataSet);
+  openCommunication.Enabled :=
+      StartsText('http://', ttCommunicationADDRESS.AsWideString) or
+      StartsText('https://', ttCommunicationADDRESS.AsWideString) or
+      StartsText('mailto:', ttCommunicationADDRESS.AsWideString); // <-- TODO: Better: E-Mail-Address detection!
 end;
 
 procedure TArtistForm.ttCommunicationBeforeDelete(DataSet: TDataSet);
@@ -534,11 +542,10 @@ end;
 
 procedure TArtistForm.dbgCommunicationDblClick(Sender: TObject);
 begin
+  if ttCommunication.State in [dsEdit,dsInsert] then exit;
   if ttCommunication.RecordCount = 0 then exit;
   if ttCommunicationADDRESS.AsWideString = '' then exit;
-  if StartsText('http://', ttCommunicationADDRESS.AsWideString) or
-     StartsText('https://', ttCommunicationADDRESS.AsWideString) or
-     StartsText('mailto:', ttCommunicationADDRESS.AsWideString) then // <-- Better: E-Mail-Adress detection!
+  if openCommunication.Enabled then
   begin
     ShellExecute(Handle, 'open', PChar(ttCommunicationADDRESS.AsWideString), '', '', SW_NORMAL);
   end;
@@ -961,6 +968,16 @@ begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgCommission.Enabled := false;
   Timer2.Enabled := true;
+end;
+
+procedure TArtistForm.openCommissionClick(Sender: TObject);
+begin
+  dbgCommissionDblClick(dbgCommission);
+end;
+
+procedure TArtistForm.openCommunicationClick(Sender: TObject);
+begin
+  dbgCommunicationDblClick(dbgCommunication);
 end;
 
 end.

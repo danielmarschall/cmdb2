@@ -121,7 +121,7 @@ object CommissionForm: TCommissionForm
         Top = 212
         Width = 750
         Height = 300
-        ActivePage = tsQuotes
+        ActivePage = tsUploads
         Align = alClient
         TabOrder = 1
         object tsQuotes: TTabSheet

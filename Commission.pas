@@ -739,6 +739,7 @@ end;
 
 procedure TCommissionForm.dbgUploadsDblClick(Sender: TObject);
 begin
+  if ttUploads.State in [dsEdit,dsInsert] then exit;
   if ttUploads.RecordCount = 0 then exit;
   if ttUploadsURL.AsWideString = '' then exit;
   if StartsText('http://', ttUploadsURL.AsWideString) or

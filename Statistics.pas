@@ -28,6 +28,7 @@ type
     GoBackBtn: TButton;
     HelpBtn: TButton;
     Timer2: TTimer;
+    openQuery: TBitBtn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -54,6 +55,7 @@ type
     procedure dbgQueryDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
+    procedure openQueryClick(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryStatistics_Init: boolean;
@@ -519,6 +521,12 @@ begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgQuery.Enabled := false;
   Timer2.Enabled := true;
+end;
+
+procedure TStatisticsForm.openQueryClick(Sender: TObject);
+begin
+  // TODO: It is unknown if it is implemented!
+  dbgQueryDblClick(dbgQuery);
 end;
 
 end.

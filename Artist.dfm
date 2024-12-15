@@ -109,6 +109,7 @@ object ArtistForm: TArtistForm
         Width = 1092
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvCommission: TButton
@@ -132,6 +133,18 @@ object ArtistForm: TArtistForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshCommissionClick
+        end
+        object openCommission: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openCommissionClick
         end
       end
     end
@@ -209,6 +222,7 @@ object ArtistForm: TArtistForm
         Width = 1092
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvPayment: TButton
@@ -302,6 +316,7 @@ object ArtistForm: TArtistForm
         Width = 1092
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvArtistEvent: TButton
@@ -384,6 +399,7 @@ object ArtistForm: TArtistForm
         Width = 1092
         Height = 31
         Align = alBottom
+        Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
         object csvCommunication: TButton
@@ -407,6 +423,18 @@ object ArtistForm: TArtistForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = refreshCommunicationClick
+        end
+        object openCommunication: TBitBtn
+          Left = 198
+          Top = 0
+          Width = 99
+          Height = 31
+          Align = alLeft
+          Caption = 'Open'
+          Kind = bkOK
+          NumGlyphs = 2
+          TabOrder = 2
+          OnClick = openCommunicationClick
         end
       end
     end
