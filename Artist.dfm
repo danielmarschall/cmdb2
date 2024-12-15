@@ -345,6 +345,7 @@ object ArtistForm: TArtistForm
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
         OnDrawColumnCell = dbgCommunicationDrawColumnCell
+        OnDblClick = dbgCommunicationDblClick
         OnKeyDown = dbgCommunicationKeyDown
         OnTitleClick = dbgCommunicationTitleClick
         Columns = <

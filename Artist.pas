@@ -156,6 +156,7 @@ type
     procedure Timer2Timer(Sender: TObject);
     procedure ttCommunicationBeforePost(DataSet: TDataSet);
     procedure ttCommissionBeforePost(DataSet: TDataSet);
+    procedure dbgCommunicationDblClick(Sender: TObject);
   private
     Edit1Sav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -187,7 +188,7 @@ implementation
 
 uses
   CmDbMain, Commission, DbGridHelper, AdoConnHelper, CmDbFunctions,
-  VtsCurConvDLLHeader;
+  VtsCurConvDLLHeader, StrUtils, ShellAPI;
 
 procedure TArtistForm.ttArtistEventAfterScroll(DataSet: TDataSet);
 begin
@@ -528,6 +529,18 @@ begin
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TArtistForm.dbgCommunicationDblClick(Sender: TObject);
+begin
+  if ttCommunication.RecordCount = 0 then exit;
+  if ttCommunicationADDRESS.AsWideString = '' then exit;
+  if StartsText('http://', ttCommunicationADDRESS.AsWideString) or
+     StartsText('https://', ttCommunicationADDRESS.AsWideString) or
+     StartsText('mailto:', ttCommunicationADDRESS.AsWideString) then // <-- Better: E-Mail-Adress detection!
+  begin
+    ShellExecute(Handle, 'open', PChar(ttCommunicationADDRESS.AsWideString), '', '', SW_NORMAL);
   end;
 end;
 
