@@ -81,7 +81,7 @@ To restore a backup, first unzip the ZIP file (it might be protected with your d
 
 Backup files can be regularly purged by simply deleting the files.
 
-### How payment work
+### How payment works
 
 CMDB2 works with the "down payment" system. This allows partial payments or payments for multiple commissions at once.
 - In the commission window you create a "quote" event and enter the price of the commission
@@ -92,11 +92,13 @@ The program automatically calculates how much debt or credit an artist/client ha
 - Sum of all payments - Sum of all commission quotes < 0 means there is a debt.
 - Sum of all payments - Sum of all commission quotes = 0 means everything has been paid for.
 
+The order of matching quotes and payments is chronologically by payment date and quote date (NOT commission date)
+
 ### How refunding works
 
-- In the commission window, create or enter a "quote" event and add a negative price, so that the original price is balanced to zero. (Or to a value that was agreed with the artist/client). DO NOT create a new commission with a negative price.
-- If the client has already paid, then the program will recognize a Credit (Payments - Quotes > 0).
-- After the client has been paid back, the negative payment will be added in the artist/client window.
+- In the commission window, create or enter a "quote" event and add a negative price, so that the original price is balanced to zero. (Or to a price that was agreed with the artist/client). DO NOT create a new commission with a negative price.
+- If the client has already paid, then the program will recognize that there is a credit (Payments - Quotes > 0).
+- After the client has been paid back, the a new payment needs to be added to the artist/client window, with a negative price.
 - Alternatively, if the artist is paid back with another artwork, then simply add new commissions with quotes. The program will automatically keep track of the credit by subtracting the sum of quotes for the commissions from the sum of payments from.
 
 ## Explanation of all windows and tabs
