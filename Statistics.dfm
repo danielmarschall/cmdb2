@@ -81,7 +81,7 @@ object StatisticsForm: TStatisticsForm
           OnClick = csvQueryClick
         end
         object refreshQuery: TBitBtn
-          Left = 99
+          Left = 198
           Top = 0
           Width = 99
           Height = 31
@@ -89,20 +89,22 @@ object StatisticsForm: TStatisticsForm
           Caption = 'Refresh'
           Kind = bkRetry
           NumGlyphs = 2
-          TabOrder = 1
+          TabOrder = 2
           OnClick = refreshQueryClick
+          ExplicitLeft = 99
         end
         object openQuery: TBitBtn
-          Left = 198
+          Left = 99
           Top = 0
           Width = 99
           Height = 31
           Align = alLeft
           Caption = 'Open'
-          Kind = bkOK
           NumGlyphs = 2
-          TabOrder = 2
+          TabOrder = 1
           OnClick = openQueryClick
+          ExplicitLeft = 70
+          ExplicitTop = 6
         end
       end
     end

@@ -26,7 +26,7 @@ object MandatorsForm: TMandatorsForm
     Top = 41
     Width = 624
     Height = 288
-    ActivePage = tsConfig
+    ActivePage = tsMandator
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
@@ -87,7 +87,7 @@ object MandatorsForm: TMandatorsForm
           OnClick = csvMandatorClick
         end
         object refreshMandator: TBitBtn
-          Left = 99
+          Left = 198
           Top = 0
           Width = 99
           Height = 31
@@ -95,19 +95,18 @@ object MandatorsForm: TMandatorsForm
           Caption = 'Refresh'
           Kind = bkRetry
           NumGlyphs = 2
-          TabOrder = 1
+          TabOrder = 2
           OnClick = refreshMandatorClick
         end
         object openMandator: TBitBtn
-          Left = 198
+          Left = 99
           Top = 0
           Width = 99
           Height = 31
           Align = alLeft
           Caption = 'Open'
-          Kind = bkOK
           NumGlyphs = 2
-          TabOrder = 2
+          TabOrder = 1
           OnClick = openMandatorClick
         end
       end

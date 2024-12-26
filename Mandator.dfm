@@ -128,7 +128,7 @@ object MandatorForm: TMandatorForm
           OnClick = csvArtistsClick
         end
         object refreshArtists: TBitBtn
-          Left = 99
+          Left = 198
           Top = 0
           Width = 99
           Height = 31
@@ -136,19 +136,18 @@ object MandatorForm: TMandatorForm
           Caption = 'Refresh'
           Kind = bkRetry
           NumGlyphs = 2
-          TabOrder = 1
+          TabOrder = 2
           OnClick = refreshArtistsClick
         end
         object openArtist: TBitBtn
-          Left = 198
+          Left = 99
           Top = 0
           Width = 99
           Height = 31
           Align = alLeft
           Caption = 'Open'
-          Kind = bkOK
           NumGlyphs = 2
-          TabOrder = 2
+          TabOrder = 1
           OnClick = openArtistClick
         end
       end
@@ -252,7 +251,7 @@ object MandatorForm: TMandatorForm
           OnClick = csvClientsClick
         end
         object refreshClients: TBitBtn
-          Left = 99
+          Left = 198
           Top = 0
           Width = 99
           Height = 31
@@ -260,20 +259,22 @@ object MandatorForm: TMandatorForm
           Caption = 'Refresh'
           Kind = bkRetry
           NumGlyphs = 2
-          TabOrder = 1
+          TabOrder = 2
           OnClick = refreshClientsClick
+          ExplicitLeft = 99
         end
         object openClients: TBitBtn
-          Left = 198
+          Left = 99
           Top = 0
           Width = 99
           Height = 31
           Align = alLeft
           Caption = 'Open'
-          Kind = bkOK
           NumGlyphs = 2
-          TabOrder = 2
+          TabOrder = 1
           OnClick = openClientsClick
+          ExplicitLeft = 78
+          ExplicitTop = 6
         end
       end
     end
@@ -374,7 +375,7 @@ object MandatorForm: TMandatorForm
           OnClick = csvCommissionsClick
         end
         object refreshCommissions: TBitBtn
-          Left = 99
+          Left = 198
           Top = 0
           Width = 99
           Height = 31
@@ -382,20 +383,22 @@ object MandatorForm: TMandatorForm
           Caption = 'Refresh'
           Kind = bkRetry
           NumGlyphs = 2
-          TabOrder = 1
+          TabOrder = 2
           OnClick = refreshCommissionsClick
+          ExplicitLeft = 99
         end
         object openCommission: TBitBtn
-          Left = 198
+          Left = 99
           Top = 0
           Width = 99
           Height = 31
           Align = alLeft
           Caption = 'Open'
-          Kind = bkOK
           NumGlyphs = 2
-          TabOrder = 2
+          TabOrder = 1
           OnClick = openCommissionClick
+          ExplicitLeft = 70
+          ExplicitTop = 6
         end
       end
     end
@@ -577,7 +580,7 @@ object MandatorForm: TMandatorForm
           OnClick = csvStatisticsClick
         end
         object refreshStatistics: TBitBtn
-          Left = 99
+          Left = 198
           Top = 0
           Width = 99
           Height = 31
@@ -585,20 +588,22 @@ object MandatorForm: TMandatorForm
           Caption = 'Refresh'
           Kind = bkRetry
           NumGlyphs = 2
-          TabOrder = 1
+          TabOrder = 2
           OnClick = refreshStatisticsClick
+          ExplicitLeft = 99
         end
         object openStatistics: TBitBtn
-          Left = 198
+          Left = 99
           Top = 0
           Width = 99
           Height = 31
           Align = alLeft
           Caption = 'Open'
-          Kind = bkOK
           NumGlyphs = 2
-          TabOrder = 2
+          TabOrder = 1
           OnClick = openStatisticsClick
+          ExplicitLeft = 62
+          ExplicitTop = 6
         end
       end
     end
