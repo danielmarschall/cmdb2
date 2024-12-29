@@ -145,7 +145,7 @@ resourcestring
   S_InstalledPlugins = 'Installed plugins:';
 const
   DevelopmentYear = 2024;
-  GitHubVersion = '1.5';
+  GitHubVersion = '1.6.1';
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   InstallId := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
