@@ -61,6 +61,7 @@ type
     HelpBtn: TButton;
     GoBackBtn: TButton;
     Timer2: TTimer;
+    TitlePanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ttQuotesNewRecord(DataSet: TDataSet);
@@ -876,7 +877,7 @@ begin
     PageControl2.pages[i].Visible := false;
     PageControl2.pages[i].TabVisible := false;
   end;
-  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
+  TitlePanel.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttEvents / dbgEvents'}

@@ -29,6 +29,7 @@ type
     HelpBtn: TButton;
     Timer2: TTimer;
     openQuery: TBitBtn;
+    TitlePanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -231,7 +232,7 @@ end;
 
 procedure TStatisticsForm.ttQueryAfterScroll(DataSet: TDataSet);
 begin
-  sbQuery.Caption := CmDb_ShowRows(DataSet);
+  sbQuery.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TStatisticsForm.ttQueryBeforeDelete(DataSet: TDataSet);
@@ -496,7 +497,7 @@ begin
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   PageControl1.ActivePageIndex := 0;
-  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
+  TitlePanel.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttQuery / dbgQuery'}

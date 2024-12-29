@@ -58,6 +58,7 @@ type
     ttTextBackupCHECKSUM: TStringField;
     Timer2: TTimer;
     openMandator: TBitBtn;
+    TitlePanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
@@ -135,7 +136,7 @@ uses
 
 procedure TMandatorsForm.ttConfigAfterScroll(DataSet: TDataSet);
 begin
-  sbConfig.Caption := CmDb_ShowRows(DataSet);
+  sbConfig.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorsForm.ttConfigBeforeDelete(DataSet: TDataSet);
@@ -207,7 +208,7 @@ end;
 
 procedure TMandatorsForm.ttMandatorAfterScroll(DataSet: TDataSet);
 begin
-  sbMandator.Caption := CmDb_ShowRows(DataSet);
+  sbMandator.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorsForm.ttMandatorBeforeDelete(DataSet: TDataSet);
@@ -232,7 +233,7 @@ end;
 
 procedure TMandatorsForm.ttTextBackupAfterScroll(DataSet: TDataSet);
 begin
-  sbTextBackup.Caption := CmDb_ShowRows(DataSet);
+  sbTextBackup.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorsForm.ttTextBackupBeforeDelete(DataSet: TDataSet);
@@ -631,7 +632,7 @@ end;
 procedure TMandatorsForm.Init;
 begin
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
-  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
+  TitlePanel.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   if not CmDb_DatabasePasswordcheck(AdoConnection1) then
   begin
     Close;

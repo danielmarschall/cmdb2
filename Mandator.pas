@@ -146,6 +146,7 @@ type
     openClients: TBitBtn;
     openCommission: TBitBtn;
     openStatistics: TBitBtn;
+    TitlePanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ttArtistsNewRecord(DataSet: TDataSet);
     procedure ttClientsNewRecord(DataSet: TDataSet);
@@ -281,7 +282,7 @@ uses
 
 procedure TMandatorForm.ttArtistsAfterScroll(DataSet: TDataSet);
 begin
-  sbArtists.Caption := CmDb_ShowRows(DataSet);
+  sbArtists.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorForm.ttArtistsBeforeDelete(DataSet: TDataSet);
@@ -348,7 +349,7 @@ end;
 
 procedure TMandatorForm.ttClientsAfterScroll(DataSet: TDataSet);
 begin
-  sbClients.Caption := CmDb_ShowRows(DataSet);
+  sbClients.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorForm.ttClientsBeforeDelete(DataSet: TDataSet);
@@ -461,7 +462,7 @@ end;
 
 procedure TMandatorForm.ttCommissionAfterScroll(DataSet: TDataSet);
 begin
-  sbCommissions.Caption := CmDb_ShowRows(DataSet);
+  sbCommissions.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorForm.ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -481,7 +482,7 @@ end;
 
 procedure TMandatorForm.ttPaymentAfterScroll(DataSet: TDataSet);
 begin
-  sbPayment.Caption := CmDb_ShowRows(DataSet);
+  sbPayment.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorForm.ttPaymentBeforeDelete(DataSet: TDataSet);
@@ -569,7 +570,7 @@ end;
 
 procedure TMandatorForm.ttStatisticsAfterScroll(DataSet: TDataSet);
 begin
-  sbStatistics.Caption := CmDb_ShowRows(DataSet);
+  sbStatistics.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TMandatorForm.ttStatisticsBeforeDelete(DataSet: TDataSet);
@@ -1210,7 +1211,7 @@ begin
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
-  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
+  TitlePanel.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttArtists / dbgArtists'}

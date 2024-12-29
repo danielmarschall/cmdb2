@@ -4,7 +4,7 @@ object MandatorsForm: TMandatorsForm
   Hint = 'Show help'
   Caption = 'MandatorsForm'
   ClientHeight = 329
-  ClientWidth = 624
+  ClientWidth = 629
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -24,12 +24,13 @@ object MandatorsForm: TMandatorsForm
   object PageControl1: TPageControl
     Left = 0
     Top = 41
-    Width = 624
+    Width = 629
     Height = 288
     ActivePage = tsMandator
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
+    ExplicitWidth = 624
     object tsMandator: TTabSheet
       Caption = 'Mandators'
       object navMandator: TDBNavigator
@@ -46,7 +47,7 @@ object MandatorsForm: TMandatorsForm
       object dbgMandator: TDBGrid
         Left = 33
         Top = 0
-        Width = 583
+        Width = 588
         Height = 227
         Align = alClient
         DataSource = dsMandator
@@ -70,12 +71,13 @@ object MandatorsForm: TMandatorsForm
       object sbMandator: TPanel
         Left = 0
         Top = 227
-        Width = 616
+        Width = 621
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 616
         object csvMandator: TButton
           Left = 0
           Top = 0
@@ -117,7 +119,7 @@ object MandatorsForm: TMandatorsForm
       object dbgTextBackup: TDBGrid
         Left = 33
         Top = 0
-        Width = 583
+        Width = 588
         Height = 227
         Align = alClient
         DataSource = dsTextBackup
@@ -167,12 +169,13 @@ object MandatorsForm: TMandatorsForm
       object sbTextBackup: TPanel
         Left = 0
         Top = 227
-        Width = 616
+        Width = 621
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 616
         object csvTextBackup: TButton
           Left = 0
           Top = 0
@@ -214,7 +217,7 @@ object MandatorsForm: TMandatorsForm
       object dbgConfig: TDBGrid
         Left = 33
         Top = 0
-        Width = 583
+        Width = 588
         Height = 227
         Align = alClient
         DataSource = dsConfig
@@ -251,12 +254,13 @@ object MandatorsForm: TMandatorsForm
       object sbConfig: TPanel
         Left = 0
         Top = 227
-        Width = 616
+        Width = 621
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 616
         object csvConfig: TButton
           Left = 0
           Top = 0
@@ -285,7 +289,7 @@ object MandatorsForm: TMandatorsForm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 624
+    Width = 629
     Height = 41
     Align = alTop
     Color = clBlueviolet
@@ -297,13 +301,14 @@ object MandatorsForm: TMandatorsForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 624
     DesignSize = (
-      624
+      629
       41)
     object Edit1: TEdit
-      Left = 422
-      Top = 12
-      Width = 171
+      Left = 424
+      Top = 9
+      Width = 165
       Height = 23
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -317,8 +322,8 @@ object MandatorsForm: TMandatorsForm
       OnKeyDown = Edit1KeyDown
     end
     object SearchBtn: TButton
-      Left = 595
-      Top = 10
+      Left = 596
+      Top = 8
       Width = 25
       Height = 25
       Anchors = [akTop, akRight]
@@ -333,8 +338,8 @@ object MandatorsForm: TMandatorsForm
       OnClick = SearchBtnClick
     end
     object HelpBtn: TButton
-      Left = 12
-      Top = 10
+      Left = 8
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Show help'
@@ -349,6 +354,16 @@ object MandatorsForm: TMandatorsForm
       ShowHint = True
       TabOrder = 2
       OnClick = HelpBtnClick
+    end
+    object TitlePanel: TPanel
+      Left = 40
+      Top = 1
+      Width = 377
+      Height = 39
+      BevelOuter = bvNone
+      Caption = 'Panel2'
+      ParentColor = True
+      TabOrder = 3
     end
   end
   object dsMandator: TDataSource

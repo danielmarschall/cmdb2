@@ -91,7 +91,6 @@ object StatisticsForm: TStatisticsForm
           NumGlyphs = 2
           TabOrder = 2
           OnClick = refreshQueryClick
-          ExplicitLeft = 99
         end
         object openQuery: TBitBtn
           Left = 99
@@ -103,8 +102,6 @@ object StatisticsForm: TStatisticsForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = openQueryClick
-          ExplicitLeft = 70
-          ExplicitTop = 6
         end
       end
     end
@@ -128,9 +125,9 @@ object StatisticsForm: TStatisticsForm
       1100
       41)
     object Edit1: TEdit
-      Left = 898
-      Top = 12
-      Width = 175
+      Left = 895
+      Top = 9
+      Width = 165
       Height = 23
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -144,8 +141,8 @@ object StatisticsForm: TStatisticsForm
       OnKeyDown = Edit1KeyDown
     end
     object SearchBtn: TButton
-      Left = 1071
-      Top = 10
+      Left = 1067
+      Top = 8
       Width = 25
       Height = 25
       Anchors = [akTop, akRight]
@@ -160,8 +157,8 @@ object StatisticsForm: TStatisticsForm
       OnClick = SearchBtnClick
     end
     object GoBackBtn: TButton
-      Left = 43
-      Top = 10
+      Left = 40
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Go back to Mandator'
@@ -178,8 +175,8 @@ object StatisticsForm: TStatisticsForm
       OnClick = GoBackBtnClick
     end
     object HelpBtn: TButton
-      Left = 12
-      Top = 10
+      Left = 8
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Show help'
@@ -194,6 +191,16 @@ object StatisticsForm: TStatisticsForm
       ShowHint = True
       TabOrder = 2
       OnClick = HelpBtnClick
+    end
+    object TitlePanel: TPanel
+      Left = 72
+      Top = 1
+      Width = 816
+      Height = 39
+      BevelOuter = bvNone
+      Caption = 'TitlePanel'
+      ParentColor = True
+      TabOrder = 4
     end
   end
   object ADOConnection1: TADOConnection

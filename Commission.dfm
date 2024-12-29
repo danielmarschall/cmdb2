@@ -344,8 +344,8 @@ object CommissionForm: TCommissionForm
     ParentFont = False
     TabOrder = 1
     object HelpBtn: TButton
-      Left = 12
-      Top = 10
+      Left = 8
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Show help'
@@ -362,8 +362,8 @@ object CommissionForm: TCommissionForm
       OnClick = HelpBtnClick
     end
     object GoBackBtn: TButton
-      Left = 43
-      Top = 10
+      Left = 40
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Go back to Artist/Client'
@@ -378,6 +378,16 @@ object CommissionForm: TCommissionForm
       ShowHint = True
       TabOrder = 1
       OnClick = GoBackBtnClick
+    end
+    object TitlePanel: TPanel
+      Left = 72
+      Top = 1
+      Width = 685
+      Height = 39
+      BevelOuter = bvNone
+      Caption = 'Panel2'
+      ParentColor = True
+      TabOrder = 2
     end
   end
   object dsQuotes: TDataSource

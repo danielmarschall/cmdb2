@@ -4,7 +4,7 @@ object MandatorForm: TMandatorForm
   Hint = 'Show help'
   Caption = 'MandatorForm'
   ClientHeight = 441
-  ClientWidth = 1044
+  ClientWidth = 1100
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -24,18 +24,19 @@ object MandatorForm: TMandatorForm
   object PageControl1: TPageControl
     Left = 0
     Top = 41
-    Width = 1044
+    Width = 1100
     Height = 400
     ActivePage = tsArtists
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
+    ExplicitWidth = 1044
     object tsArtists: TTabSheet
       Caption = 'Artists'
       object dbgArtists: TDBGrid
         Left = 33
         Top = 0
-        Width = 1003
+        Width = 1059
         Height = 339
         Align = alClient
         DataSource = dsArtists
@@ -111,12 +112,13 @@ object MandatorForm: TMandatorForm
       object sbArtists: TPanel
         Left = 0
         Top = 339
-        Width = 1036
+        Width = 1092
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 1036
         object csvArtists: TButton
           Left = 0
           Top = 0
@@ -157,7 +159,7 @@ object MandatorForm: TMandatorForm
       object dbgClients: TDBGrid
         Left = 33
         Top = 0
-        Width = 1003
+        Width = 1059
         Height = 339
         Align = alClient
         DataSource = dsClients
@@ -234,12 +236,13 @@ object MandatorForm: TMandatorForm
       object sbClients: TPanel
         Left = 0
         Top = 339
-        Width = 1036
+        Width = 1092
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 1036
         object csvClients: TButton
           Left = 0
           Top = 0
@@ -261,7 +264,6 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 2
           OnClick = refreshClientsClick
-          ExplicitLeft = 99
         end
         object openClients: TBitBtn
           Left = 99
@@ -273,8 +275,6 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = openClientsClick
-          ExplicitLeft = 78
-          ExplicitTop = 6
         end
       end
     end
@@ -284,7 +284,7 @@ object MandatorForm: TMandatorForm
       object dbgCommissions: TDBGrid
         Left = 33
         Top = 0
-        Width = 1003
+        Width = 1059
         Height = 339
         Align = alClient
         DataSource = dsCommission
@@ -358,12 +358,13 @@ object MandatorForm: TMandatorForm
       object sbCommissions: TPanel
         Left = 0
         Top = 339
-        Width = 1036
+        Width = 1092
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 1036
         object csvCommissions: TButton
           Left = 0
           Top = 0
@@ -385,7 +386,6 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 2
           OnClick = refreshCommissionsClick
-          ExplicitLeft = 99
         end
         object openCommission: TBitBtn
           Left = 99
@@ -397,8 +397,6 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = openCommissionClick
-          ExplicitLeft = 70
-          ExplicitTop = 6
         end
       end
     end
@@ -408,12 +406,13 @@ object MandatorForm: TMandatorForm
       object sbPayment: TPanel
         Left = 0
         Top = 339
-        Width = 1036
+        Width = 1092
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 1036
         object csvPayment: TButton
           Left = 0
           Top = 0
@@ -440,7 +439,7 @@ object MandatorForm: TMandatorForm
       object dbgPayment: TDBGrid
         Left = 33
         Top = 0
-        Width = 1003
+        Width = 1059
         Height = 339
         Align = alClient
         DataSource = dsPayment
@@ -527,7 +526,7 @@ object MandatorForm: TMandatorForm
       object dbgStatistics: TDBGrid
         Left = 33
         Top = 0
-        Width = 1003
+        Width = 1059
         Height = 339
         Align = alClient
         DataSource = dsStatistics
@@ -563,12 +562,13 @@ object MandatorForm: TMandatorForm
       object sbStatistics: TPanel
         Left = 0
         Top = 339
-        Width = 1036
+        Width = 1092
         Height = 31
         Align = alBottom
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
+        ExplicitWidth = 1036
         object csvStatistics: TButton
           Left = 0
           Top = 0
@@ -590,7 +590,6 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 2
           OnClick = refreshStatisticsClick
-          ExplicitLeft = 99
         end
         object openStatistics: TBitBtn
           Left = 99
@@ -602,8 +601,6 @@ object MandatorForm: TMandatorForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = openStatisticsClick
-          ExplicitLeft = 62
-          ExplicitTop = 6
         end
       end
     end
@@ -611,7 +608,7 @@ object MandatorForm: TMandatorForm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 1044
+    Width = 1100
     Height = 41
     Align = alTop
     Color = clBurlywood
@@ -623,13 +620,14 @@ object MandatorForm: TMandatorForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 1044
     DesignSize = (
-      1044
+      1100
       41)
     object Edit1: TEdit
-      Left = 842
-      Top = 12
-      Width = 175
+      Left = 895
+      Top = 9
+      Width = 165
       Height = 23
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -641,10 +639,11 @@ object MandatorForm: TMandatorForm
       TabOrder = 0
       OnChange = Edit1Change
       OnKeyDown = Edit1KeyDown
+      ExplicitLeft = 839
     end
     object SearchBtn: TButton
-      Left = 1015
-      Top = 10
+      Left = 1067
+      Top = 8
       Width = 25
       Height = 25
       Anchors = [akTop, akRight]
@@ -657,10 +656,11 @@ object MandatorForm: TMandatorForm
       ParentFont = False
       TabOrder = 1
       OnClick = SearchBtnClick
+      ExplicitLeft = 1011
     end
     object HelpBtn: TButton
-      Left = 12
-      Top = 10
+      Left = 8
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Show help'
@@ -677,8 +677,8 @@ object MandatorForm: TMandatorForm
       OnClick = HelpBtnClick
     end
     object GoBackBtn: TButton
-      Left = 43
-      Top = 10
+      Left = 40
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Go back to Database'
@@ -693,6 +693,16 @@ object MandatorForm: TMandatorForm
       ShowHint = True
       TabOrder = 3
       OnClick = GoBackBtnClick
+    end
+    object TitlePanel: TPanel
+      Left = 72
+      Top = 1
+      Width = 816
+      Height = 39
+      BevelOuter = bvNone
+      Caption = 'TitlePanel'
+      ParentColor = True
+      TabOrder = 4
     end
   end
   object dsArtists: TDataSource

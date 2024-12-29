@@ -95,6 +95,7 @@ type
     Timer2: TTimer;
     openCommission: TBitBtn;
     openCommunication: TBitBtn;
+    TitlePanel: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dbgCommissionDblClick(Sender: TObject);
     procedure ttCommissionNewRecord(DataSet: TDataSet);
@@ -196,7 +197,7 @@ uses
 
 procedure TArtistForm.ttArtistEventAfterScroll(DataSet: TDataSet);
 begin
-  sbArtistEvent.Caption := CmDb_ShowRows(DataSet);
+  sbArtistEvent.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TArtistForm.ttArtistEventBeforeDelete(DataSet: TDataSet);
@@ -231,7 +232,7 @@ end;
 
 procedure TArtistForm.ttCommissionAfterScroll(DataSet: TDataSet);
 begin
-  sbCommission.Caption := CmDb_ShowRows(DataSet);
+  sbCommission.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TArtistForm.ttCommissionBeforeDelete(DataSet: TDataSet);
@@ -257,7 +258,7 @@ end;
 
 procedure TArtistForm.ttCommunicationAfterScroll(DataSet: TDataSet);
 begin
-  sbCommunication.Caption := CmDb_ShowRows(DataSet);
+  sbCommunication.Caption := CmDb_ShowRows(DataSet)+'   ';
   openCommunication.Enabled :=
       StartsText('http://', ttCommunicationADDRESS.AsWideString) or
       StartsText('https://', ttCommunicationADDRESS.AsWideString) or
@@ -289,7 +290,7 @@ end;
 
 procedure TArtistForm.ttPaymentAfterScroll(DataSet: TDataSet);
 begin
-  sbPayment.Caption := CmDb_ShowRows(DataSet);
+  sbPayment.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
 procedure TArtistForm.ttPaymentBeforeDelete(DataSet: TDataSet);
@@ -914,7 +915,7 @@ begin
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
-  Panel1.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
+  TitlePanel.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
   Screen.Cursor := crHourGlass;
   try
     {$REGION 'ttCommission / dbgCommission'}

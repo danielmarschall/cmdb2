@@ -133,7 +133,6 @@ object ArtistForm: TArtistForm
           NumGlyphs = 2
           TabOrder = 2
           OnClick = refreshCommissionClick
-          ExplicitLeft = 99
         end
         object openCommission: TBitBtn
           Left = 99
@@ -145,7 +144,6 @@ object ArtistForm: TArtistForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = openCommissionClick
-          ExplicitLeft = 62
         end
       end
     end
@@ -424,7 +422,6 @@ object ArtistForm: TArtistForm
           NumGlyphs = 2
           TabOrder = 2
           OnClick = refreshCommunicationClick
-          ExplicitLeft = 99
         end
         object openCommunication: TBitBtn
           Left = 99
@@ -436,8 +433,6 @@ object ArtistForm: TArtistForm
           NumGlyphs = 2
           TabOrder = 1
           OnClick = openCommunicationClick
-          ExplicitLeft = 78
-          ExplicitTop = -8
         end
       end
     end
@@ -461,9 +456,9 @@ object ArtistForm: TArtistForm
       1100
       41)
     object Edit1: TEdit
-      Left = 898
-      Top = 12
-      Width = 175
+      Left = 895
+      Top = 9
+      Width = 165
       Height = 23
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -477,8 +472,8 @@ object ArtistForm: TArtistForm
       OnKeyDown = Edit1KeyDown
     end
     object SearchBtn: TButton
-      Left = 1071
-      Top = 10
+      Left = 1067
+      Top = 8
       Width = 25
       Height = 25
       Anchors = [akTop, akRight]
@@ -493,8 +488,8 @@ object ArtistForm: TArtistForm
       OnClick = SearchBtnClick
     end
     object HelpBtn: TButton
-      Left = 12
-      Top = 10
+      Left = 8
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Show help'
@@ -511,8 +506,8 @@ object ArtistForm: TArtistForm
       OnClick = HelpBtnClick
     end
     object GoBackBtn: TButton
-      Left = 43
-      Top = 10
+      Left = 40
+      Top = 8
       Width = 25
       Height = 25
       Hint = 'Go back to Mandator'
@@ -527,6 +522,16 @@ object ArtistForm: TArtistForm
       ShowHint = True
       TabOrder = 3
       OnClick = GoBackBtnClick
+    end
+    object TitlePanel: TPanel
+      Left = 72
+      Top = 1
+      Width = 816
+      Height = 39
+      BevelOuter = bvNone
+      Caption = 'TitlePanel'
+      ParentColor = True
+      TabOrder = 4
     end
   end
   object ADOConnection1: TADOConnection
