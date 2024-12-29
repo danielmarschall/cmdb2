@@ -30,7 +30,6 @@ object MandatorForm: TMandatorForm
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
-    ExplicitWidth = 1044
     object tsArtists: TTabSheet
       Caption = 'Artists'
       object dbgArtists: TDBGrid
@@ -118,7 +117,6 @@ object MandatorForm: TMandatorForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 1036
         object csvArtists: TButton
           Left = 0
           Top = 0
@@ -242,7 +240,6 @@ object MandatorForm: TMandatorForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 1036
         object csvClients: TButton
           Left = 0
           Top = 0
@@ -364,7 +361,6 @@ object MandatorForm: TMandatorForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 1036
         object csvCommissions: TButton
           Left = 0
           Top = 0
@@ -412,7 +408,6 @@ object MandatorForm: TMandatorForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 1036
         object csvPayment: TButton
           Left = 0
           Top = 0
@@ -568,7 +563,6 @@ object MandatorForm: TMandatorForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 1036
         object csvStatistics: TButton
           Left = 0
           Top = 0
@@ -620,11 +614,10 @@ object MandatorForm: TMandatorForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 1044
     DesignSize = (
       1100
       41)
-    object Edit1: TEdit
+    object SearchEdit: TEdit
       Left = 895
       Top = 9
       Width = 165
@@ -637,9 +630,8 @@ object MandatorForm: TMandatorForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      OnChange = Edit1Change
-      OnKeyDown = Edit1KeyDown
-      ExplicitLeft = 839
+      OnChange = SearchEditChange
+      OnKeyDown = SearchEditKeyDown
     end
     object SearchBtn: TButton
       Left = 1067
@@ -656,7 +648,6 @@ object MandatorForm: TMandatorForm
       ParentFont = False
       TabOrder = 1
       OnClick = SearchBtnClick
-      ExplicitLeft = 1011
     end
     object HelpBtn: TButton
       Left = 8
@@ -699,6 +690,7 @@ object MandatorForm: TMandatorForm
       Top = 1
       Width = 816
       Height = 39
+      Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
       Caption = 'TitlePanel'
       ParentColor = True

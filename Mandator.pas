@@ -13,7 +13,7 @@ type
     ADOConnection1: TADOConnection;
     PageControl1: TPageControl;
     Panel1: TPanel;
-    Edit1: TEdit;
+    SearchEdit: TEdit;
     tsStatistics: TTabSheet;
     SearchBtn: TButton;
 
@@ -152,8 +152,8 @@ type
     procedure ttClientsNewRecord(DataSet: TDataSet);
     procedure dbgArtistsDblClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure Edit1Change(Sender: TObject);
-    procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SearchEditChange(Sender: TObject);
+    procedure SearchEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure PageControl1Change(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchBtnClick(Sender: TObject);
@@ -248,7 +248,7 @@ type
     procedure openCommissionClick(Sender: TObject);
     procedure openStatisticsClick(Sender: TObject);
   private
-    Edit1Sav: TStringList;
+    SearchEditSav: TStringList;
     SqlQueryArtistClient_Init: boolean;
     SqlQueryArtistClient_Order: string;
     SqlQueryArtistClient_Asc: boolean;
@@ -592,8 +592,8 @@ end;
 
 procedure TMandatorForm.SearchBtnClick(Sender: TObject);
 begin
-  if Edit1.Text <> '' then
-    Edit1.Clear;
+  if SearchEdit.Text <> '' then
+    SearchEdit.Clear;
 end;
 
 procedure TMandatorForm.HelpBtnClick(Sender: TObject);
@@ -670,7 +670,7 @@ begin
     SqlQueryArtistClient_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryArtistClient(true, Edit1.Text);
+    ds.SQL.Text := SqlQueryArtistClient(true, SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -716,7 +716,7 @@ begin
     SqlQueryArtistClient_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryArtistClient(false, Edit1.Text);
+    ds.SQL.Text := SqlQueryArtistClient(false, SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -762,7 +762,7 @@ begin
     SqlQueryCommissions_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryCommissions(Edit1.Text);
+    ds.SQL.Text := SqlQueryCommissions(SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -801,7 +801,7 @@ begin
     SqlQueryPayment_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryPayment(Edit1.Text);
+    ds.SQL.Text := SqlQueryPayment(SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -856,7 +856,7 @@ begin
     SqlQueryStatistics_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryStatistics(Edit1.Text);
+    ds.SQL.Text := SqlQueryStatistics(SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -865,10 +865,10 @@ end;
 
 procedure TMandatorForm.PageControl1Change(Sender: TObject);
 begin
-  if Assigned(Edit1Sav) then
-    Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name]
+  if Assigned(SearchEditSav) then
+    SearchEdit.Text := SearchEditSav.Values[TPageControl(Sender).ActivePage.Name]
   else
-    Edit1.Text := '';
+    SearchEdit.Text := '';
   Timer1.Enabled := False;
 end;
 
@@ -1015,16 +1015,16 @@ end;
 procedure TMandatorForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
-  if Assigned(Edit1Sav) then
+  if Assigned(SearchEditSav) then
   begin
-    Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+    SearchEditSav.Values[PageControl1.ActivePage.Name] := SearchEdit.Text;
   end;
   if PageControl1.ActivePage = tsArtists then
   begin
     Screen.Cursor := crHourGlass;
     try
       ttArtists.Active := false;
-      ttArtists.SQL.Text := SqlQueryArtistClient(true, Edit1.Text);
+      ttArtists.SQL.Text := SqlQueryArtistClient(true, SearchEdit.Text);
       ttArtists.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -1035,7 +1035,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       ttClients.Active := false;
-      ttClients.SQL.Text := SqlQueryArtistClient(false, Edit1.Text);
+      ttClients.SQL.Text := SqlQueryArtistClient(false, SearchEdit.Text);
       ttClients.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -1046,7 +1046,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       ttCommission.Active := false;
-      ttCommission.SQL.Text := SqlQueryCommissions(Edit1.Text);
+      ttCommission.SQL.Text := SqlQueryCommissions(SearchEdit.Text);
       ttCommission.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -1057,7 +1057,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       ttPayment.Active := false;
-      ttPayment.SQL.Text := SqlQueryPayment(Edit1.Text);
+      ttPayment.SQL.Text := SqlQueryPayment(SearchEdit.Text);
       ttPayment.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -1068,7 +1068,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       ttStatistics.Active := false;
-      ttStatistics.SQL.Text := SqlQueryStatistics(Edit1.Text);
+      ttStatistics.SQL.Text := SqlQueryStatistics(SearchEdit.Text);
       ttStatistics.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -1084,13 +1084,13 @@ begin
   dbgartists.Invalidate;
 end;
 
-procedure TMandatorForm.Edit1Change(Sender: TObject);
+procedure TMandatorForm.SearchEditChange(Sender: TObject);
 begin
   Timer1.Enabled := false;
   Timer1.Enabled := true;
 end;
 
-procedure TMandatorForm.Edit1KeyDown(Sender: TObject; var Key: Word;
+procedure TMandatorForm.SearchEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_RETURN then
@@ -1151,13 +1151,13 @@ end;
 
 procedure TMandatorForm.FormCreate(Sender: TObject);
 begin
-  Edit1Sav := TStringList.Create;
+  SearchEditSav := TStringList.Create;
   PageControl1.ActivePageIndex := 0;
 end;
 
 procedure TMandatorForm.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(Edit1Sav);
+  FreeAndNil(SearchEditSav);
 end;
 
 procedure TMandatorForm.FormKeyDown(Sender: TObject; var Key: Word;

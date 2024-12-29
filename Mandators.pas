@@ -20,7 +20,7 @@ type
     Panel1: TPanel;
     ttMandatorID: TGuidField;
     ttMandatorNAME: TWideStringField;
-    Edit1: TEdit;
+    SearchEdit: TEdit;
     SearchBtn: TButton;
     ttTextBackup: TADOQuery;
     dsTextBackup: TDataSource;
@@ -63,9 +63,9 @@ type
     procedure dbgMandatorDblClick(Sender: TObject);
     procedure ttMandatorNewRecord(DataSet: TDataSet);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure Edit1Change(Sender: TObject);
+    procedure SearchEditChange(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
-    procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SearchEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchBtnClick(Sender: TObject);
     procedure ttTextBackupBeforeInsert(DataSet: TDataSet);
     procedure ttConfigBeforeInsert(DataSet: TDataSet);
@@ -110,7 +110,7 @@ type
     procedure ttMandatorBeforePost(DataSet: TDataSet);
     procedure openMandatorClick(Sender: TObject);
   private
-    Edit1Sav: TStringList;
+    SearchEditSav: TStringList;
     SqlQueryMandator_Init: boolean;
     SqlQueryMandator_Order: string;
     SqlQueryMandator_Asc: boolean;
@@ -253,8 +253,8 @@ end;
 
 procedure TMandatorsForm.SearchBtnClick(Sender: TObject);
 begin
-  if Edit1.Text <> '' then
-    Edit1.Clear;
+  if SearchEdit.Text <> '' then
+    SearchEdit.Clear;
 end;
 
 procedure TMandatorsForm.HelpBtnClick(Sender: TObject);
@@ -312,7 +312,7 @@ begin
     SqlQueryConfig_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryConfig(Edit1.Text);
+    ds.SQL.Text := SqlQueryConfig(SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -358,7 +358,7 @@ begin
     SqlQueryMandator_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryMandator(Edit1.Text);
+    ds.SQL.Text := SqlQueryMandator(SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -397,7 +397,7 @@ begin
     SqlQueryTextBackup_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryTextBackup(Edit1.Text);
+    ds.SQL.Text := SqlQueryTextBackup(SearchEdit.Text);
     ds.Active := true;
   finally
     Screen.Cursor := crDefault;
@@ -406,10 +406,10 @@ end;
 
 procedure TMandatorsForm.PageControl1Change(Sender: TObject);
 begin
-  if Assigned(Edit1Sav) then
-    Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name]
+  if Assigned(SearchEditSav) then
+    SearchEdit.Text := SearchEditSav.Values[TPageControl(Sender).ActivePage.Name]
   else
-    Edit1.Text := '';
+    SearchEdit.Text := '';
   Timer1.Enabled := False;
 end;
 
@@ -474,16 +474,16 @@ end;
 procedure TMandatorsForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
-  if Assigned(Edit1Sav) then
+  if Assigned(SearchEditSav) then
   begin
-    Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+    SearchEditSav.Values[PageControl1.ActivePage.Name] := SearchEdit.Text;
   end;
   if PageControl1.ActivePage = tsMandator then
   begin
     Screen.Cursor := crHourGlass;
     try
       ttMandator.Active := false;
-      ttMandator.SQL.Text := SqlQueryMandator(Edit1.Text);
+      ttMandator.SQL.Text := SqlQueryMandator(SearchEdit.Text);
       ttMandator.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -494,7 +494,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       ttTextBackup.Active := false;
-      ttTextBackup.SQL.Text := SqlQueryTextBackup(Edit1.Text);
+      ttTextBackup.SQL.Text := SqlQueryTextBackup(SearchEdit.Text);
       ttTextBackup.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -505,7 +505,7 @@ begin
     Screen.Cursor := crHourGlass;
     try
       ttConfig.Active := false;
-      ttConfig.SQL.Text := SqlQueryConfig(Edit1.Text);
+      ttConfig.SQL.Text := SqlQueryConfig(SearchEdit.Text);
       ttConfig.Active := true;
     finally
       Screen.Cursor := crDefault;
@@ -535,13 +535,13 @@ begin
   result := result + 'order by ' + SqlQueryConfig_order + ' ' + AscDesc(SqlQueryConfig_asc);
 end;
 
-procedure TMandatorsForm.Edit1Change(Sender: TObject);
+procedure TMandatorsForm.SearchEditChange(Sender: TObject);
 begin
   Timer1.Enabled := false;
   Timer1.Enabled := true;
 end;
 
-procedure TMandatorsForm.Edit1KeyDown(Sender: TObject; var Key: Word;
+procedure TMandatorsForm.SearchEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_RETURN then
@@ -594,13 +594,13 @@ end;
 
 procedure TMandatorsForm.FormCreate(Sender: TObject);
 begin
-  Edit1Sav := TStringList.Create;
+  SearchEditSav := TStringList.Create;
   PageControl1.ActivePageIndex := 0;
 end;
 
 procedure TMandatorsForm.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(Edit1Sav);
+  FreeAndNil(SearchEditSav);
 end;
 
 procedure TMandatorsForm.FormKeyDown(Sender: TObject; var Key: Word;

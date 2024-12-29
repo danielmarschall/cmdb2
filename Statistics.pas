@@ -18,7 +18,7 @@ type
     ttQuery: TADOQuery;
     dsQuery: TDataSource;
     Panel1: TPanel;
-    Edit1: TEdit;
+    SearchEdit: TEdit;
     SearchBtn: TButton;
     Timer1: TTimer;
     sbQuery: TPanel;
@@ -33,9 +33,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Edit1Change(Sender: TObject);
+    procedure SearchEditChange(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
-    procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SearchEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SearchBtnClick(Sender: TObject);
     procedure dbgQueryDblClick(Sender: TObject);
     procedure ttQueryBeforeInsert(DataSet: TDataSet);
@@ -58,7 +58,7 @@ type
     procedure Timer2Timer(Sender: TObject);
     procedure openQueryClick(Sender: TObject);
   private
-    Edit1Sav: TStringList;
+    SearchEditSav: TStringList;
     SqlQueryStatistics_Init: boolean;
     SqlQueryStatistics_Order: string;
     SqlQueryStatistics_Asc: boolean;
@@ -88,16 +88,16 @@ uses
 
 procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin
-  if Edit1.Text <> '' then
-    Edit1.Clear;
+  if SearchEdit.Text <> '' then
+    SearchEdit.Clear;
 end;
 
 procedure TStatisticsForm.PageControl1Change(Sender: TObject);
 begin
-  if Assigned(Edit1Sav) then
-    Edit1.Text := Edit1Sav.Values[TPageControl(Sender).ActivePage.Name]
+  if Assigned(SearchEditSav) then
+    SearchEdit.Text := SearchEditSav.Values[TPageControl(Sender).ActivePage.Name]
   else
-    Edit1.Text := '';
+    SearchEdit.Text := '';
   Timer1.Enabled := False;
 end;
 
@@ -203,16 +203,16 @@ end;
 procedure TStatisticsForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
-  if Assigned(Edit1Sav) then
+  if Assigned(SearchEditSav) then
   begin
-    Edit1Sav.Values[PageControl1.ActivePage.Name] := Edit1.Text;
+    SearchEditSav.Values[PageControl1.ActivePage.Name] := SearchEdit.Text;
   end;
   if PageControl1.ActivePage = tsQuery then
   begin
     Screen.Cursor := crHourGlass;
     try
       ttQuery.Active := false;
-      ttQuery.SQL.Text := SqlQueryStatistics(Edit1.Text);
+      ttQuery.SQL.Text := SqlQueryStatistics(SearchEdit.Text);
       ttQuery.Active := true;
       dbgQuery.HideColumnPrefix('__');
       SetFormats;
@@ -319,7 +319,7 @@ begin
     SqlQueryStatistics_Asc := TitleButtonHelper(Column);
     ds := Column.Grid.DataSource.DataSet as TAdoQuery;
     ds.Active := false;
-    ds.SQL.Text := SqlQueryStatistics(Edit1.Text);
+    ds.SQL.Text := SqlQueryStatistics(SearchEdit.Text);
     ds.Active := true;
     TDbGrid(Column.Grid).HideColumnPrefix('__');
     SetFormats; // for some reason, we need it only in this form, nowhere else. Because field list is dynamic? ( https://github.com/danielmarschall/cmdb2/issues/11 )
@@ -328,13 +328,13 @@ begin
   end;
 end;
 
-procedure TStatisticsForm.Edit1Change(Sender: TObject);
+procedure TStatisticsForm.SearchEditChange(Sender: TObject);
 begin
   Timer1.Enabled := false;
   Timer1.Enabled := true;
 end;
 
-procedure TStatisticsForm.Edit1KeyDown(Sender: TObject; var Key: Word;
+procedure TStatisticsForm.SearchEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_RETURN then
@@ -375,12 +375,12 @@ end;
 
 procedure TStatisticsForm.FormCreate(Sender: TObject);
 begin
-  Edit1Sav := TStringList.Create;
+  SearchEditSav := TStringList.Create;
 end;
 
 procedure TStatisticsForm.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(Edit1Sav);
+  FreeAndNil(SearchEditSav);
 end;
 
 procedure TStatisticsForm.FormKeyDown(Sender: TObject; var Key: Word;

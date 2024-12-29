@@ -343,6 +343,9 @@ object CommissionForm: TCommissionForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
+    DesignSize = (
+      758
+      41)
     object HelpBtn: TButton
       Left = 8
       Top = 8
@@ -384,6 +387,7 @@ object CommissionForm: TCommissionForm
       Top = 1
       Width = 685
       Height = 39
+      Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
       Caption = 'Panel2'
       ParentColor = True

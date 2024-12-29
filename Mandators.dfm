@@ -30,7 +30,6 @@ object MandatorsForm: TMandatorsForm
     Align = alClient
     TabOrder = 1
     OnChange = PageControl1Change
-    ExplicitWidth = 624
     object tsMandator: TTabSheet
       Caption = 'Mandators'
       object navMandator: TDBNavigator
@@ -77,7 +76,6 @@ object MandatorsForm: TMandatorsForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 616
         object csvMandator: TButton
           Left = 0
           Top = 0
@@ -175,7 +173,6 @@ object MandatorsForm: TMandatorsForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 616
         object csvTextBackup: TButton
           Left = 0
           Top = 0
@@ -260,7 +257,6 @@ object MandatorsForm: TMandatorsForm
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        ExplicitWidth = 616
         object csvConfig: TButton
           Left = 0
           Top = 0
@@ -301,11 +297,10 @@ object MandatorsForm: TMandatorsForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 624
     DesignSize = (
       629
       41)
-    object Edit1: TEdit
+    object SearchEdit: TEdit
       Left = 424
       Top = 9
       Width = 165
@@ -318,8 +313,8 @@ object MandatorsForm: TMandatorsForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      OnChange = Edit1Change
-      OnKeyDown = Edit1KeyDown
+      OnChange = SearchEditChange
+      OnKeyDown = SearchEditKeyDown
     end
     object SearchBtn: TButton
       Left = 596
@@ -360,6 +355,7 @@ object MandatorsForm: TMandatorsForm
       Top = 1
       Width = 377
       Height = 39
+      Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
       Caption = 'Panel2'
       ParentColor = True

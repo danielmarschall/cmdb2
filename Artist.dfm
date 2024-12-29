@@ -455,7 +455,7 @@ object ArtistForm: TArtistForm
     DesignSize = (
       1100
       41)
-    object Edit1: TEdit
+    object SearchEdit: TEdit
       Left = 895
       Top = 9
       Width = 165
@@ -468,8 +468,8 @@ object ArtistForm: TArtistForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      OnChange = Edit1Change
-      OnKeyDown = Edit1KeyDown
+      OnChange = SearchEditChange
+      OnKeyDown = SearchEditKeyDown
     end
     object SearchBtn: TButton
       Left = 1067
@@ -528,6 +528,7 @@ object ArtistForm: TArtistForm
       Top = 1
       Width = 816
       Height = 39
+      Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
       Caption = 'TitlePanel'
       ParentColor = True
