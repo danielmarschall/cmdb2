@@ -54,7 +54,7 @@ type
     DatabaseOpenedOnce: boolean;
     procedure RestoreMdiChild(frm: TForm);
     procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
-    procedure OpenMandatorsForm;
+    procedure OpenDatabaseForm;
     function FindForm(guid: TGuid; addinfo1: string=''): TForm;
     procedure ShowHelpWindow(const MDFile: string);
   end;
@@ -67,7 +67,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Mandators, AdoConnHelper, StrUtils, Help, CmDbPluginClient,
+  Database, AdoConnHelper, StrUtils, Help, CmDbPluginClient,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
   ShellApi, System.UITypes, System.Hash, DateUtils,
   EncryptedZipFile, System.Zip, Memo;
@@ -400,32 +400,32 @@ begin
   ShowHelpWindow('README.md');
 end;
 
-procedure TMainForm.OpenMandatorsForm;
+procedure TMainForm.OpenDatabaseForm;
 var
-  MandatorsForm: TMandatorsForm;
+  DatabaseForm: TDatabaseForm;
   i: integer;
 resourcestring
   SDatabase = 'Database';
 begin
   for I := 0 to MDIChildCount-1 do
   begin
-    if MDIChildren[i] is TMandatorsForm then
+    if MDIChildren[i] is TDatabaseForm then
     begin
       RestoreMdiChild(MdiChildren[i]);
       exit;
     end;
   end;
 
-  MandatorsForm := TMandatorsForm.Create(Application.MainForm);
-  MandatorsForm.Caption := SDatabase;
-  MandatorsForm.ADOConnection1.Connected := false;
-  MandatorsForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
-  MandatorsForm.Init;
+  DatabaseForm := TDatabaseForm.Create(Application.MainForm);
+  DatabaseForm.Caption := SDatabase;
+  DatabaseForm.ADOConnection1.Connected := false;
+  DatabaseForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
+  DatabaseForm.Init;
 end;
 
 procedure TMainForm.OpenDatabase1Click(Sender: TObject);
 begin
-  OpenMandatorsForm;
+  OpenDatabaseForm;
 end;
 
 class procedure TMainForm.ZeichneHintergrundschrift(text1_normal, text2_kursiv: string; minScale: double);
@@ -578,7 +578,7 @@ begin
       Application.ProcessMessages;
       try
         CmDb_RestoreDatabase(AdoConnection1, bakFileName);
-        OpenMandatorsForm;
+        OpenDatabaseForm;
       finally
         EnableAllMenuItems(MainMenu1);
         Application.ProcessMessages;
@@ -775,7 +775,7 @@ begin
     try
       CmDb_ConnectViaLocalDb(ADOConnection1, CmDbDefaultDatabaseName);
       CmDb_InstallOrUpdateSchema(ADOConnection1);
-      OpenMandatorsForm;
+      OpenDatabaseForm;
     finally
       Screen.Cursor := crDefault;
       WaitLabel.Visible := false;

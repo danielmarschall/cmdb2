@@ -18,7 +18,7 @@ type
     ttCommission: TADOQuery;
     dsCommission: TDataSource;
     tsPayment: TTabSheet;
-    Panel1: TPanel;
+    HeadPanel: TPanel;
     ttPayment: TADOQuery;
     dsPayment: TDataSource;
     navPayment: TDBNavigator;

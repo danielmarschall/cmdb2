@@ -17,7 +17,7 @@ type
     ADOConnection1: TADOConnection;
     ttQuery: TADOQuery;
     dsQuery: TDataSource;
-    Panel1: TPanel;
+    HeadPanel: TPanel;
     SearchEdit: TEdit;
     SearchBtn: TButton;
     Timer1: TTimer;

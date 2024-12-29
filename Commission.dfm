@@ -328,7 +328,7 @@ object CommissionForm: TCommissionForm
       end
     end
   end
-  object Panel1: TPanel
+  object HeadPanel: TPanel
     Left = 0
     Top = 0
     Width = 758

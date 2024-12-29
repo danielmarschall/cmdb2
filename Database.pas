@@ -1,4 +1,4 @@
-unit Mandators;
+unit Database;
 
 interface
 
@@ -9,7 +9,7 @@ uses
   Vcl.ComCtrls;
 
 type
-  TMandatorsForm = class(TForm)
+  TDatabaseForm = class(TForm)
     dbgMandator: TDBGrid;
     dsMandator: TDataSource;
     ADOConnection1: TADOConnection;
@@ -17,7 +17,7 @@ type
     navMandator: TDBNavigator;
     PageControl1: TPageControl;
     tsMandator: TTabSheet;
-    Panel1: TPanel;
+    HeadPanel: TPanel;
     ttMandatorID: TGuidField;
     ttMandatorNAME: TWideStringField;
     SearchEdit: TEdit;
@@ -134,12 +134,12 @@ implementation
 uses
   CmDbMain, Mandator, DbGridHelper, CmDbFunctions, AdoConnHelper;
 
-procedure TMandatorsForm.ttConfigAfterScroll(DataSet: TDataSet);
+procedure TDatabaseForm.ttConfigAfterScroll(DataSet: TDataSet);
 begin
   sbConfig.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
-procedure TMandatorsForm.ttConfigBeforeDelete(DataSet: TDataSet);
+procedure TDatabaseForm.ttConfigBeforeDelete(DataSet: TDataSet);
 resourcestring
   SDeleteNotPossible = 'Delete not possible';
   SPasswordProtectionDisabled = 'Password protection disabled';
@@ -163,12 +163,12 @@ begin
   Abort;
 end;
 
-procedure TMandatorsForm.ttConfigBeforeInsert(DataSet: TDataSet);
+procedure TDatabaseForm.ttConfigBeforeInsert(DataSet: TDataSet);
 begin
   Abort;
 end;
 
-procedure TMandatorsForm.ttConfigBeforePost(DataSet: TDataSet);
+procedure TDatabaseForm.ttConfigBeforePost(DataSet: TDataSet);
 var
   oldHashed: string;
 resourcestring
@@ -206,87 +206,87 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.ttMandatorAfterScroll(DataSet: TDataSet);
+procedure TDatabaseForm.ttMandatorAfterScroll(DataSet: TDataSet);
 begin
   sbMandator.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
-procedure TMandatorsForm.ttMandatorBeforeDelete(DataSet: TDataSet);
+procedure TDatabaseForm.ttMandatorBeforeDelete(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround_BeforeDelete(Dataset as TAdoQuery, 'ID', 'MANDATOR', 'ID');
 end;
 
-procedure TMandatorsForm.ttMandatorBeforeEdit(DataSet: TDataSet);
+procedure TDatabaseForm.ttMandatorBeforeEdit(DataSet: TDataSet);
 begin
   InsteadOfDeleteWorkaround_BeforeEdit(Dataset as TAdoQuery, 'ID');
 end;
 
-procedure TMandatorsForm.ttMandatorBeforePost(DataSet: TDataSet);
+procedure TDatabaseForm.ttMandatorBeforePost(DataSet: TDataSet);
 begin
   DataSet.FieldByName('NAME').AsWideString := Trim(DataSet.FieldByName('NAME').AsWideString);
 end;
 
-procedure TMandatorsForm.ttMandatorNewRecord(DataSet: TDataSet);
+procedure TDatabaseForm.ttMandatorNewRecord(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
 end;
 
-procedure TMandatorsForm.ttTextBackupAfterScroll(DataSet: TDataSet);
+procedure TDatabaseForm.ttTextBackupAfterScroll(DataSet: TDataSet);
 begin
   sbTextBackup.Caption := CmDb_ShowRows(DataSet)+'   ';
 end;
 
-procedure TMandatorsForm.ttTextBackupBeforeDelete(DataSet: TDataSet);
+procedure TDatabaseForm.ttTextBackupBeforeDelete(DataSet: TDataSet);
 begin
   Abort;
 end;
 
-procedure TMandatorsForm.ttTextBackupBeforeInsert(DataSet: TDataSet);
+procedure TDatabaseForm.ttTextBackupBeforeInsert(DataSet: TDataSet);
 begin
   Abort;
 end;
 
-procedure TMandatorsForm.ttTextBackupBeforePost(DataSet: TDataSet);
+procedure TDatabaseForm.ttTextBackupBeforePost(DataSet: TDataSet);
 begin
   DataSet.FieldByName('ANNOTATION').AsWideString := Trim(DataSet.FieldByName('ANNOTATION').AsWideString);
 end;
 
-procedure TMandatorsForm.SearchBtnClick(Sender: TObject);
+procedure TDatabaseForm.SearchBtnClick(Sender: TObject);
 begin
   if SearchEdit.Text <> '' then
     SearchEdit.Clear;
 end;
 
-procedure TMandatorsForm.HelpBtnClick(Sender: TObject);
+procedure TDatabaseForm.HelpBtnClick(Sender: TObject);
 begin
   MainForm.ShowHelpWindow('HELP_DatabaseWindow.md');
 end;
 
-procedure TMandatorsForm.csvConfigClick(Sender: TObject);
+procedure TDatabaseForm.csvConfigClick(Sender: TObject);
 begin
   if sdCsvConfig.Execute then
     SaveGridToCsv(dbgConfig, sdCsvConfig.FileName);
 end;
 
-procedure TMandatorsForm.csvMandatorClick(Sender: TObject);
+procedure TDatabaseForm.csvMandatorClick(Sender: TObject);
 begin
   if sdCsvMandator.Execute then
     SaveGridToCsv(dbgMandator, sdCsvMandator.FileName);
 end;
 
-procedure TMandatorsForm.csvTextBackupClick(Sender: TObject);
+procedure TDatabaseForm.csvTextBackupClick(Sender: TObject);
 begin
   if sdCsvTextBackup.Execute then
     SaveGridToCsv(dbgTextBackup, sdCsvTextBackup.FileName);
 end;
 
-procedure TMandatorsForm.dbgConfigDrawColumnCell(Sender: TObject;
+procedure TDatabaseForm.dbgConfigDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
   InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'NAME');
 end;
 
-procedure TMandatorsForm.dbgConfigKeyDown(Sender: TObject; var Key: Word;
+procedure TDatabaseForm.dbgConfigKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F5 then
@@ -302,7 +302,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.dbgConfigTitleClick(Column: TColumn);
+procedure TDatabaseForm.dbgConfigTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
 begin
@@ -319,20 +319,20 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.dbgMandatorDblClick(Sender: TObject);
+procedure TDatabaseForm.dbgMandatorDblClick(Sender: TObject);
 begin
   if ttMandator.State in [dsEdit,dsInsert] then ttMandator.Post;
   if ttMandator.FieldByName('ID').IsNull then exit;
   MainForm.OpenDbObject('MANDATOR', ttMandator.FieldByName('ID').AsGuid);
 end;
 
-procedure TMandatorsForm.dbgMandatorDrawColumnCell(Sender: TObject;
+procedure TDatabaseForm.dbgMandatorDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
   InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
-procedure TMandatorsForm.dbgMandatorKeyDown(Sender: TObject; var Key: Word;
+procedure TDatabaseForm.dbgMandatorKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F5 then
@@ -348,7 +348,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.dbgMandatorTitleClick(Column: TColumn);
+procedure TDatabaseForm.dbgMandatorTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
 begin
@@ -365,13 +365,13 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.dbgTextBackupDrawColumnCell(Sender: TObject;
+procedure TDatabaseForm.dbgTextBackupDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
   InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'BAK_ID');
 end;
 
-procedure TMandatorsForm.dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
+procedure TDatabaseForm.dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F5 then
@@ -387,7 +387,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.dbgTextBackupTitleClick(Column: TColumn);
+procedure TDatabaseForm.dbgTextBackupTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
 begin
@@ -404,7 +404,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.PageControl1Change(Sender: TObject);
+procedure TDatabaseForm.PageControl1Change(Sender: TObject);
 begin
   if Assigned(SearchEditSav) then
     SearchEdit.Text := SearchEditSav.Values[TPageControl(Sender).ActivePage.Name]
@@ -413,7 +413,7 @@ begin
   Timer1.Enabled := False;
 end;
 
-procedure TMandatorsForm.refreshConfigClick(Sender: TObject);
+procedure TDatabaseForm.refreshConfigClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -423,7 +423,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.refreshMandatorClick(Sender: TObject);
+procedure TDatabaseForm.refreshMandatorClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -433,7 +433,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.refreshTextBackupClick(Sender: TObject);
+procedure TDatabaseForm.refreshTextBackupClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -443,7 +443,7 @@ begin
   end;
 end;
 
-function TMandatorsForm.SqlQueryMandator(const search: string): string;
+function TDatabaseForm.SqlQueryMandator(const search: string): string;
 begin
   if not SqlQueryMandator_Init then
   begin
@@ -457,7 +457,7 @@ begin
   result := result + 'order by ' + SqlQueryMandator_order + ' ' + AscDesc(SqlQueryMandator_asc);
 end;
 
-function TMandatorsForm.SqlQueryTextBackup(const search: string): string;
+function TDatabaseForm.SqlQueryTextBackup(const search: string): string;
 begin
   if not SqlQueryTextBackup_Init then
   begin
@@ -471,7 +471,7 @@ begin
   result := result + 'order by ' + SqlQueryTextBackup_order + ' ' + AscDesc(SqlQueryTextBackup_asc);
 end;
 
-procedure TMandatorsForm.Timer1Timer(Sender: TObject);
+procedure TDatabaseForm.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := false;
   if Assigned(SearchEditSav) then
@@ -513,7 +513,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.Timer2Timer(Sender: TObject);
+procedure TDatabaseForm.Timer2Timer(Sender: TObject);
 begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   Timer2.Enabled := false;
@@ -521,7 +521,7 @@ begin
   dbgMandator.Invalidate;
 end;
 
-function TMandatorsForm.SqlQueryConfig(const search: string): string;
+function TDatabaseForm.SqlQueryConfig(const search: string): string;
 begin
   if not SqlQueryConfig_Init then
   begin
@@ -535,13 +535,13 @@ begin
   result := result + 'order by ' + SqlQueryConfig_order + ' ' + AscDesc(SqlQueryConfig_asc);
 end;
 
-procedure TMandatorsForm.SearchEditChange(Sender: TObject);
+procedure TDatabaseForm.SearchEditChange(Sender: TObject);
 begin
   Timer1.Enabled := false;
   Timer1.Enabled := true;
 end;
 
-procedure TMandatorsForm.SearchEditKeyDown(Sender: TObject; var Key: Word;
+procedure TDatabaseForm.SearchEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_RETURN then
@@ -577,12 +577,12 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TDatabaseForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
 end;
 
-procedure TMandatorsForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TDatabaseForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   if (ttMandator.State=dsEdit) or ((ttMandator.State=dsInsert) and (ttMandatorNAME.AsWideString<>'')) then
     ttMandator.Post;
@@ -592,18 +592,18 @@ begin
     ttConfig.Post;
 end;
 
-procedure TMandatorsForm.FormCreate(Sender: TObject);
+procedure TDatabaseForm.FormCreate(Sender: TObject);
 begin
   SearchEditSav := TStringList.Create;
   PageControl1.ActivePageIndex := 0;
 end;
 
-procedure TMandatorsForm.FormDestroy(Sender: TObject);
+procedure TDatabaseForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(SearchEditSav);
 end;
 
-procedure TMandatorsForm.FormKeyDown(Sender: TObject; var Key: Word;
+procedure TDatabaseForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   // We must use FormKeyDown AND FormKeyUp. Why?
@@ -619,7 +619,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.FormKeyUp(Sender: TObject; var Key: Word;
+procedure TDatabaseForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Key = VK_ESCAPE) and (Tag = 1) then
@@ -629,7 +629,7 @@ begin
   end;
 end;
 
-procedure TMandatorsForm.Init;
+procedure TDatabaseForm.Init;
 begin
   // We cannot use OnShow(), because TForm.Create() calls OnShow(), even if Visible=False
   TitlePanel.Caption := StringReplace(Caption, '&', '&&', [rfReplaceAll]);
@@ -670,12 +670,12 @@ begin
   Timer2.Enabled := true;
 end;
 
-procedure TMandatorsForm.openMandatorClick(Sender: TObject);
+procedure TDatabaseForm.openMandatorClick(Sender: TObject);
 begin
   dbgMandatorDblClick(dbgMandator);
 end;
 
-procedure TMandatorsForm.ttConfigBeforeEdit(DataSet: TDataSet);
+procedure TDatabaseForm.ttConfigBeforeEdit(DataSet: TDataSet);
 begin
   if ttConfigREAD_ONLY.AsBoolean then Abort; // Note: Unfortunately, we probably cannot make this cell cream colored!
 end;

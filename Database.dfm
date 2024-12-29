@@ -1,8 +1,8 @@
-object MandatorsForm: TMandatorsForm
+object DatabaseForm: TDatabaseForm
   Left = 0
   Top = 0
   Hint = 'Show help'
-  Caption = 'MandatorsForm'
+  Caption = 'DatabaseForm'
   ClientHeight = 329
   ClientWidth = 629
   Color = clBtnFace
@@ -282,7 +282,7 @@ object MandatorsForm: TMandatorsForm
       end
     end
   end
-  object Panel1: TPanel
+  object HeadPanel: TPanel
     Left = 0
     Top = 0
     Width = 629

@@ -5,7 +5,7 @@ program CmDb2;
 uses
   Vcl.Forms,
   CmDbMain in 'CmDbMain.pas' {MainForm},
-  Mandators in 'Mandators.pas' {MandatorsForm},
+  Database in 'Database.pas' {DatabaseForm},
   Mandator in 'Mandator.pas' {MandatorForm},
   Artist in 'Artist.pas' {ArtistForm},
   Commission in 'Commission.pas' {CommissionForm},

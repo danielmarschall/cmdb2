@@ -17,7 +17,7 @@ type
     dsQuotes: TDataSource;
     ttQuotes: TADOQuery;
     ADOConnection1: TADOConnection;
-    Panel1: TPanel;
+    HeadPanel: TPanel;
     tsEvents: TTabSheet;
     navEvents: TDBNavigator;
     dbgEvents: TDBGrid;

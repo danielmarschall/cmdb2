@@ -12,7 +12,7 @@ type
   TMandatorForm = class(TForm)
     ADOConnection1: TADOConnection;
     PageControl1: TPageControl;
-    Panel1: TPanel;
+    HeadPanel: TPanel;
     SearchEdit: TEdit;
     tsStatistics: TTabSheet;
     SearchBtn: TButton;
@@ -1190,7 +1190,7 @@ end;
 
 procedure TMandatorForm.GoBackBtnClick(Sender: TObject);
 begin
-  MainForm.OpenMandatorsForm;
+  MainForm.OpenDatabaseForm;
 end;
 
 procedure TMandatorForm.Init;
