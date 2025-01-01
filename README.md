@@ -35,7 +35,7 @@ The latest version can be downloaded at [GitHub](https://github.com/danielmarsch
 
 ## Intro video
 
-Download an intro video here: https://github.com/danielmarschall/cmdb2/raw/refs/heads/master/intro_video.mp4
+[Download an intro video here](https://github.com/danielmarschall/cmdb2/raw/refs/heads/master/intro_video.mp4)
 
 This video shows:
 - Creating a mandator, an artist, and two commissions
