@@ -33,6 +33,28 @@ CMDB2 software is only available for Microsoft Windows.
 
 The latest version can be downloaded at [GitHub](https://github.com/danielmarschall/cmdb2/releases).
 
+## Intro video
+
+Download an intro video here: https://github.com/danielmarschall/cmdb2/raw/refs/heads/master/intro_video.mp4
+
+This video shows:
+- Creating a mandator, an artist, and two commissions
+- Add a quote to a commission
+- Add a payment with 2 installments until the commission is fully paid
+- Set the status of the commission from `c aw ack` (customer awaits acknowlegement), to `c aw sk` (customer awaits sketch), and finally to `fin` (finish).
+
+The video shows the view of a customer. For an artist, the workflow is exactly the same, just with the difference that the tab "Clients" instead of "Artists" must be used.
+
+Most important things to know:
+- Save any data row by leaving the row (e.g. cursor down and up)
+- Delete data with Ctrl + Del
+- Open dataset by double clicking
+- At the commission window, you need to save `quote` and `upload` events first, by moving the cursor down and up, and then the lower pane will appear.
+
+Music: [Aaron Kruk - Aphelion, Argofox Release](https://www.youtube.com/watch?v=7J5eRcx5GaI)
+
+Recorded using [BandiCam](https://www.bandicam.com/).
+
 ## General information
 
 ### Handling database grids

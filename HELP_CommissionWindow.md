@@ -12,12 +12,12 @@ The database grid has the following columns:
 - Column `STATE` is the art status (independent of the payment!) which can have the following values:
 	- `idea`: This marks the commission as idea (usually by the client), but nothing has yet been decided. ("Idea" usually means: far-future, project is uncertain)
 	- `c td initcm`: The client ("c") needs to do ("td") the initial commission ("initcm") description, which means they must contact the artist and tell what he wants to commish.
-	- `c aw ack`: The client ("c") awaits ("aw") that the commission is accepted/acknowledged ("ack").
+	- `c aw ack`: The client ("c") awaits ("aw") the commission to be accepted/acknowledged ("ack").
 	- `quote`: A quote has been entered. **If this event is selected, a new tab "Quote" will be shown!**
-	- `c aw sk`: The client ("c") waits ("aw") a sketch ("sk").
+	- `c aw sk`: The client ("c") awaits ("aw") a sketch ("sk").
 	- `c td feedback`: The client ("c") needs to do ("td") a feedback report for a sketch/WIP he has received.
-	- `c aw cont`: The client ("c") waits ("aw") that the artwork is continued ("cont") after the first sketch has been approved.
-	- `c aw hires`: The client ("c") waits ("aw") the final, high-resolution file (for digital art), or the painting shipped (for physical art).
+	- `c aw cont`: The client ("c") awaits ("aw") the artwork to be continued ("cont"), after the first sketch has been approved.
+	- `c aw hires`: The client ("c") awaits ("aw") the final, high-resolution file (for digital art), or the painting shipped (for physical art).
 	- `fin`: The artwork is finished ("fin"). This sets the `END_DATE` status in the commission overview.
 	- `annot`: Annotation
 	- `cancel a`: The artist ("a") has canceled the commission.
