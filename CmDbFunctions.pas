@@ -41,7 +41,7 @@ implementation
 
 uses
   ShlObj, ShellApi, System.Hash, Dialogs, WinInet,
-  CmDbMain, Artist, Commission, Mandator, Statistics;
+  CmDbMain, Artist, Commission, Mandator, Statistics, Registry;
 
 const
   LOCALDB_INSTANCE_NAME = 'MSSQLLocalDB';
@@ -396,7 +396,7 @@ begin
   // 2. sqllocaldb create MSSQLLocalDB
   //    sqllocaldb start MSSQLLocalDB
 
-  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, 'master');
+  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, 'master');  // do not localize
   ADOConnection1.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = N'+AdoConnection1.SQLStringEscape(DataBaseName)+') ' +
     'BEGIN ' +
@@ -420,7 +420,7 @@ begin
     '  ALTER DATABASE '+AdoConnection1.SQLDatabaseNameEscape(DataBaseName)+' SET MULTI_USER; ' +
     'END'
   );
-  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);
+  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);  // do not localize
 end;
 
 procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
@@ -631,10 +631,47 @@ begin
   end;
 end;
 
+function GetSystemCurrencyCode: string;
+var
+  Reg: TRegistry;
+begin
+  try
+    Result := '';
+    Reg := TRegistry.Create(KEY_READ);
+    try
+      Reg.RootKey := HKEY_CURRENT_USER;
+      if Reg.OpenKeyReadOnly('Control Panel\International') then // do not localize
+      begin
+        Result := Reg.ReadString('sCurrency'); // do not localize
+        Reg.CloseKey;
+      end;
+    finally
+      Reg.Free;
+    end;
+
+    // Optional: Konvertiere das Währungssymbol in einen ISO-Code
+    if Result = '€' then
+      Result := 'EUR'
+    else if Result = '$' then
+      Result := 'USD'
+    else if Result = '£' then
+      Result := 'GBP'
+    else if Result = '¥' then
+      Result := 'JPY';
+
+    Result := UpperCase(Result);
+    if Length(Result) <> 3 then Result := '';
+  except
+    Result := '';
+  end;
+end;
+
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
 resourcestring
   SSchemaDUnknown = 'Schema %d is unknown. The database is probably newer than the software version.';
   SDbInstallError = 'DB Install %s error: %s';
+  SMandator0Default = 'Mandator 0 (Testing)';
+  SMandator1Default = 'Mandator 1 (Productive)';
 
   procedure InstallSql(targetSchema: integer; fil: string);
   var
@@ -661,7 +698,10 @@ resourcestring
 
 var
   schemaVer: integer;
+  isFirstInstall: boolean;
+  sCurCode: string;
 begin
+  isFirstInstall := false;
   while true do
   begin
     if not AdoConnection1.TableExists('CONFIG') then
@@ -671,6 +711,7 @@ begin
 
     if schemaVer = 0 then
     begin
+      isFirstInstall := true;
       {$REGION 'Install schema 1'}
       if not AdoConnection1.TableExists('CONFIG') then
         InstallSql(1, 'CONFIG');
@@ -854,12 +895,21 @@ begin
       //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''7'' where NAME = ''DB_VERSION''');
 
       // We have reached the highest supported version and can now exit the loop.
-      Exit;
+      Break;
     end
     else
     begin
       raise Exception.CreateFmt(SSchemaDUnknown, [schemaVer]);
     end;
+  end;
+
+  if isFirstInstall then
+  begin
+    AdoConnection1.ExecSQL('insert into MANDATOR (NAME) values ('+AdoConnection1.SQLStringEscape(SMandator0Default)+');');
+    AdoConnection1.ExecSQL('insert into MANDATOR (NAME) values ('+AdoConnection1.SQLStringEscape(SMandator1Default)+');');
+    sCurCode := GetSystemCurrencyCode;
+    if sCurCode <> '' then
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = '+AdoConnection1.SQLStringEscape(sCurCode)+' where NAME = ''LOCAL_CURRENCY'';');
   end;
 end;
 
@@ -897,6 +947,8 @@ var
   fs: TFileStream;
   unixTime: integer;
   peOffset: Integer;
+resourcestring
+  SGetBuildTimestampFailed = 'GetBuildTimestamp(%s) failed';
 begin
   try
     fs := TFileStream.Create(ExeFile, fmOpenRead or fmShareDenyNone);
@@ -918,7 +970,7 @@ begin
   except
     // Sollte nicht passieren
     if not FileAge(ExeFile, result) then
-      raise Exception.CreateFmt('GetBuildTimestamp(%s) fehlgeschlagen', [ExeFile]);
+      raise Exception.CreateFmt(SGetBuildTimestampFailed, [ExeFile]);
   end;
 end;
 
@@ -1005,9 +1057,9 @@ end;
 function AscDesc(asc: boolean): string;
 begin
   if asc then
-    result := 'asc'
+    result := 'asc' // do not localize
   else
-    result := 'desc';
+    result := 'desc'; // do not localize
 end;
 
 procedure AdoQueryRefresh(ADataset: TAdoQuery; const ALocateField: string);
@@ -1248,8 +1300,8 @@ begin
   {$ENDREGION}
 
   // Now delete for real
-  Dataset.Connection.ExecSQL('delete from '+Dataset.Connection.SQLObjectNameEscape(basetable)+' '+
-                             'where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ''' + id + '''');
+  Dataset.Connection.ExecSQL('delete from '+Dataset.Connection.SQLObjectNameEscape(basetable)+' '+  // do not localize
+                             'where '+Dataset.Connection.SQLFieldNameEscape(baseTableField)+' = ' + Dataset.Connection.SQLStringEscape(id));  // do not localize
 
   // Mark the dataset as deleted
   DeletedList.Add(listname);
@@ -1387,12 +1439,17 @@ var
   reserved: DWORD;
   StatusCode: DWORD;
   RedirectCount: integer;
+resourcestring
+  SInternetOpenFailed = 'Error initializing WinInet: %s';
+  SInternetOpenUrlFailed = 'Error opening request: %s';
+  STooManyRedirects = 'Error: Too many redirects';
+  SHTTPError = 'HTTP Error %d with %s request %s';
 begin
   AUrl := Url;
 
   hSession := InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
   if not Assigned(hSession) then
-    raise Exception.Create('Error initializing WinInet: ' + SysErrorMessage(GetLastError));
+    raise Exception.CreateFmt(SInternetOpenFailed, [SysErrorMessage(GetLastError)]);
   try
     RedirectCount := 0;
     while true do
@@ -1400,7 +1457,7 @@ begin
       if Assigned(Application) and Application.Terminated then Abort;
       hRequest := InternetOpenUrl(hSession, PChar(AURL), nil, 0, INTERNET_FLAG_RELOAD or INTERNET_FLAG_NO_CACHE_WRITE, 0);
       if not Assigned(hRequest) then
-        raise Exception.Create('Error opening request: ' + SysErrorMessage(GetLastError));
+        raise Exception.CreateFmt(SInternetOpenUrlFailed, [SysErrorMessage(GetLastError)]);
       try
         StatusCode := GetStatusCode(hRequest);
         if (StatusCode >= 300) and (StatusCode < 400) then
@@ -1410,7 +1467,7 @@ begin
           // Stop following redirects if we exceed the maximum number of allowed redirects.
           if RedirectCount > MaxRedirects then
           begin
-            raise Exception.Create('Error: Too many redirects');
+            raise Exception.Create(STooManyRedirects);
           end;
 
           // Get the "Location" header for the new URL
@@ -1449,7 +1506,7 @@ begin
           break;
         end
         else
-          raise Exception.CreateFmt('HTTP Error %d with GET request %s', [StatusCode, aurl]);
+          raise Exception.CreateFmt(SHTTPError, [StatusCode, 'GET', aurl]);
       finally
         InternetCloseHandle(hRequest);
       end;
