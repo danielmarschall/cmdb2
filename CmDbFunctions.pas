@@ -698,10 +698,8 @@ resourcestring
 
 var
   schemaVer: integer;
-  isFirstInstall: boolean;
   sCurCode: string;
 begin
-  isFirstInstall := false;
   while true do
   begin
     if not AdoConnection1.TableExists('CONFIG') then
@@ -711,188 +709,236 @@ begin
 
     if schemaVer = 0 then
     begin
-      isFirstInstall := true;
       {$REGION 'Install schema 1'}
-      if not AdoConnection1.TableExists('CONFIG') then
-        InstallSql(1, 'CONFIG');
-      if not AdoConnection1.TableExists('MANDATOR') then
-        InstallSql(1, 'MANDATOR');
-      if not AdoConnection1.TableExists('ARTIST') then
-        InstallSql(1, 'ARTIST');
-      if not AdoConnection1.TableExists('ARTIST_EVENT') then
-        InstallSql(1, 'ARTIST_EVENT');
-      if not AdoConnection1.TableExists('COMMISSION') then
-        InstallSql(1, 'COMMISSION');
-      if not AdoConnection1.TableExists('COMMISSION_EVENT') then
-        InstallSql(1, 'COMMISSION_EVENT');
-      if not AdoConnection1.TableExists('QUOTE') then
-        InstallSql(1, 'QUOTE');
-      if not AdoConnection1.TableExists('UPLOAD') then
-        InstallSql(1, 'UPLOAD');
-      if not AdoConnection1.TableExists('PAYMENT') then
-        InstallSql(1, 'PAYMENT');
-      if not AdoConnection1.TableExists('COMMUNICATION') then
-        InstallSql(1, 'COMMUNICATION');
-      if not AdoConnection1.TableExists('STATISTICS') then
-        InstallSql(1, 'STATISTICS');
-      if not AdoConnection1.TableExists('TEXT_BACKUP') then
-        InstallSql(1, 'TEXT_BACKUP');
+      AdoConnection1.BeginTrans;
+      try
+        if not AdoConnection1.TableExists('CONFIG') then
+          InstallSql(1, 'CONFIG');
+        if not AdoConnection1.TableExists('MANDATOR') then
+          InstallSql(1, 'MANDATOR');
+        if not AdoConnection1.TableExists('ARTIST') then
+          InstallSql(1, 'ARTIST');
+        if not AdoConnection1.TableExists('ARTIST_EVENT') then
+          InstallSql(1, 'ARTIST_EVENT');
+        if not AdoConnection1.TableExists('COMMISSION') then
+          InstallSql(1, 'COMMISSION');
+        if not AdoConnection1.TableExists('COMMISSION_EVENT') then
+          InstallSql(1, 'COMMISSION_EVENT');
+        if not AdoConnection1.TableExists('QUOTE') then
+          InstallSql(1, 'QUOTE');
+        if not AdoConnection1.TableExists('UPLOAD') then
+          InstallSql(1, 'UPLOAD');
+        if not AdoConnection1.TableExists('PAYMENT') then
+          InstallSql(1, 'PAYMENT');
+        if not AdoConnection1.TableExists('COMMUNICATION') then
+          InstallSql(1, 'COMMUNICATION');
+        if not AdoConnection1.TableExists('STATISTICS') then
+          InstallSql(1, 'STATISTICS');
+        if not AdoConnection1.TableExists('TEXT_BACKUP') then
+          InstallSql(1, 'TEXT_BACKUP');
 
-      InstallSql(1, 'vw_CONFIG');
-      InstallSql(1, 'vw_MANDATOR');
+        InstallSql(1, 'vw_CONFIG');
+        InstallSql(1, 'vw_MANDATOR');
 
-      InstallSql(1, 'vw_COMMISSION');
-      InstallSql(1, 'vw_ARTIST'); // requires vw_COMMISSION
-      InstallSql(1, 'vw_ARTIST_EVENT');
-      InstallSql(1, 'vw_COMMISSION_EVENT');
-      InstallSql(1, 'vw_QUOTE');
-      InstallSql(1, 'vw_UPLOAD');
-      InstallSql(1, 'vw_PAYMENT');
-      InstallSql(1, 'vw_COMMUNICATION');
-      InstallSql(1, 'vw_STATISTICS');
-      InstallSql(1, 'vw_TEXT_BACKUP');
+        InstallSql(1, 'vw_COMMISSION');
+        InstallSql(1, 'vw_ARTIST'); // requires vw_COMMISSION
+        InstallSql(1, 'vw_ARTIST_EVENT');
+        InstallSql(1, 'vw_COMMISSION_EVENT');
+        InstallSql(1, 'vw_QUOTE');
+        InstallSql(1, 'vw_UPLOAD');
+        InstallSql(1, 'vw_PAYMENT');
+        InstallSql(1, 'vw_COMMUNICATION');
+        InstallSql(1, 'vw_STATISTICS');
+        InstallSql(1, 'vw_TEXT_BACKUP');
 
-      InstallSql(1, 'vw_STAT_RUNNING_COMMISSIONS');
-      InstallSql(1, 'vw_STAT_SUM_YEARS');
-      InstallSql(1, 'vw_STAT_SUM_MONTHS');
-      InstallSql(1, 'vw_STAT_TEXT_EXPORT');
-      InstallSql(1, 'vw_STAT_TOP_ARTISTS');
+        InstallSql(1, 'vw_STAT_RUNNING_COMMISSIONS');
+        InstallSql(1, 'vw_STAT_SUM_YEARS');
+        InstallSql(1, 'vw_STAT_SUM_MONTHS');
+        InstallSql(1, 'vw_STAT_TEXT_EXPORT');
+        InstallSql(1, 'vw_STAT_TOP_ARTISTS');
 
-      InstallSql(1, 'DEFAULT'); // STATISTICS and CONFIG entries
+        InstallSql(1, 'DEFAULT'); // STATISTICS and CONFIG entries
+        AdoConnection1.ExecSQL('insert into MANDATOR (NAME) values ('+AdoConnection1.SQLStringEscape(SMandator0Default)+');');
+        AdoConnection1.ExecSQL('insert into MANDATOR (NAME) values ('+AdoConnection1.SQLStringEscape(SMandator1Default)+');');
+        sCurCode := GetSystemCurrencyCode;
+        if sCurCode <> '' then
+          AdoConnection1.ExecSQL('update CONFIG set VALUE = '+AdoConnection1.SQLStringEscape(sCurCode)+' where NAME = ''LOCAL_CURRENCY'';');
+
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
+      end;
       {$ENDREGION}
     end
     else if schemaVer = 1 then
     begin
       {$REGION 'Update schema 1 => 2'}
+      AdoConnection1.BeginTrans;
+      try
+        {$REGION 'Statistics schema 2: Statistics are not in the core anymore, but instead in a Plugin'}
+        if AdoConnection1.ColumnExists('STATISTICS', 'SQL_VIEW') or not AdoConnection1.TableExists('STATISTICS') then
+        begin
+          AdoConnection1.DropTableOrView('STATISTICS');
+          InstallSql(2, 'STATISTICS');
+          InstallSql(1{sic}, 'vw_STATISTICS');
+        end;
 
-      {$REGION 'Statistics schema 2: Statistics are not in the core anymore, but instead in a Plugin'}
-      if AdoConnection1.ColumnExists('STATISTICS', 'SQL_VIEW') or not AdoConnection1.TableExists('STATISTICS') then
-      begin
-        AdoConnection1.DropTableOrView('STATISTICS');
-        InstallSql(2, 'STATISTICS');
-        InstallSql(1{sic}, 'vw_STATISTICS');
+        if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
+          AdoConnection1.DropTableOrView('vw_STAT_RUNNING_COMMISSIONS');
+        if AdoConnection1.TableExists('vw_STAT_SUM_YEARS') then
+          AdoConnection1.DropTableOrView('vw_STAT_SUM_YEARS');
+        if AdoConnection1.TableExists('vw_STAT_SUM_MONTHS') then
+          AdoConnection1.DropTableOrView('vw_STAT_SUM_MONTHS');
+        if AdoConnection1.TableExists('vw_STAT_TOP_ARTISTS') then
+          AdoConnection1.DropTableOrView('vw_STAT_TOP_ARTISTS');
+        if AdoConnection1.TableExists('vw_STAT_TEXT_EXPORT') then
+          AdoConnection1.DropTableOrView('vw_STAT_TEXT_EXPORT');
+        {$ENDREGION}
+
+        // The text dump generation is not a statistics anymore, but a core feature
+        InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
+
+        // Downpayment now uses the quote data rather than the commission date
+        // Also, the order of ART_STATUS has been mended
+        InstallSql(2, 'vw_COMMISSION');
+
+        {$REGION 'New config table fields'}
+        if not AdoConnection1.ColumnExists('CONFIG', 'READ_ONLY') then
+        begin
+          AdoConnection1.ExecSQL('alter table CONFIG add READ_ONLY bit;');
+          AdoConnection1.ExecSQL('update CONFIG set READ_ONLY = 0');
+          AdoConnection1.ExecSQL('alter table CONFIG alter column READ_ONLY bit NOT NULL');
+        end;
+        if not AdoConnection1.ColumnExists('CONFIG', 'HIDDEN') then
+        begin
+          AdoConnection1.ExecSQL('alter table CONFIG add HIDDEN bit;');
+          AdoConnection1.ExecSQL('update CONFIG set HIDDEN = iif(NAME=''DB_VERSION'' or NAME=''CUSTOMIZATION_ID'' or NAME=''INSTALL_ID'', 1, 0)');
+          AdoConnection1.ExecSQL('alter table CONFIG alter column HIDDEN bit NOT NULL');
+        end;
+        {$ENDREGION}
+
+        AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''PASSWORD_HASHED'') '+
+                               'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''PASSWORD_HASHED'', '''', 0, 1;');
+        AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''NEW_PASSWORD'') '+
+                               'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''NEW_PASSWORD'', '''', 0, 0;');
+        InstallSql(2, 'vw_CONFIG');
+
+        {$REGION 'Text dumps now as files and not in database anymore'}
+        if AdoConnection1.TableExists('TEXT_BACKUP') then
+        begin
+          AdoConnection1.DropTableOrView('TEXT_BACKUP');
+          AdoConnection1.DropTableOrView('vw_TEXT_BACKUP');
+          InstallSql(2, 'BACKUP');
+          InstallSql(2, 'vw_BACKUP');
+        end;
+        {$ENDREGION}
+
+        AdoConnection1.ExecSQL('update COMMISSION_EVENT set STATE = ''c aw sk'' where STATE = ''ack''');
+
+        AdoConnection1.ExecSQL('delete from CONFIG where NAME = ''CUSTOMIZATION_ID'''); // use INSTALL_ID instead
+
+        // Update to Schema version 2
+        AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
       end;
-
-      if AdoConnection1.TableExists('vw_STAT_RUNNING_COMMISSIONS') then
-        AdoConnection1.DropTableOrView('vw_STAT_RUNNING_COMMISSIONS');
-      if AdoConnection1.TableExists('vw_STAT_SUM_YEARS') then
-        AdoConnection1.DropTableOrView('vw_STAT_SUM_YEARS');
-      if AdoConnection1.TableExists('vw_STAT_SUM_MONTHS') then
-        AdoConnection1.DropTableOrView('vw_STAT_SUM_MONTHS');
-      if AdoConnection1.TableExists('vw_STAT_TOP_ARTISTS') then
-        AdoConnection1.DropTableOrView('vw_STAT_TOP_ARTISTS');
-      if AdoConnection1.TableExists('vw_STAT_TEXT_EXPORT') then
-        AdoConnection1.DropTableOrView('vw_STAT_TEXT_EXPORT');
-      {$ENDREGION}
-
-      // The text dump generation is not a statistics anymore, but a core feature
-      InstallSql(2, 'vw_TEXT_BACKUP_GENERATE');
-
-      // Downpayment now uses the quote data rather than the commission date
-      // Also, the order of ART_STATUS has been mended
-      InstallSql(2, 'vw_COMMISSION');
-
-      {$REGION 'New config table fields'}
-      if not AdoConnection1.ColumnExists('CONFIG', 'READ_ONLY') then
-      begin
-        AdoConnection1.ExecSQL('alter table CONFIG add READ_ONLY bit;');
-        AdoConnection1.ExecSQL('update CONFIG set READ_ONLY = 0');
-        AdoConnection1.ExecSQL('alter table CONFIG alter column READ_ONLY bit NOT NULL');
-      end;
-      if not AdoConnection1.ColumnExists('CONFIG', 'HIDDEN') then
-      begin
-        AdoConnection1.ExecSQL('alter table CONFIG add HIDDEN bit;');
-        AdoConnection1.ExecSQL('update CONFIG set HIDDEN = iif(NAME=''DB_VERSION'' or NAME=''CUSTOMIZATION_ID'' or NAME=''INSTALL_ID'', 1, 0)');
-        AdoConnection1.ExecSQL('alter table CONFIG alter column HIDDEN bit NOT NULL');
-      end;
-      {$ENDREGION}
-
-      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''PASSWORD_HASHED'') '+
-                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''PASSWORD_HASHED'', '''', 0, 1;');
-      AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''NEW_PASSWORD'') '+
-                             'insert into CONFIG (NAME, VALUE, READ_ONLY, HIDDEN) select ''NEW_PASSWORD'', '''', 0, 0;');
-      InstallSql(2, 'vw_CONFIG');
-
-      {$REGION 'Text dumps now as files and not in database anymore'}
-      if AdoConnection1.TableExists('TEXT_BACKUP') then
-      begin
-        AdoConnection1.DropTableOrView('TEXT_BACKUP');
-        AdoConnection1.DropTableOrView('vw_TEXT_BACKUP');
-        InstallSql(2, 'BACKUP');
-        InstallSql(2, 'vw_BACKUP');
-      end;
-      {$ENDREGION}
-
-      AdoConnection1.ExecSQL('update COMMISSION_EVENT set STATE = ''c aw sk'' where STATE = ''ack''');
-
-      AdoConnection1.ExecSQL('delete from CONFIG where NAME = ''CUSTOMIZATION_ID'''); // use INSTALL_ID instead
-
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''2'' where NAME = ''DB_VERSION''');
       {$ENDREGION}
     end
     else if schemaVer = 2 then
     begin
       {$REGION 'Update schema 2 => 3'}
-      InstallSql(3, 'vw_COMMISSION');
-      if AdoConnection1.ViewExists('vw_TEXT_BACKUP_GENERATE') then
-      begin
-        AdoConnection1.DropTableOrView('vw_TEXT_BACKUP_GENERATE');
+      AdoConnection1.BeginTrans;
+      try
+        InstallSql(3, 'vw_COMMISSION');
+        if AdoConnection1.ViewExists('vw_TEXT_BACKUP_GENERATE') then
+        begin
+          AdoConnection1.DropTableOrView('vw_TEXT_BACKUP_GENERATE');
+        end;
+
+        // Update to Schema version 3
+        AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
       end;
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''3'' where NAME = ''DB_VERSION''');
       {$ENDREGION}
     end
     else if schemaVer = 3 then
     begin
       {$REGION 'Update schema 3 => 4'}
-      // Remove Identity from BACKUP table, because the next value cannot be predicted due to Microsoft's crap decision
-      // see https://github.com/danielmarschall/cmdb2/issues/4
-      AdoConnection1.ExecSQL('EXEC sp_rename ''BACKUP'', ''BACKUP_OLD'';');
-      AdoConnection1.ExecSQL('EXEC sp_rename ''PK_BACKUP'', ''PK_BACKUP_OLD'';');
-      InstallSql(4, 'BACKUP');
-      AdoConnection1.ExecSQL('insert into [BACKUP] select * from BACKUP_OLD;');
-      AdoConnection1.ExecSQL('drop table BACKUP_OLD;');
-      InstallSql(2{sic}, 'vw_BACKUP');
+      AdoConnection1.BeginTrans;
+      try
+        // Remove Identity from BACKUP table, because the next value cannot be predicted due to Microsoft's crap decision
+        // see https://github.com/danielmarschall/cmdb2/issues/4
+        AdoConnection1.ExecSQL('EXEC sp_rename ''BACKUP'', ''BACKUP_OLD'';');
+        AdoConnection1.ExecSQL('EXEC sp_rename ''PK_BACKUP'', ''PK_BACKUP_OLD'';');
+        InstallSql(4, 'BACKUP');
+        AdoConnection1.ExecSQL('insert into [BACKUP] select * from BACKUP_OLD;');
+        AdoConnection1.ExecSQL('drop table BACKUP_OLD;');
+        InstallSql(2{sic}, 'vw_BACKUP');
 
-      // Update to Schema version 4
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''4'' where NAME = ''DB_VERSION''');
+        // Update to Schema version 4
+        AdoConnection1.ExecSQL('update CONFIG set VALUE = ''4'' where NAME = ''DB_VERSION''');
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
+      end;
       {$ENDREGION}
     end
     else if schemaVer = 4 then
     begin
       {$REGION 'Update schema 4 => 5'}
-      // Remove LEGACY_ID fields which came from the non-public CMDB1 migration
-      AdoConnection1.ExecSQL('alter table ARTIST drop column LEGACY_ID;');
-      AdoConnection1.ExecSQL('alter table ARTIST_EVENT drop column LEGACY_ID;');
-      AdoConnection1.ExecSQL('alter table COMMISSION drop column LEGACY_ID;');
-      AdoConnection1.ExecSQL('alter table COMMUNICATION	drop column LEGACY_ID;');
-      AdoConnection1.ExecSQL('alter table QUOTE	drop column LEGACY_ID;');
-      AdoConnection1.ExecSQL('alter table UPLOAD drop column LEGACY_ID;');
-      InstallSql(3{sic}, 'vw_COMMISSION'); // must come before vw_ARTIST
-      InstallSql(1{sic}, 'vw_ARTIST');
-      InstallSql(1{sic}, 'vw_ARTIST_EVENT');
-      InstallSql(1{sic}, 'vw_COMMUNICATION');
-      InstallSql(1{sic}, 'vw_QUOTE');
-      InstallSql(1{sic}, 'vw_UPLOAD');
+      AdoConnection1.BeginTrans;
+      try
+        // Remove LEGACY_ID fields which came from the non-public CMDB1 migration
+        AdoConnection1.ExecSQL('alter table ARTIST drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table ARTIST_EVENT drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table COMMISSION drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table COMMUNICATION	drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table QUOTE	drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table UPLOAD drop column LEGACY_ID;');
+        InstallSql(3{sic}, 'vw_COMMISSION'); // must come before vw_ARTIST
+        InstallSql(1{sic}, 'vw_ARTIST');
+        InstallSql(1{sic}, 'vw_ARTIST_EVENT');
+        InstallSql(1{sic}, 'vw_COMMUNICATION');
+        InstallSql(1{sic}, 'vw_QUOTE');
+        InstallSql(1{sic}, 'vw_UPLOAD');
 
-      // Update to Schema version 5
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''5'' where NAME = ''DB_VERSION''');
+        // Update to Schema version 5
+        AdoConnection1.ExecSQL('update CONFIG set VALUE = ''5'' where NAME = ''DB_VERSION''');
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
+      end;
       {$ENDREGION}
     end
     else if schemaVer = 5 then
     begin
       {$REGION 'Update schema 5 => 6'}
-      InstallSql(5, 'vw_COMMISSION'); // must come before vw_ARTIST
-      InstallSql(5, 'vw_ARTIST');
+      AdoConnection1.BeginTrans;
+      try
+        InstallSql(5, 'vw_COMMISSION'); // must come before vw_ARTIST
+        InstallSql(5, 'vw_ARTIST');
 
-      // Update to Schema version 6
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = ''6'' where NAME = ''DB_VERSION''');
+        // Update to Schema version 6
+        AdoConnection1.ExecSQL('update CONFIG set VALUE = ''6'' where NAME = ''DB_VERSION''');
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
+      end;
       {$ENDREGION}
     end
     else if schemaVer = 6 then
     begin
-      // <<< Future update code goes here! >>>
-
-      //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''7'' where NAME = ''DB_VERSION''');
+      AdoConnection1.BeginTrans;
+      try
+        // <<< Future update code goes here! >>>
+        //AdoConnection1.ExecSQL('update CONFIG set VALUE = ''7'' where NAME = ''DB_VERSION''');
+        AdoConnection1.CommitTrans;
+      except
+        AdoConnection1.RollbackTrans;
+      end;
 
       // We have reached the highest supported version and can now exit the loop.
       Break;
@@ -901,15 +947,6 @@ begin
     begin
       raise Exception.CreateFmt(SSchemaDUnknown, [schemaVer]);
     end;
-  end;
-
-  if isFirstInstall then
-  begin
-    AdoConnection1.ExecSQL('insert into MANDATOR (NAME) values ('+AdoConnection1.SQLStringEscape(SMandator0Default)+');');
-    AdoConnection1.ExecSQL('insert into MANDATOR (NAME) values ('+AdoConnection1.SQLStringEscape(SMandator1Default)+');');
-    sCurCode := GetSystemCurrencyCode;
-    if sCurCode <> '' then
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = '+AdoConnection1.SQLStringEscape(sCurCode)+' where NAME = ''LOCAL_CURRENCY'';');
   end;
 end;
 
