@@ -1,4 +1,4 @@
-CREATE OR ALTER view [dbo].[vw_COMMISSION] as
+CREATE OR ALTER   view [dbo].[vw_COMMISSION] as
 
 WITH UploadStuff AS (
 	select
@@ -21,41 +21,49 @@ PaymentSums AS (
 	left join ARTIST art ON art.ID = p.ARTIST_ID
 	group by art.ID, p.CURRENCY
 ),
+QuoteEvents AS (
+	select
+		q.EVENT_ID,
+		SUM(q.AMOUNT) as AMOUNT,
+		q.CURRENCY,
+		SUM(q.AMOUNT_LOCAL) as AMOUNT_LOCAL,
+		q.IS_FREE
+	from QUOTE q
+	group by q.EVENT_ID, q.CURRENCY, q.IS_FREE
+),
 QuoteSums AS (
 	select
-		q.ID AS QUOTE_ID,
+		q.EVENT_ID,
 		q.CURRENCY,
 		art.ID as ARTIST_ID,
-		SUM(CASE 
-			WHEN isnull(q.IS_FREE,0) = 0 THEN q.AMOUNT 
-			ELSE 0 
-		END) OVER (PARTITION BY art.ID, q.CURRENCY ORDER BY
-			iif (q.DESCRIPTION like 'nicht bez%' or q.DESCRIPTION like 'not paid%', 1, 0), -- Individual for DMX/SD
-			ev.DATE, q.ID
+		q.IS_FREE,
+		q.AMOUNT,
+		q.AMOUNT_LOCAL,
+		SUM(iif(isnull(q.IS_FREE,0)=0,q.AMOUNT,0))
+		OVER (PARTITION BY art.ID, q.CURRENCY ORDER BY
+			ev.DATE, q.EVENT_ID
 		) AS RunningQuoteSum
-	from QUOTE q
+	from QuoteEvents q
 	left join COMMISSION_EVENT ev ON ev.ID = q.EVENT_ID
 	left join COMMISSION cm ON cm.ID = ev.COMMISSION_ID
 	left join ARTIST art ON art.ID = cm.ARTIST_ID
 ),
 QuoteNotPaid as (
 	select 
-		--q.ID as QUOTE_ID,
 		qs.ARTIST_ID,
 		cm.ID as COMMISSION_ID,
-		q.IS_FREE,
-		q.AMOUNT as Amount,
+		qs.IS_FREE,
+		qs.AMOUNT as Amount,
 		qs.CURRENCY,
-		q.AMOUNT_LOCAL as AmountLocal,
+		qs.AMOUNT_LOCAL as AmountLocal,
 		case
-			when qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) >= q.AMOUNT then q.AMOUNT -- Not paid
+			when qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) >= qs.AMOUNT then qs.AMOUNT -- Not paid
 			when qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) <  0.00001 then 0.00 -- Paid
 			else qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) -- Partial paid
 		end as NotPaid
 	from QuoteSums qs
 	left join PaymentSums ps ON qs.ARTIST_ID = ps.ARTIST_ID and qs.CURRENCY = ps.CURRENCY
-	left join QUOTE q on q.ID = qs.QUOTE_ID
-	left join COMMISSION_EVENT ev on ev.ID = q.EVENT_ID
+	left join COMMISSION_EVENT ev on ev.ID = qs.EVENT_ID
 	left join COMMISSION cm on cm.ID = ev.COMMISSION_ID
 ),
 QuotePayStatus as (
@@ -66,7 +74,9 @@ QuotePayStatus as (
 		--sum(qps.NotPaid) as NOT_PAID_SUM,
 		sum(qps.AmountLocal) as AMOUNT_LOCAL,
 		case
-			when sum(qps.NotPaid) >= sum(qps.Amount) then
+			when sum(qps.Amount) < 0.00001 then
+				format(sum(qps.Amount), 'N2') + N' ' + qps.CURRENCY
+			when sum(qps.NotPaid) >= 0.00001 and sum(qps.NotPaid) >= sum(qps.Amount) then
 				N'!!!!!! NOT PAID ' + format(sum(qps.Amount), 'N2') + N' ' + cast(qps.CURRENCY as varchar(100))
 			when sum(qps.NotPaid) < 0.00001 then
 				N'Paid ' + format(sum(qps.Amount), 'N2') + N' ' + qps.CURRENCY
@@ -106,7 +116,7 @@ QuotePayStatus as (
 QuotePayStatusAggr as (
 	select
 		QuotePayStatus.COMMISSION_ID,
-		STRING_AGG(QuotePayStatus.PAY_STATUS, ' /// ') within group (order by QuotePayStatus.PAY_STATUS_ORDER, QuotePayStatus.AMOUNT desc, QuotePayStatus.CURRENCY) as PAY_STATUS,
+		STRING_AGG(QuotePayStatus.PAY_STATUS, ' + ') within group (order by QuotePayStatus.PAY_STATUS_ORDER, QuotePayStatus.AMOUNT desc, QuotePayStatus.CURRENCY) as PAY_STATUS,
 		sum(QuotePayStatus.AMOUNT_LOCAL) as AMOUNT_LOCAL
 	from QuotePayStatus
 	group by QuotePayStatus.COMMISSION_ID
