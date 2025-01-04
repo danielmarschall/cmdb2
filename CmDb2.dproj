@@ -340,6 +340,11 @@
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>SQL_VW_UPLOAD</ResourceId>
         </RcItem>
+        <RcItem Include="DB\version.txt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>SQL_VERSION</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -475,6 +480,12 @@
                 <DeployFile LocalName="DB\Schema5\[vw_ARTIST].sql" Configuration="Release" Class="ProjectFile"/>
                 <DeployFile LocalName="DB\Schema5\[vw_COMMISSION].sql" Configuration="Release" Class="ProjectFile"/>
                 <DeployFile LocalName="DB\UPLOAD.sql" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="DB\version.txt" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

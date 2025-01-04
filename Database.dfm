@@ -357,7 +357,6 @@ object DatabaseForm: TDatabaseForm
       Height = 39
       Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
-      Caption = 'Panel2'
       ParentColor = True
       TabOrder = 3
     end

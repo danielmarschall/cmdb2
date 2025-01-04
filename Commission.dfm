@@ -389,7 +389,6 @@ object CommissionForm: TCommissionForm
       Height = 39
       Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
-      Caption = 'Panel2'
       ParentColor = True
       TabOrder = 2
     end

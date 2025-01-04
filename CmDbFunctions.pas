@@ -696,23 +696,40 @@ resourcestring
     end;
   end;
 
-var
-  sCurCode: string;
-  schemaVer: integer;
-const
-  CUR_SCHEMA = 7;
-begin
-  if not AdoConnection1.TableExists('CONFIG') then
-    schemaVer := 0
-  else
-    schemaVer := VariantToInteger(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''DB_VERSION'';'));
-
-  if schemaVer > CUR_SCHEMA then
+  function SchemaVersion: integer;
+  var
+    sl: TStringList;
+    rcStream: TResourceStream;
   begin
-    raise Exception.CreateFmt(SSchemaDUnknown, [schemaVer]);
+    sl := TStringList.Create;
+    rcStream := TResourceStream.Create(HInstance, 'SQL_VERSION', RT_RCDATA);
+    try
+      sl.LoadFromStream(rcStream);
+      result := StrToInt(Trim(sl.Text));
+    finally
+      FreeAndNil(sl);
+      FreeAndNil(rcStream);
+    end;
   end;
 
-  if schemaVer < CUR_SCHEMA then
+var
+  localCurrencyCode: string;
+  installedSchemaVer: integer;
+  latestSchemaVer: integer;
+begin
+  latestSchemaVer := SchemaVersion;
+
+  if not AdoConnection1.TableExists('CONFIG') then
+    installedSchemaVer := 0
+  else
+    installedSchemaVer := VariantToInteger(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''DB_VERSION'';'));
+
+  if installedSchemaVer > latestSchemaVer then
+  begin
+    raise Exception.CreateFmt(SSchemaDUnknown, [installedSchemaVer]);
+  end;
+
+  if installedSchemaVer < latestSchemaVer then
   begin
     AdoConnection1.BeginTrans;
     try
@@ -721,8 +738,8 @@ begin
       begin
         InstallSql('CONFIG');
       end;
-      sCurCode := GetSystemCurrencyCode;
-      if sCurCode = '' then sCurCode := 'USD';
+      localCurrencyCode := GetSystemCurrencyCode;
+      if localCurrencyCode = '' then localCurrencyCode := 'USD';
       AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''BACKUP_PATH'') '+
                              'insert into [CONFIG] (NAME, VALUE) values (''BACKUP_PATH'', '''');');
       AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''CURRENCY_LAYER_API_KEY'') '+
@@ -733,7 +750,7 @@ begin
       AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''INSTALL_ID'') '+
                              'insert into [CONFIG] (NAME, VALUE) values (''INSTALL_ID'', cast(newid() as varchar(100)));');
       AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''LOCAL_CURRENCY'') '+
-                             'insert into [CONFIG] (NAME, VALUE) values (''LOCAL_CURRENCY'', '+AdoConnection1.SQLStringEscape(sCurCode)+');');
+                             'insert into [CONFIG] (NAME, VALUE) values (''LOCAL_CURRENCY'', '+AdoConnection1.SQLStringEscape(localCurrencyCode)+');');
       AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''NEW_PASSWORD'') '+
                              'insert into [CONFIG] (NAME, VALUE) values (''NEW_PASSWORD'', '''');');
       AdoConnection1.ExecSQL('if not exists (select NAME from CONFIG where NAME = ''PASSWORD_HASHED'') '+
@@ -834,7 +851,7 @@ begin
       begin
         InstallSql('BACKUP');
       end
-      else if schemaVer < 4 then
+      else if installedSchemaVer < 4 then
       begin
         // Remove Identity from BACKUP table, because the next value cannot be predicted due to Microsoft's crap decision
         // see https://github.com/danielmarschall/cmdb2/issues/4
@@ -872,7 +889,7 @@ begin
       InstallSql('vw_BACKUP');
       {$ENDREGION}
 
-      AdoConnection1.ExecSQL('update CONFIG set VALUE = '+AdoConnection1.SQLStringEscape(IntToStr(CUR_SCHEMA))+' where NAME = ''DB_VERSION'';');
+      AdoConnection1.ExecSQL('update CONFIG set VALUE = '+AdoConnection1.SQLStringEscape(IntToStr(latestSchemaVer))+' where NAME = ''DB_VERSION'';');
 
       AdoConnection1.CommitTrans;
     except

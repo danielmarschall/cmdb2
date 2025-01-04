@@ -692,7 +692,6 @@ object MandatorForm: TMandatorForm
       Height = 39
       Anchors = [akLeft, akTop, akRight]
       BevelOuter = bvNone
-      Caption = 'TitlePanel'
       ParentColor = True
       TabOrder = 4
     end
