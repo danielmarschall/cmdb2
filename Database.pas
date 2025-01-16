@@ -255,6 +255,8 @@ procedure TDatabaseForm.SearchBtnClick(Sender: TObject);
 begin
   if SearchEdit.Text <> '' then
     SearchEdit.Clear;
+  if SearchEdit.CanFocus then
+    SearchEdit.SetFocus;
 end;
 
 procedure TDatabaseForm.HelpBtnClick(Sender: TObject);

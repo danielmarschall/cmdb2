@@ -594,6 +594,8 @@ procedure TMandatorForm.SearchBtnClick(Sender: TObject);
 begin
   if SearchEdit.Text <> '' then
     SearchEdit.Clear;
+  if SearchEdit.CanFocus then
+    SearchEdit.SetFocus;
 end;
 
 procedure TMandatorForm.HelpBtnClick(Sender: TObject);
