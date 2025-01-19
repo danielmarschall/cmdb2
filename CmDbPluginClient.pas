@@ -75,6 +75,9 @@ var
   plgType, plgId: TGUID;
   plgVer: DWORD;
   AuthorInfo: Pointer;
+resourcestring
+  SFailedToLoadS = 'Failed to load %s';
+  SNotAValidPlugin = '%s is not a valid CMDB2 Statistics Plugin';
 begin
   inherited Create;
 
@@ -82,14 +85,14 @@ begin
 
   FDLLHandle := LoadLibrary(PChar(FPluginDllFilename));
   if FDLLHandle = 0 then
-    raise Exception.CreateFmt('Failed to load %s', [FPluginDllFilename]);
+    raise Exception.CreateFmt(SFailedToLoadS, [FPluginDllFilename]);
   try
-    @VtsPluginID := GetProcAddress(FDLLHandle, 'VtsPluginID');
+    @VtsPluginID := GetProcAddress(FDLLHandle, 'VtsPluginID'); // do not localize
     GetMem(AuthorInfo, 4096);
     try
       ZeroMemory(AuthorInfo, 4096);
       if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer, AuthorInfo)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
-        raise Exception.CreateFmt('%s is not a valid CMDB2 Statistics Plugin', [FPluginDllFilename]);
+        raise Exception.CreateFmt(SNotAValidPlugin, [FPluginDllFilename]);
       VerInfo.ReadFromMemory(AuthorInfo);
     finally
       FreeMem(AuthorInfo);
@@ -114,17 +117,23 @@ begin
   inherited;
 end;
 
+resourcestring
+  SFunctionNotFound = 'Function %s not found in %s';
+  SCallToSFailed = 'Call to %s failed in %s';
+
 procedure TCmDbPlugin.Init(const DBConnStr: string);
 type
   TInitW = function(DBConnStr: PChar): HRESULT; stdcall;
 var
   InitW: TInitW;
+const
+  DllProcInit = 'InitW';
 begin
-  @InitW := GetProcAddress(FDLLHandle, 'InitW');
+  @InitW := GetProcAddress(FDLLHandle, DllProcInit);
   if not Assigned(InitW) then
-    raise Exception.CreateFmt('Function %s not found in %s', ['InitW', FPluginDllFilename]);
+    raise Exception.CreateFmt(SFunctionNotFound, [DllProcInit, FPluginDllFilename]);
   if Failed(InitW(PChar(DBConnStr))) then
-    raise Exception.CreateFmt('Call to %s failed in %s', ['InitW', FPluginDllFilename]);
+    raise Exception.CreateFmt(SCallToSFailed, [DllProcInit, FPluginDllFilename]);
 end;
 
 function TCmDbPlugin.ClickEvent(const DBConnStr: string; MandatorGuid,
@@ -135,16 +144,18 @@ type
 var
   ClickEventW: TClickEventW;
   ResponseData: Pointer;
+const
+  DllProcClickEvent = 'ClickEventW';
 begin
-  @ClickEventW := GetProcAddress(FDLLHandle, 'ClickEventW');
+  @ClickEventW := GetProcAddress(FDLLHandle, DllProcClickEvent);
   if not Assigned(ClickEventW) then
-    raise Exception.CreateFmt('Function %s not found in %s', ['ClickEventW', FPluginDllFilename]);
+    raise Exception.CreateFmt(SFunctionNotFound, [DllProcClickEvent, FPluginDllFilename]);
 
   GetMem(ResponseData, 4096);
   try
     ZeroMemory(ResponseData, 4096);
     if Failed(ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData)) then
-      raise Exception.CreateFmt('Call to %s failed in %s', ['ClickEventW', FPluginDllFilename]);
+      raise Exception.CreateFmt(SCallToSFailed, [DllProcClickEvent, FPluginDllFilename]);
     Result.ReadFromMemory(ResponseData);
   finally
     FreeMem(ResponseData);

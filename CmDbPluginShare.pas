@@ -129,27 +129,27 @@ var
   Ptr: PByte;
 begin
   Ptr := PByte(Memory);
-  Self.Handled := Boolean(Ptr^); // Boolean aus Byte lesen
+  Self.Handled := Boolean(Ptr^); // Read Boolean from Byte
   Inc(Ptr);
-  Self.Action := TCmDbPluginClickResponseAction(Ptr^); // Action aus Byte lesen
+  Self.Action := TCmDbPluginClickResponseAction(Ptr^); // Read Action from Byte
   Inc(Ptr);
 
   case Self.Action of
     craObject:
     begin
-      Self.ObjTable := _ReadWideString(Ptr);   // ObjTable lesen
-      Move(Ptr^, Self.ObjId, SizeOf(TGuid));  // GUID direkt lesen
+      Self.ObjTable := _ReadWideString(Ptr);   // Read ObjTable
+      Move(Ptr^, Self.ObjId, SizeOf(TGuid));  // Read GUID directly
       Inc(Ptr, SizeOf(TGuid));
     end;
     craStatistics:
     begin
-      Move(Ptr^, Self.StatId, SizeOf(TGuid));  // GUID direkt lesen
+      Move(Ptr^, Self.StatId, SizeOf(TGuid));  // Read GUID directly
       Inc(Ptr, SizeOf(TGuid));
-      Self.StatName := _ReadWideString(Ptr);       // StatName lesen
-      Self.SqlTable := _ReadWideString(Ptr);       // SqlTable lesen
-      Self.SqlInitialOrder := _ReadWideString(Ptr);// SqlInitialOrder lesen
-      Self.SqlAdditionalFilter := _ReadWideString(Ptr); // SqlAdditionalFilter lesen
-      Self.BaseTableDelete := _ReadWideString(Ptr); // BaseTableDelete lesen
+      Self.StatName := _ReadWideString(Ptr);       // Read StatName
+      Self.SqlTable := _ReadWideString(Ptr);       // Read SqlTable
+      Self.SqlInitialOrder := _ReadWideString(Ptr);// Read SqlInitialOrder
+      Self.SqlAdditionalFilter := _ReadWideString(Ptr); // Read SqlAdditionalFilter
+      Self.BaseTableDelete := _ReadWideString(Ptr); // Read BaseTableDelete
       Self.ScrollToEnd := _ReadBool(Ptr);
       Self.DisplayEditFormats := _ReadWideString(Ptr);
     end;
@@ -161,21 +161,21 @@ var
   Ptr: PByte;
 begin
   Ptr := PByte(Memory);
-  Ptr^ := Ord(Self.Handled);  // Boolean als Byte schreiben
+  Ptr^ := Ord(Self.Handled);  // Write Boolean as Byte
   Inc(Ptr);
-  Ptr^ := Ord(Self.Action);   // Action als Byte schreiben
+  Ptr^ := Ord(Self.Action);   // Write Action as Byte
   Inc(Ptr);
 
   case Self.Action of
     craObject:
     begin
-      _WriteWideString(Ptr, Self.ObjTable);  // ObjTable als WideString schreiben
-      Move(Self.ObjId, Ptr^, SizeOf(TGuid)); // GUID direkt kopieren
+      _WriteWideString(Ptr, Self.ObjTable);  // Write ObjTable as WideString
+      Move(Self.ObjId, Ptr^, SizeOf(TGuid)); // Copy GUID directory
       Inc(Ptr, SizeOf(TGuid));
     end;
     craStatistics:
     begin
-      Move(Self.StatId, Ptr^, SizeOf(TGuid));  // GUID direkt kopieren
+      Move(Self.StatId, Ptr^, SizeOf(TGuid));  // Copy GUID directly
       Inc(Ptr, SizeOf(TGuid));
       _WriteWideString(Ptr, Self.StatName);       // StatName
       _WriteWideString(Ptr, Self.SqlTable);       // SqlTable

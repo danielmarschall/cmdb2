@@ -44,6 +44,7 @@ uses
   CmDbMain, Artist, Commission, Mandator, Statistics, Registry;
 
 const
+  LOCALDB_PSEUDO_HOST = '(localdb)';
   LOCALDB_INSTANCE_NAME = 'MSSQLLocalDB';
 
 procedure CmDb_DropTempTables(AdoConnection1: TAdoConnection);
@@ -396,7 +397,7 @@ begin
   // 2. sqllocaldb create MSSQLLocalDB
   //    sqllocaldb start MSSQLLocalDB
 
-  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, 'master');  // do not localize
+  ADOConnection1.ConnectNtAuth(LOCALDB_PSEUDO_HOST+'\'+LOCALDB_INSTANCE_NAME, 'master');  // do not localize
   ADOConnection1.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = N'+AdoConnection1.SQLStringEscape(DataBaseName)+') ' +
     'BEGIN ' +
@@ -420,7 +421,7 @@ begin
     '  ALTER DATABASE '+AdoConnection1.SQLDatabaseNameEscape(DataBaseName)+' SET MULTI_USER; ' +
     'END'
   );
-  ADOConnection1.ConnectNtAuth('(localdb)\'+LOCALDB_INSTANCE_NAME, DataBaseName);  // do not localize
+  ADOConnection1.ConnectNtAuth(LOCALDB_PSEUDO_HOST+'\'+LOCALDB_INSTANCE_NAME, DataBaseName);
 end;
 
 procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
@@ -431,17 +432,24 @@ procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
     i: integer;
   const
     SEPARATOR = '; ';
+  resourcestring
+    SYes = 'Yes';
+    SNo = 'No';
   begin
     sb := TStringBuilder.Create;
     try
       for i := 0 to q.Fields.Count-1 do
       begin
-        if q.Fields[i].FieldName = 'ID' then continue;
-        if q.Fields[i].FieldName.EndsWith('_ID') then continue;
-        if q.Fields[i].FieldName.StartsWith('__') then continue;
-        if q.Fields[i].FieldName = 'IS_ARTIST' then continue;
+        if q.Fields[i].FieldName = 'ID' then continue; // primary keys are only internal, nothing the user needs to care about
+        if q.Fields[i].FieldName.EndsWith('_ID') then continue; // foreign keys are only internal, nothing the user needs to care about
+        if q.Fields[i].FieldName.StartsWith('__') then continue; // internal fields in the query, required for sorting
+        if q.Fields[i].FieldName = 'IS_ARTIST' then continue; // because we already split Clients and Artists as pseudo-tables
         if q.Fields[i].FieldName = 'NAME' then
           sb.Append(q.Fields[i].AsWideString + SEPARATOR)
+        else if (q.Fields[i].DataType = ftBoolean) and q.Fields[i].AsBoolean then
+          sb.Append(q.Fields[i].FieldName + '=' + SYes + SEPARATOR)
+        else if (q.Fields[i].DataType = ftBoolean) and not q.Fields[i].AsBoolean then
+          sb.Append(q.Fields[i].FieldName + '=' + SNo + SEPARATOR)
         else if q.Fields[i].AsWideString <> '' then
           sb.Append(q.Fields[i].FieldName + '=' + q.Fields[i].AsWideString + SEPARATOR);
       end;
@@ -454,10 +462,23 @@ procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
 
 var
   qConfig, qMandator, qArtist, qArtistEvent, qCommission, qCommunication, qPayment, qCommissionEvent, qQuote, qUpload: TADODataSet;
+resourcestring
+  STypeConfig = 'Config';
+  STypeMandator = 'Mandator';
+  STypeArtist = 'Artist';
+  STypeArtistEvent = 'Artist Event';
+  STypeClient = 'Client';
+  STypeClientEvent = 'Client Event';
+  STypeCommunication = 'Communication';
+  STypePayment = 'Payment';
+  STypeCommission = 'Commission';
+  STypeCommissionEvent = 'Commission Event';
+  STypeQuote = 'Quote';
+  STypeUpload = 'Upload';
 begin
   sl.BeginUpdate;
   try
-    {$REGION 'Query database (the order is cruicial!)}
+    {$REGION 'Query database (the order is cruicial!)'}
     qConfig := ADOConnection1.GetTable(
       'select cnf.NAME as __CNF_NAME, cnf.* ' +
       'from CONFIG cnf ' +
@@ -523,30 +544,30 @@ begin
     {$REGION 'Config'}
     while not qConfig.EOF do
     begin
-      sl.Add('Config: ' + MakeLine(qConfig));
+      sl.Add(STypeConfig + ': ' + MakeLine(qConfig));
       qConfig.Next;
     end;
     {$ENDREGION}
     {$REGION 'Mandator'}
     while not qMandator.EOF do
     begin
-      sl.Add('Mandator: ' + MakeLine(qMandator));
+      sl.Add(STypeMandator + ': ' + MakeLine(qMandator));
       {$REGION 'Artist/Client'}
       while not qArtist.EOF and
             IsEqualGUID(qArtist.FieldByName('__MAN_ID').AsGuid, qMandator.FieldByName('__MAN_ID').AsGuid) do
       begin
         if qArtist.FieldByName('IS_ARTIST').AsBoolean then
-          sl.Add(#9 + 'Artist: ' + MakeLine(qArtist))
+          sl.Add(#9 + STypeArtist + ': ' + MakeLine(qArtist))
         else
-          sl.Add(#9 + 'Client: ' + MakeLine(qArtist));
+          sl.Add(#9 + STypeClient + ': ' + MakeLine(qArtist));
         {$REGION 'Artist Event'}
         while not qArtistEvent.EOF and
               IsEqualGUID(qArtistEvent.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
           if qArtist.FieldByName('IS_ARTIST').AsBoolean then
-            sl.Add(#9#9 + 'Artist Event: ' + MakeLine(qArtistEvent))
+            sl.Add(#9#9 + STypeArtistEvent + ': ' + MakeLine(qArtistEvent))
           else
-            sl.Add(#9#9 + 'Client Event: ' + MakeLine(qArtistEvent));
+            sl.Add(#9#9 + STypeClientEvent + ': ' + MakeLine(qArtistEvent));
           qArtistEvent.Next;
         end;
         {$ENDREGION}
@@ -554,7 +575,7 @@ begin
         while not qCommunication.EOF and
               IsEqualGUID(qCommunication.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
-          sl.Add(#9#9 + 'Communication: ' + MakeLine(qCommunication));
+          sl.Add(#9#9 + STypeCommunication + ': ' + MakeLine(qCommunication));
           qCommunication.Next;
         end;
         {$ENDREGION}
@@ -562,7 +583,7 @@ begin
         while not qPayment.EOF and
               IsEqualGUID(qPayment.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
-          sl.Add(#9#9 + 'Payment: ' + MakeLine(qPayment));
+          sl.Add(#9#9 + STypePayment + ': ' + MakeLine(qPayment));
           qPayment.Next;
         end;
         {$ENDREGION}
@@ -571,9 +592,9 @@ begin
               IsEqualGUID(qArtistEvent.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
           if qArtist.FieldByName('IS_ARTIST').AsBoolean then
-            sl.Add(#9#9 + 'Artist Event: ' + MakeLine(qArtistEvent))
+            sl.Add(#9#9 + STypeArtistEvent + ': ' + MakeLine(qArtistEvent))
           else
-            sl.Add(#9#9 + 'Client Event: ' + MakeLine(qArtistEvent));
+            sl.Add(#9#9 + STypeClientEvent + ': ' + MakeLine(qArtistEvent));
           qArtistEvent.Next;
         end;
         {$ENDREGION}
@@ -581,17 +602,17 @@ begin
         while not qCommission.EOF and
               IsEqualGUID(qCommission.FieldByName('__ART_ID').AsGuid, qArtist.FieldByName('__ART_ID').AsGuid) do
         begin
-          sl.Add(#9#9 + 'Commission: ' + MakeLine(qCommission));
+          sl.Add(#9#9 + STypeCommission + ': ' + MakeLine(qCommission));
           {$REGION 'Commission Event'}
           while not qCommissionEvent.EOF and
                 IsEqualGUID(qCommissionEvent.FieldByName('__CM_ID').AsGuid, qCommission.FieldByName('__CM_ID').AsGuid) do
           begin
-            sl.Add(#9#9#9 + 'Commission Event: ' + MakeLine(qCommissionEvent));
+            sl.Add(#9#9#9 + STypeCommissionEvent + ': ' + MakeLine(qCommissionEvent));
             {$REGION 'Quote'}
             while not qQuote.EOF and
                   IsEqualGUID(qQuote.FieldByName('__EV_ID').AsGuid, qCommissionEvent.FieldByName('__EV_ID').AsGuid) do
             begin
-              sl.Add(#9#9#9#9 + 'Quote: ' + MakeLine(qQuote));
+              sl.Add(#9#9#9#9 + STypeQuote + ': ' + MakeLine(qQuote));
               qQuote.Next;
             end;
             {$ENDREGION}
@@ -599,7 +620,7 @@ begin
             while not qUpload.EOF and
                   IsEqualGUID(qUpload.FieldByName('__EV_ID').AsGuid, qCommissionEvent.FieldByName('__EV_ID').AsGuid) do
             begin
-              sl.Add(#9#9#9#9 + 'Upload: ' + MakeLine(qUpload));
+              sl.Add(#9#9#9#9 + STypeUpload + ': ' + MakeLine(qUpload));
               qUpload.Next;
             end;
             {$ENDREGION}
@@ -834,7 +855,7 @@ begin
       if not AdoConnection1.TableExists('COMMUNICATION') then
         InstallSql('COMMUNICATION');
       if AdoConnection1.ColumnExists('COMMUNICATION', 'LEGACY_ID') then
-        AdoConnection1.ExecSQL('alter table COMMUNICATION	drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table COMMUNICATION drop column LEGACY_ID;');
       {$ENDREGION}
 
       {$REGION 'STATISTICS'}
@@ -944,7 +965,7 @@ begin
       fs.Seek(peOffset+8, soFromBeginning);
       fs.Read(unixTime, 4);
 
-      {$IF CompilerVersion >= 20.0} // geraten
+      {$IF CompilerVersion >= 20.0} // guessed
       result := UnixToDateTime(unixTime, false);
       {$ELSE}
       result := UnixToDateTime(unixTime);
@@ -1183,7 +1204,7 @@ begin
       end;
     end;
     // Delete Mandator => Close Artist Window
-    q := Dataset.Connection.GetTable('select ID from ARTIST where MANDATOR_ID = ''' + id + '''');
+    q := Dataset.Connection.GetTable('select ID from ARTIST where MANDATOR_ID = ' + Dataset.Connection.SQLStringEscape(id));
     try
       while not q.EOF do
       begin
@@ -1203,7 +1224,7 @@ begin
       FreeAndNil(q);
     end;
     // Delete Mandator => Close Commission Window
-    q := Dataset.Connection.GetTable('select COMMISSION.ID from COMMISSION left join ARTIST on ARTIST.ID = COMMISSION.ARTIST_ID where ARTIST.MANDATOR_ID = ''' + id + '''');
+    q := Dataset.Connection.GetTable('select COMMISSION.ID from COMMISSION left join ARTIST on ARTIST.ID = COMMISSION.ARTIST_ID where ARTIST.MANDATOR_ID = ' + Dataset.Connection.SQLStringEscape(id));
     try
       while not q.EOF do
       begin
@@ -1248,7 +1269,7 @@ begin
       end;
     end;
     // Delete Artist => Close Commission Windows
-    q := Dataset.Connection.GetTable('select ID from COMMISSION where ARTIST_ID = ''' + id + '''');
+    q := Dataset.Connection.GetTable('select ID from COMMISSION where ARTIST_ID = ' + Dataset.Connection.SQLStringEscape(id));
     try
       while not q.EOF do
       begin
@@ -1474,7 +1495,7 @@ begin
           try
             TotalRead := 0;
             repeat
-              // Lese Daten von der URL
+              // Read data from the URL
               InternetReadFile(hRequest, @Buffer, SizeOf(Buffer), BufferLen);
               if BufferLen > 0 then
               begin
