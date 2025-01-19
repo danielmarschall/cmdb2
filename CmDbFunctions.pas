@@ -815,7 +815,7 @@ begin
       if not AdoConnection1.TableExists('QUOTE') then
         InstallSql('QUOTE');
       if AdoConnection1.ColumnExists('QUOTE', 'LEGACY_ID') then
-        AdoConnection1.ExecSQL('alter table QUOTE	drop column LEGACY_ID;');
+        AdoConnection1.ExecSQL('alter table QUOTE drop column LEGACY_ID;');
       {$ENDREGION}
 
       {$REGION 'UPLOAD'}
