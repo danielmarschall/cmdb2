@@ -610,11 +610,35 @@ begin
   if trim(search)<>'' then
     result := result + 'and lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryCommissionEvent_order = '' then
-    result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE=''ack'' then 0 ' +
-                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE like ''cancel%'' then 2 ' +
-                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE=''fin'' then 3 ' +
-                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE like ''upload%'' then 4 ' +
-                       '              else 1 end '+AscDesc(SqlQueryCommissionEvent_asc)+', DATE, STATE, ANNOTATION'
+                                      // For old datasets we have either 1900 or 2999 as date, so we need to find a meaningful order via STATE
+    result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''idea''           then 10 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''c td initcm''    then 11 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''c aw ack''       then 12 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''quote''          then 13 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''c aw sk''        then 14 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''c td feedback''  then 15 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''c aw cont''      then 16 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''c aw hires''     then 17 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE like ''cancel %''       then 30 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''rejected''       then 31 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''fin''            then 32 ' +
+                       '              when abs(datediff(year,getdate(),DATE))>100 and STATE like ''upload %''       then 33 ' +
+                       '              else 20 end, ' +
+                       '         DATE '+AscDesc(SqlQueryCommissionEvent_asc)+', ' +
+                       // See this order also in vw_COMMISSION.sql:
+                       '         case when STATE =    ''idea''           then 10 ' +
+                       '              when STATE =    ''c td initcm''    then 11 ' +
+                       '              when STATE =    ''c aw ack''       then 12 ' +
+                       '              when STATE =    ''quote''          then 13 ' +
+                       '              when STATE =    ''c aw sk''        then 14 ' +
+                       '              when STATE =    ''c td feedback''  then 15 ' +
+                       '              when STATE =    ''c aw cont''      then 16 ' +
+                       '              when STATE =    ''c aw hires''     then 17 ' +
+                       '              when STATE like ''cancel %''       then 30 ' +
+                       '              when STATE =    ''rejected''       then 31 ' +
+                       '              when STATE =    ''fin''            then 32 ' +
+                       '              when STATE like ''upload %''       then 33 ' +
+                       '              else 20 end, ANNOTATION'
   else
     result := result + 'order by ' + SqlQueryCommissionEvent_order + ' ' + AscDesc(SqlQueryCommissionEvent_asc);
 end;
@@ -884,6 +908,7 @@ begin
     ttEvents.Active := false;
     ttEvents.SQL.Text := SqlQueryCommissionEvent('');
     ttEvents.Active := true;
+    ttEvents.Locate('STATE', 'quote', []); // Jump to the quote so that the bottom pane is filled with meaningful content
     dbgEvents.AutoSizeColumns;
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgEvents, navEvents);
     {$ENDREGION}

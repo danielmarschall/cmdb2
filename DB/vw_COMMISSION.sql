@@ -149,13 +149,13 @@ cm.NAME + iif(art.IS_ARTIST=1,' by ',' for ') + art.NAME as PROJECT_NAME,
 	              else 3 end,
 	         ev.DATE desc,
 	         case
-	              when ev.STATE like 'c aw hires' then 1
-	              when ev.STATE like 'c aw cont' then 2
-	              when ev.STATE like 'c td feedback' then 3
-	              when ev.STATE like 'c aw sk' then 4
-	              when ev.STATE like 'c aw ack' then 5
-	              when ev.STATE like 'c td initcm' then 6
-	              when ev.STATE like 'idea' then 7
+	              when ev.STATE = 'c aw hires' then 1
+	              when ev.STATE = 'c aw cont' then 2
+	              when ev.STATE = 'c td feedback' then 3
+	              when ev.STATE = 'c aw sk' then 4
+	              when ev.STATE = 'c aw ack' then 5
+	              when ev.STATE = 'c td initcm' then 6
+	              when ev.STATE = 'idea' then 7
 	              else 7
 	              end
 ) as ART_STATUS,
