@@ -227,6 +227,7 @@ begin
       begin
         CmDb_DropTempTables(AdoConnection1);
         DefragIndexes(AdoConnection1);
+        ADOConnection1.ExecSQL('exec sp_updatestats');
       end;
 
       sl := TStringList.Create;
