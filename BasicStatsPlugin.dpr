@@ -210,8 +210,8 @@ begin
                           '    iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
                           '    year(cm.START_DATE) as YEAR, ' + #13#10 +
                           '    count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
-                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
-                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          '    SUM(isnull(iif(q.AMOUNT_LOCAL=0 and q.IS_FREE=0,null,q.AMOUNT_LOCAL),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '    SUM(isnull(iif(q.AMOUNT_LOCAL=0 and q.IS_FREE=0,null,q.AMOUNT_LOCAL),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
@@ -304,8 +304,8 @@ begin
                           '    iif(art.IS_ARTIST=1, ''OUT'', ''IN'') as DIRECTION, ' + #13#10 +
                           '    cast(cast(year(cm.START_DATE) as nvarchar(4)) + ''-'' + REPLICATE(''0'',2-LEN(month(cm.START_DATE))) + cast(month(cm.START_DATE) as nvarchar(2)) as nvarchar(7)) as MONTH, ' + #13#10 +
                           '    count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
-                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
-                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          '    SUM(isnull(iif(q.AMOUNT_LOCAL=0 and q.IS_FREE=0,null,q.AMOUNT_LOCAL),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '    SUM(isnull(iif(q.AMOUNT_LOCAL=0 and q.IS_FREE=0,null,q.AMOUNT_LOCAL),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
@@ -622,8 +622,8 @@ begin
                           '    art.NAME as ARTISTNAME, ' + #13#10 +
                           '    art.ID as __ID, ' + #13#10 +
                           '    count(distinct cm.ID) as COUNT_COMMISSIONS, ' + #13#10 +
-                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
-                          '    SUM(isnull(nullif(q.AMOUNT_LOCAL,0),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
+                          '    SUM(isnull(iif(q.AMOUNT_LOCAL=0 and q.IS_FREE=0,null,q.AMOUNT_LOCAL),isnull(q.AMOUNT,0))) as AMOUNT_LOCAL, ' + #13#10 +
+                          '    SUM(isnull(iif(q.AMOUNT_LOCAL=0 and q.IS_FREE=0,null,q.AMOUNT_LOCAL),isnull(q.AMOUNT,0)))/count(distinct cm.ID) as MEAN_SINGLE ' + #13#10 +
                           'from vw_COMMISSION cm ' + #13#10 +
                           'left join COMMISSION_EVENT ev on ev.COMMISSION_ID = cm.ID ' + #13#10 +
                           'left join QUOTE q on q.EVENT_ID = ev.ID and ev.STATE = ''quote'' ' + #13#10 +
