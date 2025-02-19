@@ -565,6 +565,7 @@ end;
 
 procedure TCommissionForm.BtnFolderOpenClick(Sender: TObject);
 begin
+  BtnFolderSave.Click;
   ShellExecute(Handle, 'open', PChar(FolderEdit.Text), '', '', SW_NORMAL);
 end;
 
