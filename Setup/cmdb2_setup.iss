@@ -18,7 +18,6 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-;DefaultDirName=C:\HS-Service
 DefaultDirName={autopf}\ViaThinkSoft\{#MyAppName} {#MyAppVersion}
 DisableProgramGroupPage=yes
 LicenseFile=license.rtf
