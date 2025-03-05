@@ -711,46 +711,55 @@ begin
         Application.ProcessMessages;
 
         // 1. Visual C++ Runtime (both 32bit and 64bit required according to Microsoft)
-        {$IFDEF Win64}
-        tmpDF := _GetLocalOrDownloadedExe('VC_redist.x86.exe', 'Visual C++ Redistributable (32 Bit)');
-        ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
-        _DeleteIfTemporary(tmpDF);
+        if WindowsBits = 64 then
+        begin
+          tmpDF := _GetLocalOrDownloadedExe('VC_redist.x86.exe', 'Visual C++ Redistributable (32 Bit)');
+          ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
 
-        tmpDF := _GetLocalOrDownloadedExe('VC_redist.x64.exe', 'Visual C++ Redistributable (64 Bit)');
-        ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
-        _DeleteIfTemporary(tmpDF);
-        {$ELSE}
-        tmpDF := _GetLocalOrDownloadedExe('VC_redist.x86.exe', 'Visual C++ Redistributable (32 Bit)');
-        ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
-        _DeleteIfTemporary(tmpDF);
-        {$ENDIF}
+          tmpDF := _GetLocalOrDownloadedExe('VC_redist.x64.exe', 'Visual C++ Redistributable (64 Bit)');
+          ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
+        end
+        else
+        begin
+          tmpDF := _GetLocalOrDownloadedExe('VC_redist.x86.exe', 'Visual C++ Redistributable (32 Bit)');
+          ShellExecuteWait(Handle, 'runas', PChar(tmpDF.filename), '/install /quiet /norestart', '', SW_NORMAL, True);
+          _DeleteIfTemporary(tmpDF);
+        end;
 
         // 2. LocalDB
         if not _IsLocalDbInstalled then
         begin
-          {$IFDEF Win64}
-          tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x64.msi', 'SQL Server LocalDB (64 Bit)');
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
-          _DeleteIfTemporary(tmpDF);
-          {$ELSE}
-          tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x86.msi', 'SQL Server LocalDB (32 Bit)');
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
-          _DeleteIfTemporary(tmpDF);
-          {$ENDIF}
+          if WindowsBits = 64 then
+          begin
+            tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x64.msi', 'SQL Server LocalDB (64 Bit)');
+            ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+            _DeleteIfTemporary(tmpDF);
+          end
+          else
+          begin
+            tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x86.msi', 'SQL Server LocalDB (32 Bit)');
+            ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTSQLLOCALDBLICENSETERMS=YES'), '', SW_NORMAL, True);
+            _DeleteIfTemporary(tmpDF);
+          end;
         end;
 
         // 3. OleDB Driver
         if not _SqlServerClientDriverInstalled then
         begin
-          {$IFDEF Win64}
-          tmpDF := _GetLocalOrDownloadedExe('msoledbsql19.x64.msi', 'SQL Server OLE DB Provider (64 Bit)');
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
-          _DeleteIfTemporary(tmpDF);
-          {$ELSE}
-          tmpDF := _GetLocalOrDownloadedExe('msoledbsql19.x86.msi', 'SQL Server OLE DB Provider (32 Bit)');
-          ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
-          _DeleteIfTemporary(tmpDF);
-          {$ENDIF}
+          if WindowsBits = 64 then
+          begin
+            tmpDF := _GetLocalOrDownloadedExe('msoledbsql19.x64.msi', 'SQL Server OLE DB Provider (64 Bit)');
+            ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+            _DeleteIfTemporary(tmpDF);
+          end
+          else
+          begin
+            tmpDF := _GetLocalOrDownloadedExe('msoledbsql19.x86.msi', 'SQL Server OLE DB Provider (32 Bit)');
+            ShellExecuteWait(Handle, 'runas', 'msiexec.exe', PChar('/i "'+tmpDF.filename+'" /passive /qn IACCEPTMSOLEDBSQLLICENSETERMS=YES'), '', SW_NORMAL, True);
+            _DeleteIfTemporary(tmpDF);
+          end;
         end;
       finally
         Screen.Cursor := crDefault;

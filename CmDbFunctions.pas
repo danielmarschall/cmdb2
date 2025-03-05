@@ -37,6 +37,8 @@ procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
 
 procedure WinInet_DownloadFile(const URL, FileName: string; pb: TProgressBar);
 
+function WindowsBits: integer;
+
 implementation
 
 uses
@@ -1520,6 +1522,54 @@ begin
   finally
     InternetCloseHandle(hSession);
   end;
+end;
+
+function IsWow64: Boolean;
+{$IFDEF WIN64}
+begin
+  // Native 64 Bit App means OS and CPU is 64 Bit, too.
+  result := false;
+{$ELSE}
+type
+  TIsWow64Process = function( // Type of IsWow64Process API fn
+    Handle: Windows.THandle; var Res: Windows.BOOL
+  ): Windows.BOOL; stdcall;
+var
+  IsWow64Result: Windows.BOOL;      // Result from IsWow64Process
+  IsWow64Process: TIsWow64Process;  // IsWow64Process fn reference
+begin
+  // Try to load required function from kernel32
+  IsWow64Process := Windows.GetProcAddress(
+    Windows.GetModuleHandle('kernel32'), 'IsWow64Process'
+  );
+  if Assigned(IsWow64Process) then
+  begin
+    // Function is implemented: call it
+    if not IsWow64Process(
+      Windows.GetCurrentProcess, IsWow64Result
+    ) then
+      raise SysUtils.Exception.Create('IsWow64: bad process handle');
+    // Return result of function
+    Result := IsWow64Result;
+  end
+  else
+    // Function not implemented: can't be running on Wow64
+    Result := False;
+{$ENDIF}
+end;
+
+function WindowsBits: integer;
+begin
+  // Outputs 32 or 64, depending on the WINDOWS edition,
+  // NOT depending on the application!
+  {$IFDEF WIN64}
+  result := 64;
+  {$ELSE}
+  if IsWow64 then
+    result := 64
+  else
+    result := 32;
+  {$ENDIF}
 end;
 
 initialization
