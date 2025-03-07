@@ -162,6 +162,10 @@ type
     procedure dbgCommunicationDblClick(Sender: TObject);
     procedure openCommissionClick(Sender: TObject);
     procedure openCommunicationClick(Sender: TObject);
+    procedure navCommunicationClick(Sender: TObject; Button: TNavigateBtn);
+    procedure navArtistEventClick(Sender: TObject; Button: TNavigateBtn);
+    procedure navPaymentClick(Sender: TObject; Button: TNavigateBtn);
+    procedure navCommissionClick(Sender: TObject; Button: TNavigateBtn);
   private
     SearchEditSav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -477,6 +481,11 @@ begin
       Screen.Cursor := crDefault;
     end;
     Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
+    Key := 0;
   end;
 end;
 
@@ -522,6 +531,11 @@ begin
     finally
       Screen.Cursor := crDefault;
     end;
+    Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
   end;
 end;
@@ -573,6 +587,11 @@ begin
       Screen.Cursor := crDefault;
     end;
     Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
+    Key := 0;
   end;
 end;
 
@@ -611,6 +630,11 @@ begin
     finally
       Screen.Cursor := crDefault;
     end;
+    Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
   end;
 end;
@@ -981,6 +1005,32 @@ end;
 procedure TArtistForm.openCommunicationClick(Sender: TObject);
 begin
   dbgCommunicationDblClick(dbgCommunication);
+end;
+
+procedure TArtistForm.navArtistEventClick(Sender: TObject;
+  Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
+end;
+
+procedure TArtistForm.navCommissionClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
+end;
+
+procedure TArtistForm.navCommunicationClick(Sender: TObject;
+  Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
+end;
+
+procedure TArtistForm.navPaymentClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
 end;
 
 end.

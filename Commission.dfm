@@ -57,6 +57,7 @@ object CommissionForm: TCommissionForm
           Align = alLeft
           Kind = dbnVertical
           TabOrder = 1
+          OnClick = navEventsClick
         end
         object dbgEvents: TDBGrid
           Left = 33
@@ -121,7 +122,7 @@ object CommissionForm: TCommissionForm
         Top = 212
         Width = 750
         Height = 300
-        ActivePage = tsUploads
+        ActivePage = tsQuotes
         Align = alClient
         TabOrder = 1
         object tsQuotes: TTabSheet
@@ -136,6 +137,7 @@ object CommissionForm: TCommissionForm
             Align = alLeft
             Kind = dbnVertical
             TabOrder = 0
+            OnClick = navQuotesClick
           end
           object dbgQuotes: TDBGrid
             Left = 33
@@ -200,6 +202,7 @@ object CommissionForm: TCommissionForm
             Align = alLeft
             Kind = dbnVertical
             TabOrder = 0
+            OnClick = navUploadsClick
           end
           object dbgUploads: TDBGrid
             Left = 33

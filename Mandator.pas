@@ -247,6 +247,8 @@ type
     procedure openClientsClick(Sender: TObject);
     procedure openCommissionClick(Sender: TObject);
     procedure openStatisticsClick(Sender: TObject);
+    procedure navArtistsClick(Sender: TObject; Button: TNavigateBtn);
+    procedure navClientsClick(Sender: TObject; Button: TNavigateBtn);
   private
     SearchEditSav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -659,6 +661,11 @@ begin
       Screen.Cursor := crDefault;
     end;
     Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
+    Key := 0;
   end;
 end;
 
@@ -704,6 +711,11 @@ begin
     finally
       Screen.Cursor := crDefault;
     end;
+    Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
   end;
 end;
@@ -1297,6 +1309,18 @@ end;
 procedure TMandatorForm.openStatisticsClick(Sender: TObject);
 begin
   dbgStatisticsDblClick(dbgStatistics);
+end;
+
+procedure TMandatorForm.navArtistsClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
+end;
+
+procedure TMandatorForm.navClientsClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
 end;
 
 end.

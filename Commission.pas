@@ -108,6 +108,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ttUploadsBeforePost(DataSet: TDataSet);
     procedure ttEventsBeforeScroll(DataSet: TDataSet);
+    procedure navEventsClick(Sender: TObject; Button: TNavigateBtn);
+    procedure navUploadsClick(Sender: TObject; Button: TNavigateBtn);
+    procedure navQuotesClick(Sender: TObject; Button: TNavigateBtn);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -704,6 +707,11 @@ begin
       Screen.Cursor := crDefault;
     end;
     Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
+    Key := 0;
   end;
 end;
 
@@ -742,6 +750,11 @@ begin
     finally
       Screen.Cursor := crDefault;
     end;
+    Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
   end;
 end;
@@ -793,6 +806,11 @@ begin
     finally
       Screen.Cursor := crDefault;
     end;
+    Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
   end;
 end;
@@ -945,6 +963,25 @@ begin
     ttQuotes.Post;
   if (ttUploads.State=dsEdit) or ((ttUploads.State=dsInsert) and ((ttUploadsPAGE.AsWideString<>'') or (ttUploadsURL.AsWideString<>''))) then
     ttUploads.Post;
+end;
+
+procedure TCommissionForm.navEventsClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
+end;
+
+procedure TCommissionForm.navQuotesClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
+end;
+
+procedure TCommissionForm.navUploadsClick(Sender: TObject;
+  Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
 end;
 
 end.

@@ -102,6 +102,7 @@ object ArtistForm: TArtistForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1
+        OnClick = navCommissionClick
       end
       object sbCommission: TPanel
         Left = 0
@@ -160,6 +161,7 @@ object ArtistForm: TArtistForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 0
+        OnClick = navPaymentClick
       end
       object dbgPayment: TDBGrid
         Left = 33
@@ -261,6 +263,7 @@ object ArtistForm: TArtistForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 0
+        OnClick = navArtistEventClick
       end
       object dbgArtistEvent: TDBGrid
         Left = 33
@@ -391,6 +394,7 @@ object ArtistForm: TArtistForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1
+        OnClick = navCommunicationClick
       end
       object sbCommunication: TPanel
         Left = 0

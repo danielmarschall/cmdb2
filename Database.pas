@@ -109,6 +109,7 @@ type
     procedure ttTextBackupBeforePost(DataSet: TDataSet);
     procedure ttMandatorBeforePost(DataSet: TDataSet);
     procedure openMandatorClick(Sender: TObject);
+    procedure navMandatorClick(Sender: TObject; Button: TNavigateBtn);
   private
     SearchEditSav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -346,6 +347,11 @@ begin
     finally
       Screen.Cursor := crDefault;
     end;
+    Key := 0;
+  end
+  else if Key = VK_INSERT then
+  begin
+    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
   end;
 end;
@@ -670,6 +676,12 @@ begin
   // https://stackoverflow.com/questions/54401270/when-i-perform-the-ondblclick-event-form1-to-open-form2-it-fires-the-oncellcl
   dbgMandator.Enabled := false;
   Timer2.Enabled := true;
+end;
+
+procedure TDatabaseForm.navMandatorClick(Sender: TObject; Button: TNavigateBtn);
+begin
+  if Button = nbInsert then
+    TDbNavigator(Sender).DataSource.DataSet.Append;
 end;
 
 procedure TDatabaseForm.openMandatorClick(Sender: TObject);

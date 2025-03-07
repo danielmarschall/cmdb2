@@ -42,6 +42,7 @@ object DatabaseForm: TDatabaseForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1
+        OnClick = navMandatorClick
       end
       object dbgMandator: TDBGrid
         Left = 33

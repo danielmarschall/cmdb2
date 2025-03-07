@@ -107,6 +107,7 @@ object MandatorForm: TMandatorForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1
+        OnClick = navArtistsClick
       end
       object sbArtists: TPanel
         Left = 0
@@ -230,6 +231,7 @@ object MandatorForm: TMandatorForm
         Align = alLeft
         Kind = dbnVertical
         TabOrder = 1
+        OnClick = navClientsClick
       end
       object sbClients: TPanel
         Left = 0
