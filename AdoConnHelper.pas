@@ -11,6 +11,8 @@ unit AdoConnHelper;
  * https://github.com/danielmarschall/delphiutils/blob/master/_Common/AdoConnHelper.pas
  *)
 
+// TODO: Added SeqGuid => add to ViaThinkSoft upstream
+
 interface
 
 uses
@@ -68,6 +70,7 @@ type
 
     procedure ShrinkDatabase(const Datenbankname: string; typ: TDatabaseFileType);
     function SupportsBackupCompression: boolean;
+    function NewSeqGuid: TGUID;
   end;
 
 implementation
@@ -473,6 +476,15 @@ begin
   finally
     ExecSQL('DROP PROCEDURE [dbo].[SeqId];');
   end;
+end;
+
+function TAdoConnectionHelperForSqlServer.NewSeqGuid: TGUID;
+var
+  v: variant;
+begin
+  // see https://stackoverflow.com/a/913570/488539
+  v := GetScalar('select cast(cast(NewID() as binary(10)) + cast(GetDate() as binary(6)) as uniqueidentifier)');
+  result := StringToGUID(VarToStrDef(v, '{00000000-0000-0000-0000-000000000000}'));
 end;
 
 procedure TAdoConnectionHelperForSqlServer.ShrinkDatabase(const Datenbankname: string; typ: TDatabaseFileType);

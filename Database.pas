@@ -228,7 +228,7 @@ end;
 
 procedure TDatabaseForm.ttMandatorNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
 end;
 
 procedure TDatabaseForm.ttTextBackupAfterScroll(DataSet: TDataSet);

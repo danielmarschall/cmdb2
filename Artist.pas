@@ -225,7 +225,7 @@ end;
 
 procedure TArtistForm.ttArtistEventNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
   DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
@@ -252,7 +252,7 @@ end;
 
 procedure TArtistForm.ttCommissionNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
 end;
 
@@ -284,7 +284,7 @@ end;
 
 procedure TArtistForm.ttCommunicationNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
 end;
 
@@ -376,7 +376,7 @@ end;
 
 procedure TArtistForm.ttPaymentNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('ARTIST_ID').AsGuid := ArtistId;
   DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
@@ -659,7 +659,7 @@ begin
   if SqlQueryArtistEvent_order = '' then
     result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE=''born'' then 0 ' +
                        '              when abs(datediff(year,getdate(),DATE))>100 and STATE=''deceased'' then 2 ' +
-                       '              else 1 end '+AscDesc(SqlQueryArtistEvent_asc)+', DATE '+AscDesc(SqlQueryArtistEvent_asc)+', STATE, ANNOTATION'
+                       '              else 1 end '+AscDesc(SqlQueryArtistEvent_asc)+', DATE '+AscDesc(SqlQueryArtistEvent_asc)+', STATE, ID '+AscDesc(SqlQueryArtistEvent_asc)
   else
     result := result + 'order by ' + SqlQueryArtistEvent_order + ' ' + AscDesc(SqlQueryArtistEvent_asc);
 end;
@@ -678,7 +678,7 @@ begin
   if trim(search)<>'' then
     result := result + 'and lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryCommission_order = 'START_DATE' then
-    result := result + 'order by isnull(START_DATE,CONVERT(DATETIME, ''31.12.2999'', 104)) '+AscDesc(SqlQueryCommission_asc)+', NAME'
+    result := result + 'order by isnull(START_DATE,CONVERT(DATETIME, ''31.12.2999'', 104)) '+AscDesc(SqlQueryCommission_asc)+', ID '+AscDesc(SqlQueryCommission_asc)
   else
     result := result + 'order by ' + SqlQueryCommission_order + ' ' + AscDesc(SqlQueryCommission_asc);
 end;
@@ -700,7 +700,7 @@ begin
                        'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
                        ' ) ';
   if SqlQueryCommunication_order = 'CHANNEL' then
-    result := result + 'order by CHANNEL '+AscDesc(SqlQueryCommunication_asc)+', ADDRESS, ANNOTATION'
+    result := result + 'order by CHANNEL '+AscDesc(SqlQueryCommunication_asc)+', ADDRESS, ID '+AscDesc(SqlQueryCommunication_asc)
   else
     result := result + 'order by ' + SqlQueryCommunication_order + ' ' + AscDesc(SqlQueryCommunication_asc);
 end;
@@ -719,7 +719,7 @@ begin
   if trim(search)<>'' then
     result := result + 'and lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryPayment_order = 'DATE' then
-    result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', AMOUNT, ANNOTATION desc'
+    result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', ID '+AscDesc(SqlQueryPayment_asc)
   else if SqlQueryPayment_order = 'PAYPROV' then
     result := result + 'order by PAYPROV '+AscDesc(SqlQueryPayment_asc)+', DATE'
   else

@@ -342,7 +342,7 @@ end;
 
 procedure TMandatorForm.ttArtistsNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('MANDATOR_ID').AsGuid := MandatorId;
   DataSet.FieldByName('IS_ARTIST').AsBoolean := true;
 end;
@@ -409,7 +409,7 @@ end;
 
 procedure TMandatorForm.ttClientsNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('MANDATOR_ID').AsGuid := MandatorId;
   DataSet.FieldByName('IS_ARTIST').AsBoolean := false;
 end;
@@ -967,7 +967,7 @@ begin
   if trim(search)<>'' then
     result := result + 'and lower(PROJECT_NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryCommissions_order = 'START_DATE' then
-    result := result + 'order by START_DATE '+AscDesc(SqlQueryCommissions_asc)+', END_DATE, PROJECT_NAME'
+    result := result + 'order by START_DATE '+AscDesc(SqlQueryCommissions_asc)+', ID '+AscDesc(SqlQueryCommissions_asc)
   else
     result := result + 'order by ' + SqlQueryCommissions_order + ' ' + AscDesc(SqlQueryCommissions_asc);
 end;

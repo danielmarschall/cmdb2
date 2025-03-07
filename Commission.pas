@@ -262,7 +262,7 @@ end;
 
 procedure TCommissionForm.ttQuotesNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('NO').AsInteger :=
     VariantToInteger(ADOConnection1.GetScalar('select isnull(max(NO),0)+1 from QUOTE where EVENT_ID = ' +
       ADOConnection1.SQLStringEscape(ttEvents.FieldByName('ID').AsWideString)
@@ -335,7 +335,7 @@ end;
 
 procedure TCommissionForm.ttUploadsNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('NO').AsInteger :=
     VariantToInteger(ADOConnection1.GetScalar('select isnull(max(NO),0)+1 from UPLOAD where EVENT_ID = ' +
       ADOConnection1.SQLStringEscape(ttEvents.FieldByName('ID').AsWideString)
@@ -486,7 +486,7 @@ end;
 
 procedure TCommissionForm.ttEventsNewRecord(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('ID').AsGuid := TGUID.NewGuid;
+  DataSet.FieldByName('ID').AsGuid := ADOConnection1.NewSeqGuid;
   DataSet.FieldByName('COMMISSION_ID').AsGuid := CommissionId;
   DataSet.FieldByName('DATE').AsDateTime := Date;
 end;
@@ -639,7 +639,7 @@ begin
                        '              when STATE =    ''rejected''       then 31 ' +
                        '              when STATE =    ''fin''            then 32 ' +
                        '              when STATE like ''upload %''       then 33 ' +
-                       '              else 20 end, ANNOTATION'
+                       '              else 20 end, ID '+AscDesc(SqlQueryCommissionEvent_asc)
   else
     result := result + 'order by ' + SqlQueryCommissionEvent_order + ' ' + AscDesc(SqlQueryCommissionEvent_asc);
 end;
@@ -658,7 +658,7 @@ begin
   if trim(search)<>'' then
     result := result + 'and lower(DESCRIPTION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
   if SqlQueryQuote_order = 'NO' then
-    result := result + 'order by NO '+AscDesc(SqlQueryQuote_asc)+', DESCRIPTION'
+    result := result + 'order by NO '+AscDesc(SqlQueryQuote_asc)+', ID '+AscDesc(SqlQueryQuote_asc)
   else
     result := result + 'order by ' + SqlQueryQuote_order + ' ' + AscDesc(SqlQueryQuote_asc);
 end;
@@ -680,7 +680,7 @@ begin
                        'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
                        '    ) ';
   if SqlQueryUpload_order = 'NO' then
-    result := result + 'order by NO '+AscDesc(SqlQueryUpload_asc)+', PAGE, URL'
+    result := result + 'order by NO '+AscDesc(SqlQueryUpload_asc)+', PAGE, ID '+AscDesc(SqlQueryUpload_asc)
   else
     result := result + 'order by ' + SqlQueryUpload_order + ' ' + AscDesc(SqlQueryUpload_asc);
 end;
