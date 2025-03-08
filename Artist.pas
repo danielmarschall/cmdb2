@@ -677,7 +677,7 @@ begin
   result := result + 'from vw_ARTIST_EVENT ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'STATE|ANNOTATION');
+    result := result + 'and ' + BuildSearchCondition(search, dbgArtistEvent);
   if SqlQueryArtistEvent_order = '' then
     result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE=''born'' then 0 ' +
                        '              when abs(datediff(year,getdate(),DATE))>100 and STATE=''deceased'' then 2 ' +
@@ -698,7 +698,7 @@ begin
   result := result + 'from vw_COMMISSION ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'NAME');
+    result := result + 'and ' + BuildSearchCondition(search, dbgCommission);
   if SqlQueryCommission_order = 'START_DATE' then
     result := result + 'order by isnull(START_DATE,CONVERT(DATETIME, ''31.12.2999'', 104)) '+AscDesc(SqlQueryCommission_asc)+', ID '+AscDesc(SqlQueryCommission_asc)
   else
@@ -717,7 +717,7 @@ begin
   result := result + 'from vw_COMMUNICATION ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'CHANNEL|ADDRESS|ANNOTATION');
+    result := result + 'and ' + BuildSearchCondition(search, dbgCommunication);
   if SqlQueryCommunication_order = 'CHANNEL' then
     result := result + 'order by CHANNEL '+AscDesc(SqlQueryCommunication_asc)+', ADDRESS, ID '+AscDesc(SqlQueryCommunication_asc)
   else
@@ -736,7 +736,7 @@ begin
   result := result + 'from vw_PAYMENT ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'ANNOTATION');
+    result := result + 'and ' + BuildSearchCondition(search, dbgPayment);
   if SqlQueryPayment_order = 'DATE' then
     result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', ID '+AscDesc(SqlQueryPayment_asc)
   else if SqlQueryPayment_order = 'PAYPROV' then

@@ -947,7 +947,12 @@ begin
   result := 'select * from vw_ARTIST ';
   result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'NAME');
+  begin
+    if isArtist then
+      result := result + 'and ' + BuildSearchCondition(search, dbgArtists)
+    else
+      result := result + 'and ' + BuildSearchCondition(search, dbgClients);
+  end;
   if isArtist then
     result := result + 'and IS_ARTIST = 1 '
   else
@@ -977,7 +982,7 @@ begin
   result := 'select * from vw_COMMISSION ';
   result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'PROJECT_NAME');
+    result := result + 'and ' + BuildSearchCondition(search, dbgCommissions);
   if SqlQueryCommissions_order = 'START_DATE' then
     result := result + 'order by START_DATE '+AscDesc(SqlQueryCommissions_asc)+', ID '+AscDesc(SqlQueryCommissions_asc)
   else
@@ -995,7 +1000,7 @@ begin
   result := 'select * from vw_PAYMENT ';
   result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
   if Trim(search) <> '' then
-    result := result + 'and ' + BuildSearchCondition(search, 'ANNOTATION|ARTIST_OR_CLIENT_NAME');
+    result := result + 'and ' + BuildSearchCondition(search, dbgPayment);
   if SqlQueryPayment_order = 'DATE' then
     result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', PAYPROV, ARTIST_OR_CLIENT_NAME'
   else if SqlQueryPayment_order = 'PAYPROV' then
@@ -1016,7 +1021,7 @@ begin
   end;
   result := 'select * from vw_STATISTICS ';
   if Trim(search) <> '' then
-    result := result + 'where ' + BuildSearchCondition(search, 'NAME');
+    result := result + 'where ' + BuildSearchCondition(search, dbgStatistics);
   if SqlQueryStatistics_order = 'NO' then
     result := result + 'order by NO '+AscDesc(SqlQueryStatistics_asc)+', PLUGIN, NAME'
   else if SqlQueryStatistics_order = 'PLUGIN' then

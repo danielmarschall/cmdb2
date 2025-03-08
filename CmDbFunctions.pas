@@ -38,7 +38,8 @@ procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
 procedure WinInet_DownloadFile(const URL, FileName: string; pb: TProgressBar);
 
 function WindowsBits: integer;
-function BuildSearchCondition(const search, columns: string): string;
+
+function BuildSearchCondition(const search: string; dbg: TDBGrid): string;
 
 implementation
 
@@ -1365,7 +1366,10 @@ begin
   TDBGrid(Sender).Canvas.FillRect(Rect);
 
   // Get the text of the column field
-  txt := Column.Field.AsWideString;
+  if Column.Field = nil then
+    txt := '(NULL)'
+  else
+    txt := Column.Field.AsWideString;
 
   // Use DisplayFormat for non-numeric fields as well, if available
   if (Column.Field is TNumericField) and (TNumericField(Column.Field).DisplayFormat <> '') then
@@ -1378,11 +1382,11 @@ begin
     txt := FormatFloat(TAggregateField(Column.Field).DisplayFormat, Column.Field.AsFloat);
 
   // Do we have the OnGetText Event??
-  if Assigned(Column.Field.OnGetText) then
+  if Assigned(Column.Field) and Assigned(Column.Field.OnGetText) then
     Column.Field.OnGetText(Column.Field, txt, true);
 
   // Check if the field is numeric and has a DisplayFormat
-  if Column.Field.DataType in [ftFloat, ftCurrency, ftBCD, ftFMTBcd, ftInteger, ftSmallint, ftWord, ftLargeint] then
+  if Assigned(Column.Field) and (Column.Field.DataType in [ftFloat, ftCurrency, ftBCD, ftFMTBcd, ftInteger, ftSmallint, ftWord, ftLargeint]) then
   begin
     // Calculate the width of the formatted text for right alignment
     txtWidth := TDBGrid(Sender).Canvas.TextWidth(txt);
@@ -1573,7 +1577,7 @@ begin
   {$ENDIF}
 end;
 
-function BuildSearchCondition(const search, columns: string): string;
+function _BuildSearchCondition(const search, columns: string): string;
 var
   words, columnList: TStringList;
   i, j: Integer;
@@ -1622,6 +1626,20 @@ begin
     words.Free;
     columnList.Free;
   end;
+end;
+
+function BuildSearchCondition(const search: string; dbg: TDBGrid): string;
+var
+  tmpCols: string;
+  i: integer;
+begin
+  tmpCols := '';
+  for i := 0 to dbg.Columns.Count-1 do
+  begin
+    tmpCols := tmpCols + dbg.Columns[i].FieldName + '|';
+  end;
+  tmpCols := Copy(tmpCols, 1, Length(tmpCols)-1);
+  result := _BuildSearchCondition(search, tmpCols);
 end;
 
 initialization

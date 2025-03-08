@@ -158,9 +158,6 @@ function TStatisticsForm.SqlQueryStatistics(const search: string): string;
     end;
   end;
 
-var
-  q: TAdoDataSet;
-  tmpCols: string;
 begin
   if not SqlQueryStatistics_Init then
   begin
@@ -173,29 +170,8 @@ begin
   result := result + 'where 1=1 ';
   if SqlAdditionalFilter <> '' then
     result := result + 'and (' + SqlAdditionalFilter + ') ';
-  if trim(search)<>'' then
-  begin
-    tmpCols := '';
-    {$REGION 'List columns'}
-    q := AdoConnection1.GetTable('select COLUMN_NAME ' +
-                                 'from INFORMATION_SCHEMA.COLUMNS ' +
-                                 'where TABLE_NAME = '+ADOConnection1.SQLStringEscape(SqlTable)+' ' +
-                                 //'and TABLE_SCHEMA = ''dbo'' ' +
-                                 'and COLUMN_NAME not like ''\_\_%'' escape ''\'';');
-    try
-      while not q.EOF do
-      begin
-        tmpCols := tmpCols + ADOConnection1.SQLFieldNameEscape(q.Fields[0].AsWideString) + '|';
-        q.Next;
-      end;
-    finally
-      FreeAndNil(q);
-    end;
-    tmpCols := Copy(tmpCols, 1, Length(tmpCols)-1);
-    {$ENDREGION}
-    result := result + 'and ' + BuildSearchCondition(search, tmpCols);
-  end;
-
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, dbgQuery);
   if (SqlQueryStatistics_order = '') and (SqlInitialOrder <> '') then
     result := result + 'order by ' + SqlInitialOrder // {No, because the DB might have asc/desc:} + ' ' + AscDesc(SqlQueryStatistics_asc)
   else if (SqlQueryStatistics_order = '') and (SqlInitialOrder = '') then
@@ -207,6 +183,8 @@ begin
 end;
 
 procedure TStatisticsForm.Timer1Timer(Sender: TObject);
+var
+  i: integer;
 begin
   Timer1.Enabled := false;
   if Assigned(SearchEditSav) then
@@ -222,6 +200,8 @@ begin
       ttQuery.Active := true;
       dbgQuery.HideColumnPrefix('__');
       SetFormats;
+      for i := 0 to ttQuery.FieldCount-1 do
+        ttQuery.Fields[i].ReadOnly := true;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -318,6 +298,7 @@ end;
 procedure TStatisticsForm.dbgQueryTitleClick(Column: TColumn);
 var
   ds: TAdoQuery;
+  i: integer;
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -329,6 +310,8 @@ begin
     ds.Active := true;
     TDbGrid(Column.Grid).HideColumnPrefix('__');
     SetFormats; // for some reason, we need it only in this form, nowhere else. Because field list is dynamic? ( https://github.com/danielmarschall/cmdb2/issues/11 )
+    for i := 0 to ttQuery.FieldCount-1 do
+      ttQuery.Fields[i].ReadOnly := true;
   finally
     Screen.Cursor := crDefault;
   end;
@@ -516,9 +499,7 @@ begin
     InsteadOfDeleteWorkaround_PrepareDeleteOptions(dbgQuery, navQuery);
     SetFormats;
     for i := 0 to ttQuery.FieldCount-1 do
-    begin
       ttQuery.Fields[i].ReadOnly := true;
-    end;
     if resp.ScrollToEnd then ttQuery.Last;
     {$ENDREGION}
   finally

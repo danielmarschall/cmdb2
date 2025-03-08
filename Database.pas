@@ -461,7 +461,7 @@ begin
   end;
   result := 'select * from vw_MANDATOR ';
   if Trim(search) <> '' then
-    result := result + 'where ' + BuildSearchCondition(search, 'NAME');
+    result := result + 'where ' + BuildSearchCondition(search, dbgMandator);
   result := result + 'order by ' + SqlQueryMandator_order + ' ' + AscDesc(SqlQueryMandator_asc);
 end;
 
@@ -475,7 +475,7 @@ begin
   end;
   result := 'select BAK_ID, BAK_DATE, BAK_LINES, ANNOTATION, CHECKSUM from vw_BACKUP ';
   if Trim(search) <> '' then
-    result := result + 'where ' + BuildSearchCondition(search, 'ANNOTATION');
+    result := result + 'where ' + BuildSearchCondition(search, dbgTextBackup);
   result := result + 'order by ' + SqlQueryTextBackup_order + ' ' + AscDesc(SqlQueryTextBackup_asc);
 end;
 
@@ -539,7 +539,7 @@ begin
   end;
   result := 'select * from vw_CONFIG ';
   if Trim(search) <> '' then
-    result := result + 'where ' + BuildSearchCondition(search, 'NAME');
+    result := result + 'where ' + BuildSearchCondition(search, dbgConfig);
   result := result + 'order by ' + SqlQueryConfig_order + ' ' + AscDesc(SqlQueryConfig_asc);
 end;
 
