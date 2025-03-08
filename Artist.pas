@@ -676,10 +676,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_ARTIST_EVENT ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and ( lower(STATE) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       '    ) ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'STATE|ANNOTATION');
   if SqlQueryArtistEvent_order = '' then
     result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE=''born'' then 0 ' +
                        '              when abs(datediff(year,getdate(),DATE))>100 and STATE=''deceased'' then 2 ' +
@@ -699,8 +697,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_COMMISSION ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'NAME');
   if SqlQueryCommission_order = 'START_DATE' then
     result := result + 'order by isnull(START_DATE,CONVERT(DATETIME, ''31.12.2999'', 104)) '+AscDesc(SqlQueryCommission_asc)+', ID '+AscDesc(SqlQueryCommission_asc)
   else
@@ -718,11 +716,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_COMMUNICATION ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and ( lower(CHANNEL) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       'or    lower(ADDRESS) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       ' ) ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'CHANNEL|ADDRESS|ANNOTATION');
   if SqlQueryCommunication_order = 'CHANNEL' then
     result := result + 'order by CHANNEL '+AscDesc(SqlQueryCommunication_asc)+', ADDRESS, ID '+AscDesc(SqlQueryCommunication_asc)
   else
@@ -740,8 +735,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_PAYMENT ';
   result := result + 'where ARTIST_ID = ''' + ArtistId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'ANNOTATION');
   if SqlQueryPayment_order = 'DATE' then
     result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', ID '+AscDesc(SqlQueryPayment_asc)
   else if SqlQueryPayment_order = 'PAYPROV' then

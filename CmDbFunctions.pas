@@ -38,6 +38,7 @@ procedure InsteadOfDeleteWorkaround_DrawColumnCell(Sender: TObject;
 procedure WinInet_DownloadFile(const URL, FileName: string; pb: TProgressBar);
 
 function WindowsBits: integer;
+function BuildSearchCondition(const search, columns: string): string;
 
 implementation
 
@@ -1570,6 +1571,57 @@ begin
   else
     result := 32;
   {$ENDIF}
+end;
+
+function BuildSearchCondition(const search, columns: string): string;
+var
+  words, columnList: TStringList;
+  i, j: Integer;
+  conditions, columnCondition: string;
+begin
+  if Trim(search) = '' then Exit('1=1');
+  if columns = '' then Exit('1=0');
+
+  words := TStringList.Create;
+  columnList := TStringList.Create;
+  try
+    // Split search terms (by spaces)
+    words.Delimiter := ' ';
+    words.DelimitedText := Trim(search);
+
+    // Split column names (by | char)
+    columnList.Delimiter := '|';
+    columnList.DelimitedText := columns;
+
+    conditions := '';
+
+    for i := 0 to words.Count - 1 do
+    begin
+      if conditions <> '' then
+        conditions := conditions + ' AND ';
+
+      columnCondition := '(';
+      for j := 0 to columnList.Count - 1 do
+      begin
+        if j > 0 then
+          columnCondition := columnCondition + ' OR ';
+
+        columnCondition := columnCondition +
+          'lower(' + columnList[j] + ') LIKE ''%' +
+          StringReplace(AnsiLowerCase(words[i]), '''', '`', [rfReplaceAll]) + '%''';
+      end;
+      columnCondition := columnCondition + ')';
+
+      conditions := conditions + columnCondition;
+    end;
+
+    if Conditions = '' then Conditions := '1=1';
+
+    Result := '(' + conditions + ')';
+  finally
+    words.Free;
+    columnList.Free;
+  end;
 end;
 
 initialization

@@ -160,6 +160,7 @@ function TStatisticsForm.SqlQueryStatistics(const search: string): string;
 
 var
   q: TAdoDataSet;
+  tmpCols: string;
 begin
   if not SqlQueryStatistics_Init then
   begin
@@ -174,7 +175,8 @@ begin
     result := result + 'and (' + SqlAdditionalFilter + ') ';
   if trim(search)<>'' then
   begin
-    result := result + ' and (1=0 ';
+    tmpCols := '';
+    {$REGION 'List columns'}
     q := AdoConnection1.GetTable('select COLUMN_NAME ' +
                                  'from INFORMATION_SCHEMA.COLUMNS ' +
                                  'where TABLE_NAME = '+ADOConnection1.SQLStringEscape(SqlTable)+' ' +
@@ -183,13 +185,15 @@ begin
     try
       while not q.EOF do
       begin
-        result := result + 'or ' + ADOConnection1.SQLFieldNameEscape(q.Fields[0].AsWideString) + ' like ' + AdoConnection1.SQLStringEscape('%'+search+'%');
+        tmpCols := tmpCols + ADOConnection1.SQLFieldNameEscape(q.Fields[0].AsWideString) + '|';
         q.Next;
       end;
     finally
       FreeAndNil(q);
     end;
-    result := result + ') ';
+    tmpCols := Copy(tmpCols, 1, Length(tmpCols)-1);
+    {$ENDREGION}
+    result := result + 'and ' + BuildSearchCondition(search, tmpCols);
   end;
 
   if (SqlQueryStatistics_order = '') and (SqlInitialOrder <> '') then

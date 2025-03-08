@@ -677,8 +677,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_COMMISSION_EVENT ';
   result := result + 'where COMMISSION_ID = ''' + CommissionId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'ANNOTATION');
   if SqlQueryCommissionEvent_order = '' then
                                       // For old datasets we have either 1900 or 2999 as date, so we need to find a meaningful order via STATE
     result := result + 'order by case when abs(datediff(year,getdate(),DATE))>100 and STATE =    ''idea''           then 10 ' +
@@ -724,8 +724,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_QUOTE ';
   result := result + 'where EVENT_ID = ''' + ttEvents.FieldByName('ID').AsWideString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and lower(DESCRIPTION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'DESCRIPTION');
   if SqlQueryQuote_order = 'NO' then
     result := result + 'order by NO '+AscDesc(SqlQueryQuote_asc)+', ID '+AscDesc(SqlQueryQuote_asc)
   else
@@ -743,11 +743,8 @@ begin
   result := 'select * ';
   result := result + 'from vw_UPLOAD ';
   result := result + 'where EVENT_ID = ''' + ttEvents.FieldByName('ID').AsWideString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and ( lower(PAGE) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' or ' +
-                       'or    lower(URL) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' or ' +
-                       'or    lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       '    ) ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'PAGE|URL|ANNOTATION');
   if SqlQueryUpload_order = 'NO' then
     result := result + 'order by NO '+AscDesc(SqlQueryUpload_asc)+', PAGE, ID '+AscDesc(SqlQueryUpload_asc)
   else

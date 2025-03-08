@@ -460,8 +460,8 @@ begin
     SqlQueryMandator_asc := true;
   end;
   result := 'select * from vw_MANDATOR ';
-  if trim(search)<>'' then
-    result := result + 'where lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'where ' + BuildSearchCondition(search, 'NAME');
   result := result + 'order by ' + SqlQueryMandator_order + ' ' + AscDesc(SqlQueryMandator_asc);
 end;
 
@@ -474,8 +474,8 @@ begin
     SqlQueryTextBackup_asc := true;
   end;
   result := 'select BAK_ID, BAK_DATE, BAK_LINES, ANNOTATION, CHECKSUM from vw_BACKUP ';
-  if trim(search)<>'' then
-    result := result + 'where lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'where ' + BuildSearchCondition(search, 'ANNOTATION');
   result := result + 'order by ' + SqlQueryTextBackup_order + ' ' + AscDesc(SqlQueryTextBackup_asc);
 end;
 
@@ -538,8 +538,8 @@ begin
     SqlQueryConfig_asc := true;
   end;
   result := 'select * from vw_CONFIG ';
-  if trim(search)<>'' then
-    result := result + 'where lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'where ' + BuildSearchCondition(search, 'NAME');
   result := result + 'order by ' + SqlQueryConfig_order + ' ' + AscDesc(SqlQueryConfig_asc);
 end;
 

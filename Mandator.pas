@@ -946,8 +946,8 @@ begin
   end;
   result := 'select * from vw_ARTIST ';
   result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'NAME');
   if isArtist then
     result := result + 'and IS_ARTIST = 1 '
   else
@@ -976,8 +976,8 @@ begin
   end;
   result := 'select * from vw_COMMISSION ';
   result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and lower(PROJECT_NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'PROJECT_NAME');
   if SqlQueryCommissions_order = 'START_DATE' then
     result := result + 'order by START_DATE '+AscDesc(SqlQueryCommissions_asc)+', ID '+AscDesc(SqlQueryCommissions_asc)
   else
@@ -994,9 +994,8 @@ begin
   end;
   result := 'select * from vw_PAYMENT ';
   result := result + 'where MANDATOR_ID = ''' + MandatorId.ToString + ''' ';
-  if trim(search)<>'' then
-    result := result + 'and (lower(ANNOTATION) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ' +
-                       'or  lower(ARTIST_OR_CLIENT_NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'') ';
+  if Trim(search) <> '' then
+    result := result + 'and ' + BuildSearchCondition(search, 'ANNOTATION|ARTIST_OR_CLIENT_NAME');
   if SqlQueryPayment_order = 'DATE' then
     result := result + 'order by DATE '+AscDesc(SqlQueryPayment_asc)+', PAYPROV, ARTIST_OR_CLIENT_NAME'
   else if SqlQueryPayment_order = 'PAYPROV' then
@@ -1016,8 +1015,8 @@ begin
     SqlQueryStatistics_asc := true;
   end;
   result := 'select * from vw_STATISTICS ';
-  if trim(search)<>'' then
-    result := result + 'where lower(NAME) like ''%'+StringReplace(AnsiLowerCase(trim(search)), '''', '`', [rfReplaceAll])+'%'' ';
+  if Trim(search) <> '' then
+    result := result + 'where ' + BuildSearchCondition(search, 'NAME');
   if SqlQueryStatistics_order = 'NO' then
     result := result + 'order by NO '+AscDesc(SqlQueryStatistics_asc)+', PLUGIN, NAME'
   else if SqlQueryStatistics_order = 'PLUGIN' then
