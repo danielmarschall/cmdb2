@@ -395,7 +395,7 @@ begin
           if not _Stat3_CompareFolders(AdoConn) then
           begin
             Response.Handled := true;
-            Response.Action := craAbort;
+            Response.Action := craNone;
           end;
         finally
           FreeAndNil(AdoConn);
