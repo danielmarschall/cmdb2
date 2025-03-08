@@ -140,12 +140,12 @@ var
   CopyRightYear: string;
   InstallId: string;
 resourcestring
-  S_Version = '%s (%d Bit), Version %s'+#13#10+'(C) %s Daniel Marschall, ViaThinkSoft, License: Apache 2.0';
+  S_Version = '%s (%d Bit), Version %s'+#13#10+'(C) %s Daniel Marschall, ViaThinkSoft'+#13#10+'License: Apache 2.0';
   S_InstallId = 'Installation ID: %s';
   S_InstalledPlugins = 'Installed plugins:';
 const
-  DevelopmentYear = 2025;
-  GitHubVersion = '1.6.3';
+  DevelopmentStartYear = 2024; // do not change
+  GitHubVersion = '1.7.0 WIP';
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   InstallId := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
@@ -163,10 +163,10 @@ begin
       slPlugins.Insert(0, S_InstalledPlugins);
       slPlugins.Insert(0, '');
     end;
-    if YearOf(dateidatum) > DevelopmentYear then
-      CopyRightYear := IntToStr(DevelopmentYear) + '-' + IntToStr(YearOf(dateidatum))
+    if YearOf(dateidatum) > DevelopmentStartYear then
+      CopyRightYear := IntToStr(DevelopmentStartYear) + '-' + IntToStr(YearOf(dateidatum))
     else
-      CopyRightYear := IntToStr(DevelopmentYear);
+      CopyRightYear := IntToStr(DevelopmentStartYear);
     slPlugins.Insert(0, '');
     slPlugins.Insert(0, Format(S_InstallId, [InstallId]));
     slPlugins.Insert(0, '');

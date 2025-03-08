@@ -186,7 +186,8 @@ begin
               outSL.Add('');
             outSL.Add('[ ' + SearchRec.Name + ' ]');
             outSL.Add(p.VerInfo.PluginName + ' ' + p.VerInfo.PluginVersion + ' ' + SBy + ' ' + p.VerInfo.PluginAuthor);
-            outSL.Add(p.VerInfo.PluginCopyright + ', ' + SLicense + ': ' + p.VerInfo.PluginLicense);
+            outSL.Add(p.VerInfo.PluginCopyright);
+            outSL.Add(SLicense + ': ' + p.VerInfo.PluginLicense);
             if p.VerInfo.PluginMoreInfo <> '' then outSL.Add(p.VerInfo.PluginMoreInfo);
           finally
             FreeAndNil(p);
