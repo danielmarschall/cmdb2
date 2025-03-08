@@ -222,6 +222,10 @@ begin
       DisableAllMenuItems(MainMenu1);
       Application.ProcessMessages;
 
+      // Just make sure that these are all correct (they can be wrong if the data was edited outside of CMDB2)
+      TCommissionForm.RegnerateQuoteAnnotationAll(AdoConnection1);
+      TCommissionForm.RegnerateUploadAnnotationAll(AdoConnection1);
+
       // Make some optimizations for performance
       if DatabaseOpenedOnce then
       begin

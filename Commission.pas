@@ -133,6 +133,8 @@ type
   public
     CommissionId: TGUID;
     procedure Init;
+    class procedure RegnerateUploadAnnotationAll(AdoConnection1: TAdoConnection);
+    class procedure RegnerateQuoteAnnotationAll(AdoConnection1: TAdoConnection);
   end;
 
 implementation
@@ -175,6 +177,38 @@ begin
   finally
     ttEvents.Tag := 0; // enable Annotation change check
   end;
+end;
+
+class procedure TCommissionForm.RegnerateQuoteAnnotationAll(AdoConnection1: TAdoConnection);
+begin
+  ADOConnection1.ExecSQL(
+    'WITH AggregatedAmounts AS ( ' +
+    '    SELECT ' +
+    '        EVENT_ID, ' +
+    '        IS_FREE, ' +
+    '        CURRENCY, ' +
+    '        SUM(AMOUNT) AS TotalAmount ' +
+    '    FROM QUOTE ' +
+    '    GROUP BY EVENT_ID, IS_FREE, CURRENCY ' +
+    '), ' +
+    'AggregatedResults AS ( ' +
+    '    SELECT  ' +
+    '        EVENT_ID, ' +
+    '        ISNULL(STRING_AGG(  ' +
+    '            CASE  ' +
+    '                WHEN IS_FREE = 0 THEN N''Price '' + CAST(TotalAmount AS NVARCHAR(10)) + N'' '' + CURRENCY  ' +
+    '                WHEN IS_FREE = 1 THEN CAST(TotalAmount AS NVARCHAR(10)) + N'' '' + CURRENCY + N'' Free'' ' +
+    '            END,  ' +
+    '            '' + ''  ' +
+    '        ), '''') AS AggregatedResult  ' +
+    '    FROM AggregatedAmounts  ' +
+    '    GROUP BY EVENT_ID ' +
+    ') ' +
+    'UPDATE ev ' +
+    'SET ev.ANNOTATION = ar.AggregatedResult ' +
+    'FROM COMMISSION_EVENT ev ' +
+    'JOIN AggregatedResults ar ON ev.ID = ar.EVENT_ID ' +
+    'WHERE ev.ANNOTATION <> ar.AggregatedResult;');
 end;
 
 procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
@@ -307,6 +341,38 @@ begin
   finally
     ttEvents.Tag := 0; // enable Annotation change check
   end;
+end;
+
+class procedure TCommissionForm.RegnerateUploadAnnotationAll(AdoConnection1: TAdoConnection);
+begin
+  AdoConnection1.ExecSQL(
+    'WITH AggregatedAmounts AS (  ' +
+    '    SELECT   ' +
+    '        EVENT_ID, ' +
+    '        PROHIBIT, ' +
+    '        PAGE, ' +
+    '        COUNT(*) AS TotalAmount ' +
+    '    FROM UPLOAD   ' +
+    '    GROUP BY EVENT_ID, PROHIBIT, PAGE ' +
+    '),  ' +
+    'AggregatedResults AS ( ' +
+    '    SELECT  ' +
+    '        EVENT_ID, ' +
+    '        STRING_AGG(   ' +
+    '            CASE   ' +
+    '                WHEN PROHIBIT = 0 THEN PAGE + N'' ('' + CAST(TotalAmount AS NVARCHAR(10)) + N'')''  ' +
+    '                WHEN PROHIBIT = 1 AND ISNULL(PAGE, '''') = '''' THEN N''PROHIBITED'' ' +
+    '                WHEN PROHIBIT = 1 AND ISNULL(PAGE, '''') <> '''' THEN PAGE + N'' (PROHIBITED)'' ' +
+    '            END, '', '' ' +
+    '        ) AS AggregatedResult ' +
+    '    FROM AggregatedAmounts ' +
+    '    GROUP BY EVENT_ID ' +
+    ') ' +
+    'UPDATE ev ' +
+    'SET ev.ANNOTATION = ar.AggregatedResult ' +
+    'FROM COMMISSION_EVENT ev ' +
+    'JOIN AggregatedResults ar ON ev.ID = ar.EVENT_ID ' +
+    'where ev.ANNOTATION <> ar.AggregatedResult;');
 end;
 
 procedure TCommissionForm.ttUploadsAfterPost(DataSet: TDataSet);
