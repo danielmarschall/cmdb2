@@ -1636,9 +1636,11 @@ begin
   tmpCols := '';
   for i := 0 to dbg.Columns.Count-1 do
   begin
-    tmpCols := tmpCols + dbg.Columns[i].FieldName + '|';
+    if dbg.Columns[i].Field.FieldKind = fkData then
+      tmpCols := tmpCols + dbg.Columns[i].FieldName + '|';
   end;
-  tmpCols := Copy(tmpCols, 1, Length(tmpCols)-1);
+  if tmpCols <> '' then
+    tmpCols := Copy(tmpCols, 1, Length(tmpCols)-1);
   result := _BuildSearchCondition(search, tmpCols);
 end;
 
