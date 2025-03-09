@@ -390,7 +390,7 @@ procedure TArtistForm.refreshCommissionClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttCommission, 'ID');
+    DoRefresh(dbgCommission, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -400,7 +400,7 @@ procedure TArtistForm.refreshCommunicationClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttCommunication, 'ID');
+    DoRefresh(dbgCommunication, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -410,7 +410,7 @@ procedure TArtistForm.refreshEventClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttArtistEvent, 'ID');
+    DoRefresh(dbgArtistEvent, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -420,7 +420,7 @@ procedure TArtistForm.refreshPaymentClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttPayment, 'ID');
+    DoRefresh(dbgPayment, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -477,7 +477,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgArtistEvent, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -527,7 +527,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgCommission, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -581,7 +581,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgCommunication, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -630,7 +630,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgPayment, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;

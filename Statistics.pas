@@ -108,7 +108,7 @@ procedure TStatisticsForm.refreshQueryClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    DoRefresh(Sender as TDBGrid, '__ID');
+    DoRefresh(dbgQuery, '__ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -290,7 +290,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDBGrid, '__ID');
+      DoRefresh(dbgQuery, '__ID');
     finally
       Screen.Cursor := crDefault;
     end;

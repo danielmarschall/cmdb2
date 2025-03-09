@@ -657,7 +657,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgArtists, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -707,7 +707,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgClients, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -757,7 +757,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgCommissions, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -795,7 +795,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgPayment, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -855,7 +855,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgStatistics, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -892,7 +892,7 @@ procedure TMandatorForm.refreshArtistsClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttArtists, 'ID');
+    DoRefresh(dbgArtists, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -902,7 +902,7 @@ procedure TMandatorForm.refreshClientsClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttClients, 'ID');
+    DoRefresh(dbgClients, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -912,7 +912,7 @@ procedure TMandatorForm.refreshCommissionsClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttCommission, 'ID');
+    DoRefresh(dbgCommissions, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -922,7 +922,7 @@ procedure TMandatorForm.refreshPaymentClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttPayment, 'ID');
+    DoRefresh(dbgPayment, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -932,7 +932,7 @@ procedure TMandatorForm.refreshStatisticsClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttStatistics, 'ID');
+    DoRefresh(dbgStatistics, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;

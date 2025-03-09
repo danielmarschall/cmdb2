@@ -298,7 +298,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'NAME');
+      DoRefresh(dbgConfig, 'NAME');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -343,7 +343,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgMandator, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -392,7 +392,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'BAK_ID');
+      DoRefresh(dbgTextBackup, 'BAK_ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -429,7 +429,7 @@ procedure TDatabaseForm.refreshConfigClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttConfig, 'NAME');
+    DoRefresh(dbgConfig, 'NAME');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -439,7 +439,7 @@ procedure TDatabaseForm.refreshMandatorClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttMandator, 'ID');
+    DoRefresh(dbgMandator, 'ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -449,7 +449,7 @@ procedure TDatabaseForm.refreshTextBackupClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    AdoQueryRefresh(ttTextBackup, 'BAK_ID');
+    DoRefresh(dbgTextBackup, 'BAK_ID');
   finally
     Screen.Cursor := crDefault;
   end;

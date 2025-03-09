@@ -766,7 +766,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgEvents, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -809,7 +809,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgQuotes, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
@@ -870,7 +870,7 @@ begin
     Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      DoRefresh(Sender as TDbGrid, 'ID');
+      DoRefresh(dbgUploads, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
