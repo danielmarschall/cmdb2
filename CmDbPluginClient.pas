@@ -201,6 +201,10 @@ begin
             FreeAndNil(p);
           end;
         except
+          on E: EAbort do
+          begin
+            Abort;
+          end;
           on E: Exception do
           begin
             MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
@@ -233,6 +237,10 @@ begin
               FreeAndNil(p);
             end;
           except
+            on E: EAbort do
+            begin
+              Abort;
+            end;
             on E: Exception do
             begin
               MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
@@ -272,6 +280,10 @@ begin
             FreeAndNil(p);
           end;
         except
+          on E: EAbort do
+          begin
+            Abort;
+          end;
           on E: Exception do
           begin
             MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);

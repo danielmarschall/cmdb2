@@ -714,6 +714,10 @@ resourcestring
         FreeAndNil(rcStream);
       end;
     except
+      on E: EAbort do
+      begin
+        Abort;
+      end;
       on E: Exception do
       begin
         raise Exception.CreateFmt(SDbInstallError, [fil, E.Message]);

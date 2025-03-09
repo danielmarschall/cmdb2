@@ -293,6 +293,10 @@ begin
         FreeAndNil(sl);
       end;
     except
+      on E: EAbort do
+      begin
+        Abort;
+      end;
       on E: Exception do
       begin
         MessageBox(Application.Handle, PChar(Format(S_BackupFailed, [E.Message])), PChar(Application.Title), MB_OK or MB_ICONERROR or MB_TASKMODAL);
@@ -546,6 +550,10 @@ begin
             if zip.Password <> '' then CmDbZipPassword := zip.Password;
             break;
           except
+            on E: EAbort do
+            begin
+              Abort;
+            end;
             on E: EZipInvalidPassword do
             begin
               zip.Password := InputBox(Caption, #0+SZipPassword, '');
@@ -800,6 +808,10 @@ begin
       Application.ProcessMessages;
     end;
   except
+    on E: EAbort do
+    begin
+      Abort;
+    end;
     on E: Exception do
     begin
       MessageBox(Application.Handle, PChar(E.Message), PChar(Application.Title), MB_OK or MB_ICONERROR or MB_TASKMODAL);
