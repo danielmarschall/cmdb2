@@ -206,10 +206,10 @@ begin
     '    GROUP BY EVENT_ID ' +
     ') ' +
     'UPDATE ev ' +
-    'SET ev.ANNOTATION = ar.AggregatedResult ' +
+    'SET ev.ANNOTATION = iif(ar.EVENT_ID is null, '''', ar.AggregatedResult) ' +
     'FROM COMMISSION_EVENT ev ' +
-    'JOIN AggregatedResults ar ON ev.ID = ar.EVENT_ID ' +
-    'WHERE ev.ANNOTATION <> ar.AggregatedResult;');
+    'LEFT JOIN AggregatedResults ar ON ev.ID = ar.EVENT_ID ' +
+    'WHERE ev.STATE = ''quote'' AND isnull(ev.ANNOTATION,'''') <> iif(ar.EVENT_ID is null, '''', ar.AggregatedResult);');
 end;
 
 procedure TCommissionForm.ttQuotesAfterPost(DataSet: TDataSet);
@@ -370,11 +370,11 @@ begin
     '    GROUP BY EVENT_ID ' +
     ') ' +
     'UPDATE ev ' +
-    'SET ev.ANNOTATION = ar.AggregatedResult ' +
+    'SET ev.ANNOTATION = iif(ar.EVENT_ID is null, '''', ar.AggregatedResult) ' +
     'FROM COMMISSION_EVENT ev ' +
-    'JOIN AggregatedResults ar ON ev.ID = ar.EVENT_ID ' +
-    'where ev.ANNOTATION <> ar.AggregatedResult;');
-end;
+    'LEFT JOIN AggregatedResults ar ON ev.ID = ar.EVENT_ID ' +
+    'where ev.STATE like ''upload%'' AND isnull(ev.ANNOTATION,'''') <> iif(ar.EVENT_ID is null, '''', ar.AggregatedResult);');
+  end;
 
 procedure TCommissionForm.ttUploadsAfterPost(DataSet: TDataSet);
 begin
