@@ -342,7 +342,10 @@ procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if FCloseStarted then Exit;
   FCloseStarted := true;
-  PerformBackupAndDefrag;
+  try
+    PerformBackupAndDefrag;
+  except
+  end;
   try
     AdoConnection1.Disconnect;
   except
@@ -789,6 +792,7 @@ begin
     try
       CmDb_ConnectViaLocalDb(ADOConnection1, CmDbDefaultDatabaseName);
       CmDb_InstallOrUpdateSchema(ADOConnection1);
+      CmDb_DropTempTables(ADOConnection1); // Plugins won't drop existing tables to avoid that states of open windows are destroyed. So, we make sure no old temp tables exist
       OpenDatabaseForm;
     finally
       Screen.Cursor := crDefault;

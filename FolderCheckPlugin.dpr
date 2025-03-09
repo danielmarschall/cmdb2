@@ -247,7 +247,7 @@ begin
     {$REGION 'Stat 1: Commissions without folders'}
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -296,7 +296,7 @@ begin
     {$REGION 'Stat 2: Commission folders not existing'}
     else if IsEqualGuid(StatGuid, GUID_2) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -307,15 +307,16 @@ begin
           except
             Exit(E_PLUGIN_CONN_FAIL);
           end;
-          if AdoConn.TableExists(TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')) then
-            AdoConn.ExecSQL('drop table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING'));
-          AdoConn.ExecSQL('create table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')+' ( ' + #13#10 +
-                          '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
-                          '__ID uniqueidentifier NOT NULL, ' + #13#10 +
-                          'ARTIST nvarchar(50), ' + #13#10 +
-                          'NAME nvarchar(100), ' + #13#10 +
-                          'ART_STATUS nvarchar(20), ' + #13#10 +
-                          'FOLDER nvarchar(200) );');
+          if not AdoConn.TableExists(TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')) then
+          begin
+            AdoConn.ExecSQL('create table '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')+' ( ' + #13#10 +
+                            '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
+                            '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                            'ARTIST nvarchar(50), ' + #13#10 +
+                            'NAME nvarchar(100), ' + #13#10 +
+                            'ART_STATUS nvarchar(20), ' + #13#10 +
+                            'FOLDER nvarchar(200) );');
+          end;
           q := AdoConn.GetTable(
                           'select ' + #13#10 +
                           '    man.ID as __MANDATOR_ID, ' + #13#10 +
@@ -372,7 +373,7 @@ begin
     {$REGION 'Stat 3: Comparison File System folders / Database folders'}
     else if IsEqualGuid(StatGuid, GUID_3) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -383,19 +384,20 @@ begin
           except
             Exit(E_PLUGIN_CONN_FAIL);
           end;
-          if AdoConn.TableExists(TempTableName(GUID_3, 'FOLDER_COMPARE')) then
-            AdoConn.ExecSQL('drop table '+TempTableName(GUID_3, 'FOLDER_COMPARE'));
-          AdoConn.ExecSQL('create table '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' ( ' + #13#10 +
-                          '__ID uniqueidentifier NOT NULL, ' + #13#10 +
-                          '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
-                          '__PROBLEM_INT int, ' + #13#10 +
-                          'PROBLEM nvarchar(50), ' + #13#10 +
-                          'COMMISSION nvarchar(200), ' + #13#10 +
-                          'FOLDER nvarchar(250) );');
+          if not AdoConn.TableExists(TempTableName(GUID_3, 'FOLDER_COMPARE')) then
+          begin
+            AdoConn.ExecSQL('create table '+TempTableName(GUID_3, 'FOLDER_COMPARE')+' ( ' + #13#10 +
+                            '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                            '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
+                            '__PROBLEM_INT int, ' + #13#10 +
+                            'PROBLEM nvarchar(50), ' + #13#10 +
+                            'COMMISSION nvarchar(200), ' + #13#10 +
+                            'FOLDER nvarchar(250) );');
+          end;
           if not _Stat3_CompareFolders(AdoConn) then
           begin
             Response.Handled := true;
-            Response.Action := craNone;
+            Response.Action := craAbort;
           end;
         finally
           FreeAndNil(AdoConn);

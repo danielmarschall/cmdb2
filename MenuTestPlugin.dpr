@@ -108,7 +108,7 @@ begin
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
       // This is an example for creating a plugin that outputs a "menu" with custom actions (which can be anything!)
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -119,11 +119,12 @@ begin
           except
             Exit(E_PLUGIN_CONN_FAIL);
           end;
-          if AdoConn.TableExists(TempTableName(GUID_1, 'TEST')) then
-            AdoConn.ExecSQL('drop table '+TempTableName(GUID_1, 'TEST'));
-          AdoConn.ExecSQL('create table '+TempTableName(GUID_1, 'TEST')+' ( ' + #13#10 +
-                          '__ID uniqueidentifier NOT NULL, ' + #13#10 +
-                          'NAME varchar(200) NOT NULL );');
+          if not AdoConn.TableExists(TempTableName(GUID_1, 'TEST')) then
+          begin
+            AdoConn.ExecSQL('create table '+TempTableName(GUID_1, 'TEST')+' ( ' + #13#10 +
+                            '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                            'NAME varchar(200) NOT NULL );');
+          end;
           AdoConn.ExecSQL('delete from '+TempTableName(GUID_1, 'TEST'));
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1A.ToString+''', ''View Source Code'';');
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1B.ToString+''', ''Download latest version'';');

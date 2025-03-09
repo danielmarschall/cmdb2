@@ -184,6 +184,7 @@ type
     function SqlQueryPayment(const search: string): string;
     function SqlQueryArtistEvent(const search: string): string;
     function SqlQueryCommunication(const search: string): string;
+    procedure DoRefresh(dbg: TDbGrid; const ALocateField: string);
   protected
     ArtistName: string;
   public
@@ -473,19 +474,18 @@ procedure TArtistForm.dbgArtistEventKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end
   else if Key = VK_INSERT then
   begin
-    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
+    TDbGrid(Sender).DataSource.DataSet.Append;
   end;
 end;
 
@@ -524,19 +524,18 @@ procedure TArtistForm.dbgCommissionKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end
   else if Key = VK_INSERT then
   begin
-    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
+    TDbGrid(Sender).DataSource.DataSet.Append;
   end;
 end;
 
@@ -579,19 +578,18 @@ procedure TArtistForm.dbgCommunicationKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end
   else if Key = VK_INSERT then
   begin
-    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
+    TDbGrid(Sender).DataSource.DataSet.Append;
   end;
 end;
 
@@ -618,24 +616,29 @@ begin
   InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'ID');
 end;
 
+procedure TArtistForm.DoRefresh(dbg: TDbGrid; const ALocateField: string);
+begin
+  AdoQueryRefresh(dbg.DataSource.DataSet as TAdoQuery, ALocateField);
+  dbg.AutoSizeColumns;
+end;
+
 procedure TArtistForm.dbgPaymentKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end
   else if Key = VK_INSERT then
   begin
-    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
+    TDbGrid(Sender).DataSource.DataSet.Append;
   end;
 end;
 
@@ -891,8 +894,8 @@ begin
                        and not (ttArtistEvent.State in [dsEdit,dsInsert])
                        and not (ttCommunication.State in [dsEdit,dsInsert]) then
   begin
-    Tag := 1; // tell FormKeyUp that we may close
     Key := 0;
+    Tag := 1; // tell FormKeyUp that we may close
   end;
 end;
 
@@ -901,8 +904,8 @@ procedure TArtistForm.FormKeyUp(Sender: TObject; var Key: Word;
 begin
   if (Key = VK_ESCAPE) and (Tag = 1) then
   begin
-    Close;
     Key := 0;
+    Close;
   end;
 end;
 

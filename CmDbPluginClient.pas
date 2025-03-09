@@ -60,6 +60,10 @@ begin
       StatisticsForm.ADOConnection1.ConnectionString := AdoConn.ConnectionString;
       StatisticsForm.Init(resp);
     end;
+  end
+  else if resp.Action = craAbort then
+  begin
+    Abort;
   end;
 end;
 
@@ -74,6 +78,8 @@ var
 resourcestring
   SFailedToLoadS = 'Failed to load %s';
   SNotAValidPlugin = '%s is not a valid CMDB2 Statistics Plugin';
+const
+  BUF_SIZE = 4096;
 begin
   inherited Create;
 
@@ -84,9 +90,9 @@ begin
     raise Exception.CreateFmt(SFailedToLoadS, [FPluginDllFilename]);
   try
     @VtsPluginID := GetProcAddress(FDLLHandle, 'VtsPluginID'); // do not localize
-    GetMem(AuthorInfo, 4096);
+    GetMem(AuthorInfo, BUF_SIZE);
     try
-      ZeroMemory(AuthorInfo, 4096);
+      ZeroMemory(AuthorInfo, BUF_SIZE);
       if not Assigned(VtsPluginID) or Failed(VtsPluginID(@plgType, @plgId, @plgVer, AuthorInfo)) or not IsEqualGUID(plgType, CMDB2_STATSPLUGIN_V1_TYPE) then
         raise Exception.CreateFmt(SNotAValidPlugin, [FPluginDllFilename]);
       VerInfo.ReadFromMemory(AuthorInfo);
@@ -142,14 +148,16 @@ var
   ResponseData: Pointer;
 const
   DllProcClickEvent = 'ClickEventW';
+const
+  BUF_SIZE = 4096;
 begin
   @ClickEventW := GetProcAddress(FDLLHandle, DllProcClickEvent);
   if not Assigned(ClickEventW) then
     raise Exception.CreateFmt(SFunctionNotFound, [DllProcClickEvent, FPluginDllFilename]);
 
-  GetMem(ResponseData, 4096);
+  GetMem(ResponseData, BUF_SIZE);
   try
-    ZeroMemory(ResponseData, 4096);
+    ZeroMemory(ResponseData, BUF_SIZE);
     if Failed(ClickEventW(PChar(DBConnStr), MandatorGuid, StatGuid, ItemGuid, ResponseData)) then
       raise Exception.CreateFmt(SCallToSFailed, [DllProcClickEvent, FPluginDllFilename]);
     Result.ReadFromMemory(ResponseData);
@@ -255,7 +263,11 @@ begin
           p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
           try
             result := p.ClickEvent(AdoConn.ConnectionString, MandatorGuid, StatGuid, ItemGuid);
-            if Result.Handled then Exit;
+            if Result.Handled then
+            begin
+              if Result.Action = craAbort then Abort; // can cancel clicking "Refresh" button
+              Exit;
+            end;
           finally
             FreeAndNil(p);
           end;

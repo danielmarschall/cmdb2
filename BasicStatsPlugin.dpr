@@ -132,7 +132,7 @@ begin
     {$REGION 'Stat 1: Running commissions'}
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -192,7 +192,7 @@ begin
     {$REGION 'Stat 2: Local sum over years'}
     else if IsEqualGuid(StatGuid, GUID_2) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -286,7 +286,7 @@ begin
     {$REGION 'Stat 3: Local sum over months'}
     else if IsEqualGuid(StatGuid, GUID_3) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -371,7 +371,7 @@ begin
     end
     else if IsEqualGuid(StatGuid, GUID_3A) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         // Nothing here.
       end
@@ -387,7 +387,7 @@ begin
     {$REGION 'Stat 5: Waiting List'}
     else if IsEqualGuid(StatGuid, GUID_5) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -496,7 +496,7 @@ begin
     {$REGION 'Stat 6: To Do List'}
     else if IsEqualGuid(StatGuid, GUID_6) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -605,7 +605,7 @@ begin
     {$REGION 'Stat 4: Top artists/clients'}
     else if IsEqualGuid(StatGuid, GUID_4) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try

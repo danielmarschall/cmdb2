@@ -45,7 +45,7 @@ implementation
 
 uses
   ShlObj, ShellApi, System.Hash, Dialogs, WinInet,
-  CmDbMain, Artist, Commission, Mandator, Statistics, Registry;
+  CmDbMain, Artist, Commission, Mandator, Statistics, Registry, CmDbPluginShare;
 
 const
   LOCALDB_PSEUDO_HOST = '(localdb)';
@@ -55,7 +55,7 @@ procedure CmDb_DropTempTables(AdoConnection1: TAdoConnection);
 var
   q: TAdoDataSet;
 begin
-  q := AdoConnection1.GetTable('select name from sysobjects where name like ''tmp_%'';');
+  q := AdoConnection1.GetTable('select name from sysobjects where name like ''' + TEMP_TABLE_PREFIX + '%'';');
   try
     while not q.EOF do
     begin

@@ -124,6 +124,7 @@ type
     function SqlQueryMandator(const search: string): string;
     function SqlQueryTextBackup(const search: string): string;
     function SqlQueryConfig(const search: string): string;
+    procedure DoRefresh(dbg: TDbGrid; const ALocateField: string);
   public
     procedure Init;
   end;
@@ -294,14 +295,13 @@ procedure TDatabaseForm.dbgConfigKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'NAME');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'NAME');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end;
 end;
 
@@ -340,19 +340,18 @@ procedure TDatabaseForm.dbgMandatorKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end
   else if Key = VK_INSERT then
   begin
-    TDbGrid(Sender).DataSource.DataSet.Append;
     Key := 0;
+    TDbGrid(Sender).DataSource.DataSet.Append;
   end;
 end;
 
@@ -379,19 +378,24 @@ begin
   InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, 'BAK_ID');
 end;
 
+procedure TDatabaseForm.DoRefresh(dbg: TDbGrid; const ALocateField: string);
+begin
+  AdoQueryRefresh(dbg.DataSource.DataSet as TAdoQuery, ALocateField);
+  dbg.AutoSizeColumns;
+end;
+
 procedure TDatabaseForm.dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, 'BAK_ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDbGrid, 'BAK_ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end;
 end;
 
@@ -622,8 +626,8 @@ begin
     not (ttTextBackup.State in [dsEdit,dsInsert]) and
     not (ttConfig.State in [dsEdit,dsInsert]) then
   begin
-    Tag := 1; // tell FormKeyUp that we may close
     Key := 0;
+    Tag := 1; // tell FormKeyUp that we may close
   end;
 end;
 
@@ -632,8 +636,8 @@ procedure TDatabaseForm.FormKeyUp(Sender: TObject; var Key: Word;
 begin
   if (Key = VK_ESCAPE) and (Tag = 1) then
   begin
-    Close;
     Key := 0;
+    Close;
   end;
 end;
 

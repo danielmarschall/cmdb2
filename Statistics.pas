@@ -64,6 +64,7 @@ type
     SqlQueryStatistics_Asc: boolean;
     function SqlQueryStatistics(const search: string): string;
     procedure SetFormats;
+    procedure DoRefresh(dbg: TDbGrid; const ALocateField: string);
   protected
     MandatorName: string;
   public
@@ -107,11 +108,7 @@ procedure TStatisticsForm.refreshQueryClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    // Note: ClickEvent will be called to refresh or regenerate the data
-    //       (this is important if the dataset is not a view but a table filled by the plugin).
-    //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
-    TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
-    AdoQueryRefresh(ttQuery, '__ID');
+    DoRefresh(Sender as TDBGrid, '__ID');
   finally
     Screen.Cursor := crDefault;
   end;
@@ -275,23 +272,28 @@ begin
   InsteadOfDeleteWorkaround_DrawColumnCell(Sender, Rect, DataCol, Column, State, '__ID');
 end;
 
+procedure TStatisticsForm.DoRefresh(dbg: TDbGrid; const ALocateField: string);
+begin
+  // Note: ClickEvent will be called to refresh or regenerate the data
+  //       (this is important if the dataset is not a view but a table filled by the plugin).
+  //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
+  TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_ORIGIN_REFRESH);
+  AdoQueryRefresh(dbg.DataSource.DataSet as TAdoQuery, ALocateField);
+  dbg.AutoSizeColumns;
+end;
+
 procedure TStatisticsForm.dbgQueryKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F5 then
   begin
+    Key := 0;
     Screen.Cursor := crHourGlass;
     try
-      // Note: ClickEvent will be called to refresh or regenerate the data
-      //       (this is important if the dataset is not a view but a table filled by the plugin).
-      //       TCmDbPluginClickResponse will not be evaluated, because it should have stayed the same.
-      TCmDbPluginClient.ClickEvent(ADOConnection1, MandatorId, StatisticsId, GUID_NIL);
-      AdoQueryRefresh(TDbGrid(Sender).DataSource.DataSet as TAdoQuery, '__ID');
-      TDbGrid(Sender).AutoSizeColumns;
+      DoRefresh(Sender as TDBGrid, '__ID');
     finally
       Screen.Cursor := crDefault;
     end;
-    Key := 0;
   end;
 end;
 
@@ -380,8 +382,8 @@ begin
   // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
   if (Key = VK_ESCAPE) and not (ttQuery.State in [dsEdit,dsInsert]) then
   begin
-    Tag := 1; // tell FormKeyUp that we may close
     Key := 0;
+    Tag := 1; // tell FormKeyUp that we may close
   end;
 end;
 
@@ -390,8 +392,8 @@ procedure TStatisticsForm.FormKeyUp(Sender: TObject; var Key: Word;
 begin
   if (Key = VK_ESCAPE) and (Tag = 1) then
   begin
-    Close;
     Key := 0;
+    Close;
   end;
 end;
 

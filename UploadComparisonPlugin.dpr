@@ -252,23 +252,25 @@ var
   qUpload, qMandator: TAdoDataSet;
   users: TArray<string>;
 begin
-  if AdoConnection1.TableExists(TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB')) then
-    AdoConnection1.ExecSQL('drop table '+TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB'));
-  AdoConnection1.ExecSQL('create table '+TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB')+' ( ' + #13#10 +
-                         '__ID uniqueidentifier NOT NULL, ' + #13#10 +
-                         '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
-                         'GALLERY nvarchar(250), ' + #13#10 +
-                         'URL nvarchar(250), ' + #13#10 +
-                         'TITLE nvarchar(250) );');
+  if not AdoConnection1.TableExists(TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB')) then
+  begin
+    AdoConnection1.ExecSQL('create table '+TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB')+' ( ' + #13#10 +
+                           '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                           '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
+                           'GALLERY nvarchar(250), ' + #13#10 +
+                           'URL nvarchar(250), ' + #13#10 +
+                           'TITLE nvarchar(250) );');
+  end;
 
-  if AdoConnection1.TableExists(TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB')) then
-    AdoConnection1.ExecSQL('drop table '+TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB'));
-  AdoConnection1.ExecSQL('create table '+TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB')+' ( ' + #13#10 +
-                         '__ID uniqueidentifier NOT NULL, ' + #13#10 +
-                         '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
-                         'URL nvarchar(250), ' + #13#10 +
-                         'ARTIST_OR_CLIENT nvarchar(250), ' + #13#10 +
-                         'COMMISSION nvarchar(250) );');
+  if not AdoConnection1.TableExists(TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB')) then
+  begin
+    AdoConnection1.ExecSQL('create table '+TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB')+' ( ' + #13#10 +
+                           '__ID uniqueidentifier NOT NULL, ' + #13#10 +
+                           '__MANDATOR_ID uniqueidentifier NOT NULL, ' + #13#10 +
+                           'URL nvarchar(250), ' + #13#10 +
+                           'ARTIST_OR_CLIENT nvarchar(250), ' + #13#10 +
+                           'COMMISSION nvarchar(250) );');
+  end;
 
   // Initialisierung der Komponenten
   GalleryListWeb := TStringList.Create;
@@ -383,7 +385,7 @@ begin
     {$REGION 'Stat 1: Uploads found at FA, but not in CMDB'}
     if IsEqualGuid(StatGuid, GUID_1) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try
@@ -446,7 +448,7 @@ begin
     {$REGION 'Stat 2: Uploads found in CMDB, but not at Web'}
     if IsEqualGuid(StatGuid, GUID_2) then
     begin
-      if IsEqualGuid(ItemGuid, GUID_NIL) then
+      if IsEqualGuid(ItemGuid, GUID_ORIGIN_MANDATOR) or IsEqualGuid(ItemGuid, GUID_ORIGIN_REFRESH) then
       begin
         AdoConn := TAdoConnection.Create(nil);
         try

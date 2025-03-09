@@ -6,7 +6,7 @@ uses
   Windows, SysUtils;
 
 type
-  TCmDbPluginClickResponseAction = (craNone, craObject, craStatistics);
+  TCmDbPluginClickResponseAction = (craNone, craAbort, craObject, craStatistics);
 
   TCmDbPluginClickResponse = record
     Handled: Boolean;
@@ -55,7 +55,15 @@ const
   E_PLUGIN_CONN_FAIL:         HRESULT = HRESULT($A0000002); // Failure, Customer defined, Facility 0, Code 2
 
 const
-  GUID_NIL: TGUID = '{00000000-0000-0000-0000-000000000000}';
+  // Item-GUIDs usually indicate where you want to GO TO,
+  // however, if one of these GUIDs are used, then they describe
+  // where you COME FROM, i.e. directly from the Mandator form (first call),
+  // or via the refresh button
+  GUID_ORIGIN_MANDATOR: TGUID = '{30E52A13-04D8-4500-B4F1-FDFEF8D1474A}';
+  GUID_ORIGIN_REFRESH: TGUID = '{07431C16-C51A-4194-8FB2-1FF84A72E5CC}';
+
+const
+  TEMP_TABLE_PREFIX = 'tmp_';
 
 function TempTableName(guid: TGUID; info: string): string;
 
@@ -63,7 +71,7 @@ implementation
 
 function TempTableName(guid: TGUID; info: string): string;
 begin
-  result := 'tmp_'+guid.ToString.Replace('-','').Replace('{','').Replace('}','')+'_'+info;
+  result := TEMP_TABLE_PREFIX+guid.ToString.Replace('-','').Replace('{','').Replace('}','')+'_'+info;
 end;
 
 function _ReadWideString(var Src: PByte): WideString;
