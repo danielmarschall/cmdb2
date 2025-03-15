@@ -130,12 +130,22 @@ begin
     else if Key = VK_UP then
     begin
       Key := 0;
-      Self.DataSource.Dataset.Prior;
+      if Self.DataSource.DataSet.State = dsInsert then
+      begin
+        Self.DataSource.DataSet.Post;
+        Self.DataSource.DataSet.Last; // only for CMDB2, because Insert is always at the end (SVN Rev 193)
+      end
+      else
+        Self.DataSource.Dataset.Prior;
     end
     else if Key = VK_DOWN then
     begin
       Key := 0;
+      if Self.DataSource.DataSet.State = dsInsert then
+        Exit; // only for CMDB2, because Insert is always at the end (SVN Rev 193)
       Self.DataSource.Dataset.Next;
+      if Self.DataSource.DataSet.Eof then
+        Self.DataSource.DataSet.Append;
     end
     else if Key = VK_RETURN then
     begin
