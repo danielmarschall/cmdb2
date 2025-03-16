@@ -91,7 +91,7 @@ begin
     if Key = VK_DELETE then
     begin
       Key := 0;
-      Self.DataSource.DataSet.Delete;
+      Self.DataSource.DataSet.Delete; // Note: This will show a confirmation dialog
     end;
   end
   else if Shift = [] then
@@ -104,7 +104,8 @@ begin
     else if Key = VK_INSERT then
     begin
       Key := 0;
-      Self.DataSource.DataSet.Insert;
+      //Self.DataSource.DataSet.Insert;
+      Self.DataSource.DataSet.Append; // only for CMDB2, because Insert is always at the end (SVN Rev 193)
       if Self.CanFocus then Self.SetFocus; // so that the user can start entering stuff!
     end
     else if Key = VK_HOME then
@@ -132,7 +133,7 @@ begin
       Key := 0;
       if Self.DataSource.DataSet.State = dsInsert then
       begin
-        Self.DataSource.DataSet.Post;
+        //Self.DataSource.DataSet.Post; // no, otherwise we might post empty lines
         Self.DataSource.DataSet.Last; // only for CMDB2, because Insert is always at the end (SVN Rev 193)
       end
       else
