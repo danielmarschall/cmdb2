@@ -293,7 +293,7 @@ end;
 procedure TDatabaseForm.dbgConfigKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     Screen.Cursor := crHourGlass;
@@ -338,7 +338,7 @@ end;
 procedure TDatabaseForm.dbgMandatorKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     Screen.Cursor := crHourGlass;
@@ -348,7 +348,7 @@ begin
       Screen.Cursor := crDefault;
     end;
   end
-  else if Key = VK_INSERT then
+  else if (Key = VK_INSERT) and (Shift = []) then
   begin
     Key := 0;
     TDbGrid(Sender).DataSource.DataSet.Append;
@@ -387,7 +387,7 @@ end;
 procedure TDatabaseForm.dbgTextBackupKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     Screen.Cursor := crHourGlass;
@@ -556,21 +556,22 @@ end;
 procedure TDatabaseForm.SearchEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_RETURN then
+  if (Key = VK_RETURN) and (Shift = []) then
   begin
+    // DO NOT Key := 0;
     if Timer1.Enabled then
     begin
       Timer1.Enabled := false;
       Timer1Timer(Timer1);
     end;
-  end;
+  end; // DO NOT "else"
 
-  if Key = VK_LEFT then
+  if (Key = VK_LEFT) and (Shift = []) then
   begin
     Key := 0;
     PageControl1.ActivePageIndex := (PageControl1.ActivePageIndex - 1) mod PageControl1.PageCount;
   end
-  else if Key = VK_RIGHT then
+  else if (Key = VK_RIGHT) and (Shift = []) then
   begin
     Key := 0;
     PageControl1.ActivePageIndex := (PageControl1.ActivePageIndex + 1) mod PageControl1.PageCount;

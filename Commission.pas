@@ -660,10 +660,15 @@ end;
 procedure TCommissionForm.ShellListViewKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     TryShowFileList(SavedFolder);
+  end
+  else if (Key = VK_RETURN) and (Shift = []) then
+  begin
+    Key := 0;
+    ShellListViewDblClick(ShellListView);
   end;
 end;
 
@@ -761,7 +766,7 @@ end;
 procedure TCommissionForm.dbgEventsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     Screen.Cursor := crHourGlass;
@@ -771,7 +776,7 @@ begin
       Screen.Cursor := crDefault;
     end;
   end
-  else if Key = VK_INSERT then
+  else if (Key = VK_INSERT) and (Shift = []) then
   begin
     Key := 0;
     TDbGrid(Sender).DataSource.DataSet.Append;
@@ -804,7 +809,7 @@ end;
 procedure TCommissionForm.dbgQuotesKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     Screen.Cursor := crHourGlass;
@@ -814,7 +819,7 @@ begin
       Screen.Cursor := crDefault;
     end;
   end
-  else if Key = VK_INSERT then
+  else if (Key = VK_INSERT) and (Shift = []) then
   begin
     Key := 0;
     TDbGrid(Sender).DataSource.DataSet.Append;
@@ -865,7 +870,7 @@ end;
 procedure TCommissionForm.dbgUploadsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_F5 then
+  if (Key = VK_F5) and (Shift = []) then
   begin
     Key := 0;
     Screen.Cursor := crHourGlass;
@@ -875,7 +880,7 @@ begin
       Screen.Cursor := crDefault;
     end;
   end
-  else if Key = VK_INSERT then
+  else if (Key = VK_INSERT) and (Shift = []) then
   begin
     Key := 0;
     TDbGrid(Sender).DataSource.DataSet.Append;
