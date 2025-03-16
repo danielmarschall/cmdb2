@@ -150,6 +150,8 @@
                     <Source Name="MainSource">dclshlctrls.dpk</Source>
                 </Source>
                 <Excluded_Packages/>
+                <WelcomePageFile Path="..\..\ReadMe.htm"/>
+                <WelcomePageFolder/>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">True</Platform>

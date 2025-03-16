@@ -597,6 +597,7 @@ begin
         ShellListView.Columns[2{Type}].Width := 200;
         ShellListView.Columns[3{Date}].Width := 115;
         ShellListView.Visible := not SameText(ShellListView.Root, 'C:\');
+        ShellListView.Refresh; // for some reason, 2nd call required since Delphi 12.3, otherwise shellview looks empty
       except
         ShellListView.Visible := false;
         raise;
