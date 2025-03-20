@@ -230,6 +230,7 @@ begin
       if DatabaseOpenedOnce then
       begin
         CmDb_DropTempTables(AdoConnection1);
+        ADOConnection1.ExecSQL('delete from [STATISTICS]'); // this is also some kind of temporary table, since it will be always re-built
         DefragIndexes(AdoConnection1);
         ADOConnection1.ExecSQL('exec sp_updatestats');
       end;
