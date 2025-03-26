@@ -87,7 +87,8 @@ begin
         AdoConn.LoginPrompt := false;
         AdoConn.ConnectConnStr(DBConnStr);
       except
-        Exit(E_PLUGIN_CONN_FAIL);
+        on E: EAbort do Exit(E_ABORT);
+        on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
       end;
 
       //if _VariantToString(AdoConn.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID''')) = '86DCF077-D670-4E8F-BC86-313073F9983F' then
@@ -105,7 +106,8 @@ begin
 
     result := S_PLUGIN_OK;
   except
-    Exit(E_PLUGIN_GENERIC_FAILURE);
+    on E: EAbort do Exit(E_ABORT);
+    on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
   end;
 end;
 
@@ -394,7 +396,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           case MessageBox(0, PChar(SReloadQuestion), PChar(DESC_PLUGIN_SHORT), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) of
             ID_YES:
@@ -432,11 +435,17 @@ begin
             if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
+          except
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          try
             Response.Handled := true;
             Response.Action := craNone;
             ShellExecute(0, 'open', PChar(_VariantToString(AdoConn.GetScalar('select URL from '+TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB')+' where __ID = ''' + ItemGuid.ToString + ''''))), '', '', SW_NORMAL);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
           end;
         finally
           FreeAndNil(AdoConn);
@@ -457,7 +466,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           case MessageBox(0, PChar(SReloadQuestion), PChar(DESC_PLUGIN_SHORT), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) of
             ID_YES:
@@ -500,7 +510,8 @@ begin
     Response.WriteToMemory(ResponseData);
     result := S_PLUGIN_OK;
   except
-    Exit(E_PLUGIN_GENERIC_FAILURE);
+    on E: EAbort do Exit(E_ABORT);
+    on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
   end;
 end;
 

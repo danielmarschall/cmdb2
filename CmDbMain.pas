@@ -286,7 +286,14 @@ begin
               FreeAndNil(zip);
             end;
           except
-            DeleteFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_ZIP_EXT);
+            on E: EAbort do
+            begin
+              Abort;
+            end;
+            on E: Exception do
+            begin
+              DeleteFile(IncludeTrailingPathDelimiter(RealBackupPath) + CmDbDefaultDatabaseName + '_backup_' + Format('%.5d', [NextBackupID]) + BACKUP_ZIP_EXT);
+            end;
           end;
           {$ENDREGION}
         end;
@@ -350,10 +357,18 @@ begin
   try
     PerformBackupAndDefrag;
   except
+    on E: EAbort do
+    begin
+      Abort;
+    end;
   end;
   try
     AdoConnection1.Disconnect;
   except
+    on E: EAbort do
+    begin
+      Abort;
+    end;
   end;
 end;
 

@@ -78,7 +78,8 @@ begin
         AdoConn.LoginPrompt := false;
         AdoConn.ConnectConnStr(DBConnStr);
       except
-        Exit(E_PLUGIN_CONN_FAIL);
+        on E: EAbort do Exit(E_ABORT);
+        on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
       end;
 
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_1.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+', 900, '+AdoConn.SQLStringEscape(DESC_1)+');');
@@ -90,7 +91,8 @@ begin
 
     result := S_PLUGIN_OK;
   except
-    Exit(E_PLUGIN_GENERIC_FAILURE);
+    on E: EAbort do Exit(E_ABORT);
+    on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
   end;
 end;
 
@@ -117,7 +119,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           if not AdoConn.TableExists(TempTableName(GUID_1, 'TEST')) then
           begin
@@ -163,7 +166,8 @@ begin
     Response.WriteToMemory(ResponseData);
     result := S_PLUGIN_OK;
   except
-    Exit(E_PLUGIN_GENERIC_FAILURE);
+    on E: EAbort do Exit(E_ABORT);
+    on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
   end;
 end;
 

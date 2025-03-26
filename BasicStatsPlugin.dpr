@@ -96,7 +96,8 @@ begin
         AdoConn.LoginPrompt := false;
         AdoConn.ConnectConnStr(DBConnStr);
       except
-        Exit(E_PLUGIN_CONN_FAIL);
+        on E: EAbort do Exit(E_ABORT);
+        on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
       end;
 
       AdoConn.ExecSQL('insert into [STATISTICS] (ID, PLUGIN, NO, NAME) values ('+AdoConn.SQLStringEscape(GUID_1.ToString)+', '+AdoConn.SQLStringEscape(DESC_PLUGIN_SHORT)+',  50, '+AdoConn.SQLStringEscape(DESC_1)+');');
@@ -113,7 +114,8 @@ begin
 
     result := S_PLUGIN_OK;
   except
-    Exit(E_PLUGIN_GENERIC_FAILURE);
+    on E: EAbort do Exit(E_ABORT);
+    on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
   end;
 end;
 
@@ -141,7 +143,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_1, 'RUNNING_COMMISSIONS')+' as ' + #13#10 +
                           'select ' + #13#10 +
@@ -201,7 +204,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_2, 'SUM_YEARS')+' as ' + #13#10 +
                           'select ' + #13#10 +
@@ -243,7 +247,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_2A, 'COMMISSIONS')+' as ' + #13#10 +
                           'select MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
@@ -295,7 +300,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_3, 'SUM_MONTHS')+' as ' + #13#10 +
                           'select ' + #13#10 +
@@ -337,7 +343,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_3A, 'COMMISSIONS')+' as ' + #13#10 +
                           'select MANDATOR_ID as __MANDATOR_ID, ' + #13#10 +
@@ -396,7 +403,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_5, 'WAIT_LIST')+' as ' + #13#10 +
                           {$REGION 'Art status'}
@@ -466,6 +474,11 @@ begin
             if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
+          except
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          try
             if AdoConn.GetScalar('select count(*) from COMMISSION where ID = ''' + ItemGuid.ToString + '''') > 0 then
             begin
               Response.Handled := true;
@@ -485,7 +498,8 @@ begin
               Response.Handled := false;
             end;
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
           end;
         finally
           FreeAndNil(AdoConn);
@@ -505,7 +519,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_6, 'TODO_LIST')+' as ' + #13#10 +
                           {$REGION 'Art status'}
@@ -575,6 +590,11 @@ begin
             if DBConnStr = '' then Exit(E_PLUGIN_BAD_ARGS);
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
+          except
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
+          end;
+          try
             if AdoConn.GetScalar('select count(*) from COMMISSION where ID = ''' + ItemGuid.ToString + '''') > 0 then
             begin
               Response.Handled := true;
@@ -594,7 +614,8 @@ begin
               Response.Handled := false;
             end;
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
           end;
         finally
           FreeAndNil(AdoConn);
@@ -614,7 +635,8 @@ begin
             AdoConn.LoginPrompt := false;
             AdoConn.ConnectConnStr(DBConnStr);
           except
-            Exit(E_PLUGIN_CONN_FAIL);
+            on E: EAbort do Exit(E_ABORT);
+            on E: Exception do Exit(E_PLUGIN_CONN_FAIL);
           end;
           AdoConn.ExecSQL('create or alter view '+TempTableName(GUID_4, 'SUM_MONTHS')+' as ' + #13#10 +
                           'select ' + #13#10 +
@@ -659,7 +681,8 @@ begin
     Response.WriteToMemory(ResponseData);
     result := S_PLUGIN_OK;
   except
-    Exit(E_PLUGIN_GENERIC_FAILURE);
+    on E: EAbort do Exit(E_ABORT);
+    on E: Exception do Exit(E_PLUGIN_GENERIC_FAILURE);
   end;
 end;
 

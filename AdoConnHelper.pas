@@ -4,7 +4,7 @@ unit AdoConnHelper;
  * Class helper for TAdoConnection (works only with Microsoft SQL Server)
  * by Daniel Marschall, ViaThinkSoft <www.viathinksoft.com>
  *
- * Revision: 27 September 2024
+ * Revision: 27 September 2024 + EAbort Changes 26 March 2025
  * License: Apache 2.0
  *
  * Latest version here:
@@ -247,6 +247,10 @@ begin
     try
       ExecSQL('use master');
     except
+      on E: EAbort do
+      begin
+        Abort;
+      end;
     end;
   end;
   ExecSql('drop database ' + SQLDatabaseNameEscape(aDatabaseName));
@@ -293,8 +297,15 @@ begin
     try
       ExecSQL(s, ATimeout);
     except
-      if not AContinueOnError then
-        raise;
+      on E: EAbort do
+      begin
+        Abort;
+      end;
+      on E: Exception do
+      begin
+        if not AContinueOnError then
+          raise;
+      end;
     end;
   end;
 end;

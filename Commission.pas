@@ -599,8 +599,15 @@ begin
         ShellListView.Visible := not SameText(ShellListView.Root, 'C:\');
         ShellListView.Refresh; // for some reason, 2nd call required since Delphi 12.3, otherwise shellview looks empty
       except
-        ShellListView.Visible := false;
-        raise;
+        on E: EAbort do
+        begin
+          Abort;
+        end;
+        on E: Exception do
+        begin
+          ShellListView.Visible := false;
+          raise;
+        end;
       end;
     finally
       ShellListView.Items.EndUpdate;
@@ -1020,6 +1027,10 @@ begin
       FolderEdit.Text := SavedFolder;
       TryShowFileList(SavedFolder);
     except
+      on E: EAbort do
+      begin
+        Abort;
+      end;
     end;
   finally
     Screen.Cursor := crDefault;

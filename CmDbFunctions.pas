@@ -384,8 +384,16 @@ begin
 
     AdoConnection1.CommitTrans;
   except
-    AdoConnection1.RollbackTrans;
-    raise;
+    on E: EAbort do
+    begin
+      AdoConnection1.RollbackTrans;
+      Abort;
+    end;
+    on E: Exception do
+    begin
+      AdoConnection1.RollbackTrans;
+      raise;
+    end;
   end;
 
   // For some reason CmDb2.exe keeps the connection to the temp db, so we need to forcefully disconnect. Weird!
@@ -687,7 +695,14 @@ begin
     Result := UpperCase(Result);
     if Length(Result) <> 3 then Result := '';
   except
-    Result := '';
+    on E: EAbort do
+    begin
+      Abort;
+    end;
+    on E: Exception do
+    begin
+      Result := '';
+    end;
   end;
 end;
 
@@ -922,7 +937,15 @@ begin
 
       AdoConnection1.CommitTrans;
     except
-      AdoConnection1.RollbackTrans;
+      on E: EAbort do
+      begin
+        AdoConnection1.RollbackTrans;
+        Abort;
+      end;
+      on E: Exception do
+      begin
+        AdoConnection1.RollbackTrans;
+      end;
     end;
   end;
 end;
@@ -982,9 +1005,16 @@ begin
       FreeAndNil(fs);
     end;
   except
-    // Sollte nicht passieren
-    if not FileAge(ExeFile, result) then
-      raise Exception.CreateFmt(SGetBuildTimestampFailed, [ExeFile]);
+    on E: EAbort do
+    begin
+      Abort;
+    end;
+    on E: Exception do
+    begin
+      // Sollte nicht passieren
+      if not FileAge(ExeFile, result) then
+        raise Exception.CreateFmt(SGetBuildTimestampFailed, [ExeFile]);
+    end;
   end;
 end;
 

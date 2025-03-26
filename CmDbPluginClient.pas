@@ -100,12 +100,19 @@ begin
       FreeMem(AuthorInfo);
     end;
   except
-    if FDLLHandle <> 0 then
+    on E: EAbort do
     begin
-      FreeLibrary(FDLLHandle);
-      FDLLHandle := 0;
+      Abort;
     end;
-    raise;
+    on E: Exception do
+    begin
+      if FDLLHandle <> 0 then
+      begin
+        FreeLibrary(FDLLHandle);
+        FDLLHandle := 0;
+      end;
+      raise;
+    end;
   end;
 end;
 
