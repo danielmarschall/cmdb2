@@ -251,6 +251,10 @@ begin
       begin
         Abort;
       end;
+      on E: Exception do
+      begin
+        // ignore
+      end;
     end;
   end;
   ExecSql('drop database ' + SQLDatabaseNameEscape(aDatabaseName));

@@ -361,6 +361,10 @@ begin
     begin
       Abort;
     end;
+    on E: Exception do
+    begin
+      // ignore
+    end;
   end;
   try
     AdoConnection1.Disconnect;
@@ -368,6 +372,10 @@ begin
     on E: EAbort do
     begin
       Abort;
+    end;
+    on E: Exception do
+    begin
+      // ignore
     end;
   end;
 end;
@@ -578,7 +586,7 @@ begin
             begin
               Abort;
             end;
-            else
+            on E: Exception do
             begin
               raise;
             end;
