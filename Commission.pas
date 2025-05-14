@@ -266,6 +266,7 @@ begin
     ttQuotesAMOUNT_LOCAL.AsFloat := ttQuotesAMOUNT.AsFloat;
   end
   else if ((VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)) and
+          (VarCompareValue(ttQuotesAMOUNT_LOCAL.OldValue, ttQuotesAMOUNT_LOCAL.NewValue) = vrEqual) and
           (Length(ttQuotesCURRENCY.AsWideString)=3) then
   begin
     if (Length(LocalCurrency)=3) then

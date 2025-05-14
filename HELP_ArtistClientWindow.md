@@ -30,12 +30,13 @@ The database grid has the following columns:
 - Column `PAYPROV`: The pay provider such as PayPal. You can use the picklist `PICKLIST_PAYPROVIDER`.
 - Column `ANNOTATION`: It is recommended to enter the name of the commission(s) here. Maybe also the bank statement number that you have compared with.
 
-When is the currency converted? When all these criteria have been fulfilled:
-- `AMOUNT_VERIFIED` must be "False".
-- You change the field "Amount" or "Currency" and save the row (leave the line).
-- "Currency" must be a valid 3-letter code currency, e.g. `USD`
+When is the currency converted? When you save the row (e.g. by navigating up/down) and ALL these criterias are fulfilled:
 - In the configuration you need to have `LOCAL_CURRENCY` filled with a valid 3-letter code currency, e.g. EUR
 - In the configuration you need to have `CURRENCY_LAYER_API_KEY` filled with a valid API key from [CurrencyLayer.com](https://CurrencyLayer.com/)
+- Column `AMOUNT_VERIFIED` must be "False".
+- Column `AMOUNT` or `CURRENCY` is changed
+- Column `AMOUND_LOCAL` is NOT changed
+- Column `CURRENCY` must be a valid 3-letter code currency, e.g. `USD`
 
 ## Artist/Client window tab "Events"
 

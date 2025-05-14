@@ -538,6 +538,7 @@ begin
   end
   else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
           ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
+          (VarCompareValue(ttPaymentAMOUNT_LOCAL.OldValue, ttPaymentAMOUNT_LOCAL.NewValue) = vrEqual) and
           (Length(ttPaymentCURRENCY.AsWideString)=3) then
   begin
     if (Length(LocalCurrency)=3) then
