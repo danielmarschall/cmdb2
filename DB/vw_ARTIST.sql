@@ -66,8 +66,8 @@ tmp_PAY_STATUS as (
 		deb.ARTIST_ID,
 		isnull(STRING_AGG(
 		case
-			when deb.DEBT > 0 then N'DEBT '+cast(deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
-			when deb.DEBT < 0 then N'CREDIT '+cast(-deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
+			when deb.DEBT >=  0.01 then N'DEBT '  +cast( deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
+			when deb.DEBT <= -0.01 then N'CREDIT '+cast(-deb.DEBT as nvarchar(20))+N' '+deb.CURRENCY
 			else null
 		end, N' + '), N'OKAY') as PAY_STATUS
 	from tmp2_ARTIST_DEBT deb

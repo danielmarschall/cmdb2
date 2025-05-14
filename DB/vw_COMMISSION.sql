@@ -58,7 +58,7 @@ QuoteNotPaid as (
 		qs.AMOUNT_LOCAL as AmountLocal,
 		case
 			when qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) >= qs.AMOUNT then qs.AMOUNT -- Not paid
-			when qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) <  0.00001 then 0.00 -- Paid
+			when qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) <  0.01 then 0.00 -- Paid
 			else qs.RunningQuoteSum - ISNULL(ps.TotalPayment, 0) -- Partial paid
 		end as NotPaid
 	from QuoteSums qs
@@ -74,11 +74,11 @@ QuotePayStatus as (
 		--sum(qps.NotPaid) as NOT_PAID_SUM,
 		sum(qps.AmountLocal) as AMOUNT_LOCAL,
 		case
-			when sum(qps.Amount) < 0.00001 then
+			when sum(qps.Amount) < 0.01 then
 				format(sum(qps.Amount), 'N2') + N' ' + qps.CURRENCY
-			when sum(qps.NotPaid) >= 0.00001 and sum(qps.NotPaid) >= sum(qps.Amount) then
+			when sum(qps.NotPaid) >= 0.01 and sum(qps.NotPaid) >= sum(qps.Amount) then
 				N'!!!!!! NOT PAID ' + format(sum(qps.Amount), 'N2') + N' ' + cast(qps.CURRENCY as varchar(100))
-			when sum(qps.NotPaid) < 0.00001 then
+			when sum(qps.NotPaid) < 0.01 then
 				N'Paid ' + format(sum(qps.Amount), 'N2') + N' ' + qps.CURRENCY
 			else
 				N'!!!!!! PART. PAID ' + format(sum(qps.Amount)-sum(qps.NotPaid), 'N2') + N' ' + qps.CURRENCY + N' of ' + format(sum(qps.Amount), 'N2') + N' ' + qps.CURRENCY + N' (Missing: ' + format(sum(qps.NotPaid), 'N2') + N' ' + qps.CURRENCY + N')'
@@ -86,7 +86,7 @@ QuotePayStatus as (
 		case
 			when sum(qps.NotPaid) >= sum(qps.Amount) then
 				1 -- Not paid
-			when sum(qps.NotPaid) < 0.00001 then
+			when sum(qps.NotPaid) < 0.01 then
 				3 -- Paid
 			else
 				2 -- Partially paid
@@ -144,8 +144,8 @@ cm.NAME + iif(art.IS_ARTIST=1,' by ',' for ') + art.NAME as PROJECT_NAME,
 
 (
 	select top 1 STATE from COMMISSION_EVENT ev where ev.COMMISSION_ID = cm.ID and ev.STATE <> 'quote' and ev.STATE <> 'annot' and ev.STATE not like 'upload %'
-	order by case when ev.STATE='fin' then 1
-	              when ev.STATE like 'cancel %' or ev.STATE = 'rejected' then 2
+	order by case when ev.STATE = 'fin' then 1
+	              when ev.STATE like 'cancel %' then 2
 	              else 3 end,
 	         ev.DATE desc,
 	         case
@@ -153,10 +153,11 @@ cm.NAME + iif(art.IS_ARTIST=1,' by ',' for ') + art.NAME as PROJECT_NAME,
 	              when ev.STATE = 'c aw cont' then 2
 	              when ev.STATE = 'c td feedback' then 3
 	              when ev.STATE = 'c aw sk' then 4
-	              when ev.STATE = 'c aw ack' then 5
-	              when ev.STATE = 'c td initcm' then 6
-	              when ev.STATE = 'idea' then 7
-	              else 7
+	              when ev.STATE = 'rejected' then 5 -- note that a rejected art can become non-rejected in the future
+	              when ev.STATE = 'c aw ack' then 6
+	              when ev.STATE = 'c td initcm' then 7
+	              when ev.STATE = 'idea' then 8
+	              else 9
 	              end
 ) as ART_STATUS,
 
