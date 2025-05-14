@@ -131,7 +131,7 @@ begin
     '  i.name AS IndexName, ' +
     '  ips.index_type_desc AS IndexType, ' +
     '  ips.avg_fragmentation_in_percent ' +
-    'FROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, ''LIMITED'') ips ' +
+    'FROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, ''DETAILED'') ips ' +
     'JOIN sys.tables t ON ips.object_id = t.object_id ' +
     'JOIN sys.schemas s ON t.schema_id = s.schema_id ' +
     'JOIN sys.indexes i ON ips.object_id = i.object_id AND ips.index_id = i.index_id ' +
@@ -151,7 +151,11 @@ begin
       else
       begin
         AdoConnection.ExecSQL(Format('ALTER INDEX [%s] ON [%s].[%s] REBUILD;', [IndexName, SchemaName, TableName]));
+        // For some reason, for all my DBs, the fragmentation is only 0% after reorganize, but not after rebuild!
+        AdoConnection.ExecSQL(Format('ALTER INDEX [%s] ON [%s].[%s] REORGANIZE;', [IndexName, SchemaName, TableName]));
       end;
+
+      AdoConnection.ExecSQL(Format('UPDATE STATISTICS [%s].[%s] WITH FULLSCAN;', [SchemaName, TableName]));
 
       q.Next;
     end;
