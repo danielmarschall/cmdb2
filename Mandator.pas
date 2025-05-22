@@ -281,7 +281,8 @@ implementation
 
 uses
   CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper,
-  CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient, CmDbPluginShare;
+  CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient, CmDbPluginShare,
+  Math;
 
 procedure TMandatorForm.ttArtistsAfterScroll(DataSet: TDataSet);
 begin
@@ -524,22 +525,32 @@ begin
   if ttPaymentAMOUNT_VERIFIED.IsNull then
     ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
 
+  // Note: Do not use NewValue, because it is null when a record is inserted!
+
   if ttPaymentAMOUNT.IsNull then
   begin
     ttPaymentAMOUNT_LOCAL.Clear;
   end
   else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
-          ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
-          SameText(ttPaymentCURRENCY.AsWideString, LocalCurrency) then
+          (
+            (CompareValue(VariantToFloat(ttPaymentAMOUNT.OldValue), ttPaymentAMOUNT.AsFloat) <> 0) //(VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual)
+            or
+            not SameText(VariantToString(ttPaymentCURRENCY.OldValue), ttPaymentCURRENCY.AsWideString) // (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)
+          )
+          and SameText(ttPaymentCURRENCY.AsWideString, LocalCurrency) then
   begin
     // Note: do not set AMOUNT_VERIFIED=1, because there might be additional fees beside the conversion
     ttPaymentAMOUNT_LOCAL.AsFloat := ttPaymentAMOUNT.AsFloat;
     ttPaymentAMOUNT_VERIFIED.AsBoolean := False;
   end
   else if not ttPaymentAMOUNT_VERIFIED.AsBoolean and
-          ((VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttPaymentCURRENCY.OldValue, ttPaymentCURRENCY.NewValue) <> vrEqual)) and
-          (VarCompareValue(ttPaymentAMOUNT_LOCAL.OldValue, ttPaymentAMOUNT_LOCAL.NewValue) = vrEqual) and
-          (Length(ttPaymentCURRENCY.AsWideString)=3) then
+          (
+            (CompareValue(VariantToFloat(ttPaymentAMOUNT.OldValue), ttPaymentAMOUNT.AsFloat) <> 0) // (VarCompareValue(ttPaymentAMOUNT.OldValue, ttPaymentAMOUNT.NewValue) <> vrEqual)
+            or
+            not SameText(VariantToString(ttPaymentCURRENCY.OldValue), ttPaymentCURRENCY.AsWideString) // (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)
+          )
+          and (CompareValue(VariantToFloat(ttPaymentAMOUNT_LOCAL.OldValue), ttPaymentAMOUNT_LOCAL.AsFloat) = 0) // (VarCompareValue(ttPaymentAMOUNT_LOCAL.OldValue, ttPaymentAMOUNT_LOCAL.NewValue) = vrEqual)
+          and (Length(ttPaymentCURRENCY.AsWideString)=3) then
   begin
     if (Length(LocalCurrency)=3) then
     begin

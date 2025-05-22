@@ -20,6 +20,7 @@ procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
 procedure CmDb_GetFullTextDump(AdoConnection1: TAdoConnection; sl: TStrings);
 function VariantToInteger(Value: Variant): Integer;
 function VariantToString(const Value: Variant): string;
+function VariantToFloat(const V: Variant): Double;
 function CmDb_ShowRows(ttQuery: TDataSet): string;
 function GetBuildTimestamp(const ExeFile: string): TDateTime;
 procedure SaveGridToCsv(grid: TDbGrid; const filename: string);
@@ -968,6 +969,14 @@ begin
     Result := ''
   else
     Result := VarToStr(Value);
+end;
+
+function VariantToFloat(const V: Variant): Double;
+begin
+  if VarIsNull(V) or VarIsEmpty(V) then
+    Result := 0
+  else
+    Result := V;
 end;
 
 function CmDb_ShowRows(ttQuery: TDataSet): string;

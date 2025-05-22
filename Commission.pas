@@ -252,6 +252,8 @@ begin
 
   LocalCurrency := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''LOCAL_CURRENCY'';'));
 
+  // Note: Do not use NewValue, because it is null when a record is inserted!
+
   if ttQuotesAMOUNT.IsNull then
   begin
     ttQuotesAMOUNT_LOCAL.Clear;
@@ -260,14 +262,22 @@ begin
   begin
     ttQuotesAMOUNT_LOCAL.AsFloat := 0;
   end
-  else if ((VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)) and
-          SameText(ttQuotesCURRENCY.AsWideString, LocalCurrency) then
+  else if (
+            (CompareValue(VariantToFloat(ttQuotesAMOUNT.OldValue), ttQuotesAMOUNT.AsFloat) <> 0) // (VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual)
+            or
+            not SameText(VariantToString(ttQuotesCURRENCY.OldValue), ttQuotesCURRENCY.AsWideString) // (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)
+          )
+          and SameText(ttQuotesCURRENCY.AsWideString, LocalCurrency) then
   begin
     ttQuotesAMOUNT_LOCAL.AsFloat := ttQuotesAMOUNT.AsFloat;
   end
-  else if ((VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual) or (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)) and
-          (VarCompareValue(ttQuotesAMOUNT_LOCAL.OldValue, ttQuotesAMOUNT_LOCAL.NewValue) = vrEqual) and
-          (Length(ttQuotesCURRENCY.AsWideString)=3) then
+  else if (
+            (CompareValue(VariantToFloat(ttQuotesAMOUNT.OldValue), ttQuotesAMOUNT.AsFloat) <> 0) // (VarCompareValue(ttQuotesAMOUNT.OldValue, ttQuotesAMOUNT.NewValue) <> vrEqual)
+            or
+            not SameText(VariantToString(ttQuotesCURRENCY.OldValue), ttQuotesCURRENCY.AsWideString) // (VarCompareValue(ttQuotesCURRENCY.OldValue, ttQuotesCURRENCY.NewValue) <> vrEqual)
+          )
+          and (CompareValue(VariantToFloat(ttQuotesAMOUNT_LOCAL.OldValue), ttQuotesAMOUNT_LOCAL.AsFloat) = 0) // (VarCompareValue(ttQuotesAMOUNT_LOCAL.OldValue, ttQuotesAMOUNT_LOCAL.NewValue) = vrEqual)
+          and (Length(ttQuotesCURRENCY.AsWideString)=3) then
   begin
     if (Length(LocalCurrency)=3) then
     begin
