@@ -1,4 +1,4 @@
-CREATE OR ALTER   view [dbo].[vw_COMMISSION] as
+create or alter view [dbo].[vw_COMMISSION] as
 
 WITH UploadStuff AS (
 	select
@@ -144,21 +144,20 @@ cm.NAME + iif(art.IS_ARTIST=1,' by ',' for ') + art.NAME as PROJECT_NAME,
 
 (
 	select top 1 STATE from COMMISSION_EVENT ev where ev.COMMISSION_ID = cm.ID and ev.STATE <> 'quote' and ev.STATE <> 'annot' and ev.STATE not like 'upload %'
-	order by case when ev.STATE = 'fin' then 1
-	              when ev.STATE like 'cancel %' then 2
-	              else 3 end,
+	order by case when ev.STATE = 'fin'           then 1
+	              when ev.STATE like 'cancel %'   then 2
+	                                              else 3 end,
 	         ev.DATE desc,
 	         case
-	              when ev.STATE = 'c aw hires' then 1
-	              when ev.STATE = 'c aw cont' then 2
+	              when ev.STATE = 'c aw hires'    then 1
+	              when ev.STATE = 'c aw cont'     then 2
 	              when ev.STATE = 'c td feedback' then 3
-	              when ev.STATE = 'c aw sk' then 4
-	              when ev.STATE = 'rejected' then 5 -- note that a rejected art can become non-rejected in the future
-	              when ev.STATE = 'c aw ack' then 6
-	              when ev.STATE = 'c td initcm' then 7
-	              when ev.STATE = 'idea' then 8
-	              else 9
-	              end
+	              when ev.STATE = 'c aw sk'       then 4
+	              when ev.STATE = 'rejected'      then 5 -- note that a rejected art can become non-rejected in the future
+	              when ev.STATE = 'c aw ack'      then 6
+	              when ev.STATE = 'c td initcm'   then 7
+	              when ev.STATE = 'idea'          then 8
+	                                              else 9 end
 ) as ART_STATUS,
 
 QuotePayStatusAggr.PAY_STATUS,

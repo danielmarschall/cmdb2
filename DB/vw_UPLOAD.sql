@@ -1,2 +1,3 @@
-CREATE OR ALTER view [dbo].[vw_UPLOAD] as
-select * from UPLOAD
+create or alter view [dbo].[vw_UPLOAD] as
+
+select * from [UPLOAD]

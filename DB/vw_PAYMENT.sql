@@ -1,4 +1,4 @@
-CREATE OR ALTER view [dbo].[vw_PAYMENT] as
+create or alter view [dbo].[vw_PAYMENT] as
 
 select man.ID as MANDATOR_ID, art.IS_ARTIST, art.NAME as ARTIST_NAME, pay.*, cast(case
 	when art.IS_ARTIST = 1 then art.NAME + N' (Artist)'

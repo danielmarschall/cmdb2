@@ -1,2 +1,3 @@
-CREATE OR ALTER view [dbo].[vw_BACKUP] as
+create or alter view [dbo].[vw_BACKUP] as
+
 select * from [BACKUP]

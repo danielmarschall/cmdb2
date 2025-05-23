@@ -1,2 +1,3 @@
-CREATE OR ALTER VIEW [dbo].[vw_QUOTE] AS
-select * from QUOTE
+create or alter view [dbo].[vw_QUOTE] as
+
+select * from [QUOTE]

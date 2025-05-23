@@ -1,4 +1,4 @@
-CREATE or ALTER view [dbo].[vw_ARTIST] as
+create or alter view [dbo].[vw_ARTIST] as
 
 -- TODO: query is very slow!
 WITH FilteredUploads AS (

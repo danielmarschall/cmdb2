@@ -1,2 +1,3 @@
-CREATE OR ALTER VIEW [dbo].[vw_STATISTICS] AS
+create or alter view [dbo].[vw_STATISTICS] as
+
 select * from [STATISTICS]

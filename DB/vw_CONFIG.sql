@@ -1,4 +1,5 @@
-CREATE OR ALTER VIEW [dbo].[vw_CONFIG] AS
+create or alter view [dbo].[vw_CONFIG] as
+
 select NAME, VALUE, HIDDEN, READ_ONLY,
 cast(case
 	when NAME = 'BACKUP_PATH'            then N'Path on the server machine to stored SQL Server Backups, or empty for the default path (for LocalDB: The user profile folder)'

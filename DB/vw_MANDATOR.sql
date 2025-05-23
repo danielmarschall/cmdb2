@@ -1,2 +1,3 @@
-CREATE OR ALTER view [dbo].[vw_MANDATOR]
-as select * from MANDATOR
+create or alter view [dbo].[vw_MANDATOR] as
+
+select * from [MANDATOR]

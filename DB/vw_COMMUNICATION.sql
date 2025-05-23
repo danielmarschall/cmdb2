@@ -1,2 +1,3 @@
-CREATE OR ALTER view [dbo].[vw_COMMUNICATION] as
-select * from COMMUNICATION
+create or alter view [dbo].[vw_COMMUNICATION] as
+
+select * from [COMMUNICATION]
