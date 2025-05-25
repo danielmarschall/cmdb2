@@ -158,6 +158,7 @@ begin
                           '        else 6 ' + #13#10 +
                           '    end as __STATUS_ORDER, ' + #13#10 +
                           '    cm.ART_STATUS, ' + #13#10 +
+                          '    cm.PAY_STATUS, ' + #13#10 +
                           '    art.NAME as ARTIST, ' + #13#10 +
                           '    cm.NAME, ' + #13#10 +
                           '    cm.ID as __ID, ' + #13#10 +
