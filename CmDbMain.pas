@@ -70,7 +70,7 @@ uses
   Database, AdoConnHelper, StrUtils, Help, CmDbPluginClient,
   Artist, Commission, Mandator, Statistics, CmDbFunctions, Registry,
   ShellApi, System.UITypes, System.Hash, DateUtils,
-  EncryptedZipFile, System.Zip, Memo;
+  EncryptedZipFile, System.Zip, Memo, System.IOUtils;
 
 const
   CmDbDefaultDatabaseName = 'cmdb2';
@@ -222,13 +222,13 @@ begin
       DisableAllMenuItems(MainMenu1);
       Application.ProcessMessages;
 
-      // Just make sure that these are all correct (they can be wrong if the data was edited outside of CMDB2)
-      TCommissionForm.RegnerateQuoteAnnotationAll(AdoConnection1);
-      TCommissionForm.RegnerateUploadAnnotationAll(AdoConnection1);
-
-      // Make some optimizations for performance
       if DatabaseOpenedOnce then
       begin
+        // Just make sure that these are all correct (they can be wrong if the data was edited outside of CMDB2)
+        TCommissionForm.RegnerateQuoteAnnotationAll(AdoConnection1);
+        TCommissionForm.RegnerateUploadAnnotationAll(AdoConnection1);
+
+        // Make some optimizations for performance
         CmDb_DropTempTables(AdoConnection1);
         ADOConnection1.ExecSQL('delete from [STATISTICS]'); // this is also some kind of temporary table, since it will be always re-built
         DefragIndexes(AdoConnection1);
@@ -693,7 +693,8 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
   var
     LocalExe, DownloadUrl: string;
   begin
-    LocalExe := ExtractFilePath(ParamStr(0)) + '..\Redist\' + ExeRelName;
+    // TPath.GetFullPath() is very important, because msiexec.exe won't work if there is a "..\" in the path
+    LocalExe := TPath.GetFullPath(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + '..\Redist\' + ExeRelName);
     DownloadUrl := 'https://github.com/danielmarschall/cmdb2/raw/refs/heads/master/Redist/' + ExeRelName;
     if FileExists(LocalExe) then
     begin
@@ -716,6 +717,7 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
       end;
     end;
     WaitLabel.Caption := 'Installing '+ProductName+'...';
+
     Application.ProcessMessages;
   end;
 
@@ -726,6 +728,7 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
 
 resourcestring
   SRequireComponents = 'CMDB2 requires some Microsoft SQL Server components to be installed. Install them now?';
+  SPleaseAcceptUac = 'Please accept the permission dialog (blinking in the task bar?)';
 var
   _IsLocalDbInstalled: boolean;
   _SqlServerClientDriverInstalled: boolean;
@@ -811,6 +814,8 @@ begin
     end
     else if MessageBox(Application.Handle, PChar(SRequireComponents), PChar(Application.Title), MB_YESNOCANCEL or MB_ICONQUESTION or MB_TASKMODAL) = ID_YES then
     begin
+      WaitLabel.Caption := SPleaseAcceptUac;
+      WaitLabel.Visible := true;
       ShellExecute(Handle, 'runas', PChar(ParamStr(0)), '/installredist', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
     end;
     Close;

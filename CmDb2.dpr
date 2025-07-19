@@ -42,6 +42,8 @@ var
 resourcestring
   SApplicationAlreadyRunning = 'The application is already running';
 begin
+  if ParamStr(1) = '/installredist' then exit; // otherwise we cannot install runtimes if the parent process needs time to close
+
   Unique_AppTitle := Application.Title;
 
   SetWindowText(Application.Handle, PChar(Unique_AppTitle));

@@ -375,6 +375,8 @@ begin
     AdoConnection1.ExecSQL('delete from [CONFIG];');
     //AdoConnection1.ExecSQL('delete from [BACKUP];');
 
+    // TODO: in case the original database has additional fields (for example individual development), this fails
+    //       we should rather write the actual field names
     AdoConnection1.ExecSQL('insert into [MANDATOR] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[MANDATOR];');
     AdoConnection1.ExecSQL('insert into [ARTIST] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[ARTIST];');
     AdoConnection1.ExecSQL('insert into [ARTIST_EVENT] select * from '+AdoConnection1.SQLDatabaseNameEscape(TempDbName)+'.[dbo].[ARTIST_EVENT];');
