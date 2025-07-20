@@ -1685,8 +1685,10 @@ begin
   tmpCols := '';
   for i := 0 to dbg.Columns.Count-1 do
   begin
-    if dbg.Columns[i].Field.FieldKind = fkData then
-      tmpCols := tmpCols + dbg.Columns[i].FieldName + '|';
+    // for some reason, at dbgQuery of the statistics form, dbg.Columns[i].Field is always nil
+    if not Assigned(dbg.Columns[i].Field) or (dbg.Columns[i].Field.FieldKind = fkData) then
+      if Copy(dbg.Columns[i].FieldName, 1, 2) <> '__' then
+        tmpCols := tmpCols + dbg.Columns[i].FieldName + '|';
   end;
   if tmpCols <> '' then
     tmpCols := Copy(tmpCols, 1, Length(tmpCols)-1);
