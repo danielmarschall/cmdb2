@@ -57,6 +57,8 @@ type
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure Timer2Timer(Sender: TObject);
     procedure openQueryClick(Sender: TObject);
+    procedure SearchEditKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     SearchEditSav: TStringList;
     SqlQueryStatistics_Init: boolean;
@@ -352,6 +354,16 @@ begin
   begin
     dbgQuery.HandleOtherControlKeyDown(Key, Shift);
   end;
+  if Key = 0 then SearchEdit.Tag := 1; // avoid "Ding" sound
+end;
+
+procedure TStatisticsForm.SearchEditKeyPress(Sender: TObject; var Key: Char);
+begin
+  if SearchEdit.Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+    SearchEdit.Tag := 0;
+  end;
 end;
 
 procedure TStatisticsForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -381,20 +393,32 @@ begin
   // We must use FormKeyDown AND FormKeyUp. Why?
   // If we only use FormKeyDown only, then ESC will not only close this window, but also windows below (even if Key:=0 will be performed)
   // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
-  if (Key = VK_ESCAPE) and not (ttQuery.State in [dsEdit,dsInsert]) then
+  if (Key = VK_ESCAPE) and (Shift = []) and not (ttQuery.State in [dsEdit,dsInsert]) then
   begin
     Key := 0;
     Tag := 1; // tell FormKeyUp that we may close
   end;
 end;
 
+procedure TStatisticsForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+  end;
+end;
+
 procedure TStatisticsForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key = VK_ESCAPE) and (Tag = 1) then
+  if (Key = VK_ESCAPE) and (Shift = []) and (Tag = 1) then
   begin
     Key := 0;
     Close;
+  end;
+  if (Key = VK_F1) and (Shift = []) then
+  begin
+    HelpBtn.Click;
   end;
 end;
 

@@ -19,6 +19,7 @@ object MandatorForm: TMandatorForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
   OnKeyUp = FormKeyUp
   TextHeight = 15
   object PageControl1: TPageControl
@@ -634,6 +635,7 @@ object MandatorForm: TMandatorForm
       TabOrder = 0
       OnChange = SearchEditChange
       OnKeyDown = SearchEditKeyDown
+      OnKeyPress = SearchEditKeyPress
     end
     object SearchBtn: TButton
       Left = 1067

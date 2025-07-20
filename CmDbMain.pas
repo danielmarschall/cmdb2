@@ -43,6 +43,7 @@ type
     procedure TileVertically1Click(Sender: TObject);
     procedure FormPaint(Sender: TObject);
     procedure Showtextdump1Click(Sender: TObject);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FCloseStarted: boolean;
     function RealBackupPath: string;
@@ -383,6 +384,16 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
+end;
+
+procedure TMainForm.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  // TODO: Does not work. FormKeyUp is not called
+  if (Key = VK_F1) and (Shift = []) and (ActiveMDIChild = nil) then
+  begin
+    Generalhelp1.Click;
+  end;
 end;
 
 procedure TMainForm.FormPaint(Sender: TObject);

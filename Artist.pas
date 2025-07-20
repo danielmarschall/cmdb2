@@ -166,6 +166,8 @@ type
     procedure navArtistEventClick(Sender: TObject; Button: TNavigateBtn);
     procedure navPaymentClick(Sender: TObject; Button: TNavigateBtn);
     procedure navCommissionClick(Sender: TObject; Button: TNavigateBtn);
+    procedure SearchEditKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     SearchEditSav: TStringList;
     SqlQueryCommission_Init: boolean;
@@ -520,7 +522,7 @@ end;
 procedure TArtistForm.dbgCommissionDblClick(Sender: TObject);
 begin
   if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
-  if ttCommission.FieldByName('ID').IsNull then exit;
+  if ttCommission.FieldByName('ID').IsNull then begin Beep; Exit; end;
   MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
@@ -570,7 +572,7 @@ end;
 procedure TArtistForm.dbgCommunicationDblClick(Sender: TObject);
 begin
   if ttCommunication.State in [dsEdit,dsInsert] then exit;
-  if ttCommunication.RecordCount = 0 then exit;
+  if ttCommunication.RecordCount = 0 then begin Beep; Exit; end;
   if ttCommunicationADDRESS.AsWideString = '' then exit;
   if openCommunication.Enabled then
   begin
@@ -865,6 +867,16 @@ begin
   begin
     dbgCommunication.HandleOtherControlKeyDown(Key, Shift);
   end;
+  if Key = 0 then SearchEdit.Tag := 1; // avoid "Ding" sound
+end;
+
+procedure TArtistForm.SearchEditKeyPress(Sender: TObject; var Key: Char);
+begin
+  if SearchEdit.Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+    SearchEdit.Tag := 0;
+  end;
 end;
 
 procedure TArtistForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -901,7 +913,8 @@ begin
   // We must use FormKeyDown AND FormKeyUp. Why?
   // If we only use FormKeyDown only, then ESC will not only close this window, but also windows below (even if Key:=0 will be performed)
   // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
-  if (Key = VK_ESCAPE) and not (ttCommission.State in [dsEdit,dsInsert])
+  if (Key = VK_ESCAPE) and (Shift = [])
+                       and not (ttCommission.State in [dsEdit,dsInsert])
                        and not (ttPayment.State in [dsEdit,dsInsert])
                        and not (ttArtistEvent.State in [dsEdit,dsInsert])
                        and not (ttCommunication.State in [dsEdit,dsInsert]) then
@@ -911,13 +924,25 @@ begin
   end;
 end;
 
+procedure TArtistForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+  end;
+end;
+
 procedure TArtistForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key = VK_ESCAPE) and (Tag = 1) then
+  if (Key = VK_ESCAPE) and (Shift = []) and (Tag = 1) then
   begin
     Key := 0;
     Close;
+  end;
+  if (Key = VK_F1) and (Shift = []) then
+  begin
+    HelpBtn.Click;
   end;
 end;
 

@@ -13,6 +13,9 @@ object MemoForm: TMemoForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
+  OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
+  OnKeyUp = FormKeyUp
   TextHeight = 15
   object Memo1: TMemo
     Left = 0

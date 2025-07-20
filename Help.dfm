@@ -13,6 +13,9 @@ object HelpForm: THelpForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
+  OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
+  OnKeyUp = FormKeyUp
   TextHeight = 15
   object WebBrowser1: TWebBrowser
     Left = 0

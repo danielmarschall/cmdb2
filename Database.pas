@@ -110,6 +110,8 @@ type
     procedure ttMandatorBeforePost(DataSet: TDataSet);
     procedure openMandatorClick(Sender: TObject);
     procedure navMandatorClick(Sender: TObject; Button: TNavigateBtn);
+    procedure SearchEditKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     SearchEditSav: TStringList;
     SqlQueryMandator_Init: boolean;
@@ -325,7 +327,7 @@ end;
 procedure TDatabaseForm.dbgMandatorDblClick(Sender: TObject);
 begin
   if ttMandator.State in [dsEdit,dsInsert] then ttMandator.Post;
-  if ttMandator.FieldByName('ID').IsNull then exit;
+  if ttMandator.FieldByName('ID').IsNull then begin Beep; Exit; end;
   MainForm.OpenDbObject('MANDATOR', ttMandator.FieldByName('ID').AsGuid);
 end;
 
@@ -588,6 +590,16 @@ begin
   begin
     dbgConfig.HandleOtherControlKeyDown(Key, Shift);
   end;
+  if Key = 0 then SearchEdit.Tag := 1; // avoid "Ding" sound
+end;
+
+procedure TDatabaseForm.SearchEditKeyPress(Sender: TObject; var Key: Char);
+begin
+  if SearchEdit.Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+    SearchEdit.Tag := 0;
+  end;
 end;
 
 procedure TDatabaseForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -622,7 +634,7 @@ begin
   // We must use FormKeyDown AND FormKeyUp. Why?
   // If we only use FormKeyDown only, then ESC will not only close this window, but also windows below (even if Key:=0 will be performed)
   // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
-  if (Key = VK_ESCAPE) and
+  if (Key = VK_ESCAPE) and (Shift = []) and
     not (ttMandator.State in [dsEdit,dsInsert]) and
     not (ttTextBackup.State in [dsEdit,dsInsert]) and
     not (ttConfig.State in [dsEdit,dsInsert]) then
@@ -632,13 +644,25 @@ begin
   end;
 end;
 
+procedure TDatabaseForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+  end;
+end;
+
 procedure TDatabaseForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key = VK_ESCAPE) and (Tag = 1) then
+  if (Key = VK_ESCAPE) and (Shift = []) and (Tag = 1) then
   begin
     Key := 0;
     Close;
+  end;
+  if (Key = VK_F1) and (Shift = []) then
+  begin
+    HelpBtn.Click;
   end;
 end;
 

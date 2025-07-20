@@ -3,7 +3,7 @@ unit CmDbPluginClient;
 interface
 
 uses
-  SysUtils, Classes, ADODb, AdoConnHelper, CmDbPluginShare;
+  Windows, SysUtils, Classes, ADODb, AdoConnHelper, CmDbPluginShare;
 
 type
   TCmDbPluginClient = class(TObject)
@@ -31,7 +31,7 @@ procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: 
 implementation
 
 uses
-  Windows, Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi, Dialogs, System.UITypes,
+  Forms, Statistics, CmDbMain, CmDbFunctions, ShellApi, Dialogs, System.UITypes,
   SyncObjs;
 
 procedure HandleClickResponse(AdoConn: TAdoConnection; MandatorId: TGUID; resp: TCmDbPluginClickResponse);
@@ -282,6 +282,10 @@ begin
             begin
               if Result.Action = craAbort then Abort; // can cancel clicking "Refresh" button
               Exit;
+            end
+            else
+            begin
+              Beep;
             end;
           finally
             FreeAndNil(p);

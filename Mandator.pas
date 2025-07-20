@@ -249,6 +249,8 @@ type
     procedure openStatisticsClick(Sender: TObject);
     procedure navArtistsClick(Sender: TObject; Button: TNavigateBtn);
     procedure navClientsClick(Sender: TObject; Button: TNavigateBtn);
+    procedure SearchEditKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     SearchEditSav: TStringList;
     SqlQueryArtistClient_Init: boolean;
@@ -651,7 +653,7 @@ end;
 procedure TMandatorForm.dbgArtistsDblClick(Sender: TObject);
 begin
   if ttArtists.State in [dsEdit,dsInsert] then ttArtists.Post;
-  if ttArtists.FieldByName('ID').IsNull then exit;
+  if ttArtists.FieldByName('ID').IsNull then begin Beep; Exit; end;
   MainForm.OpenDbObject('ARTIST', ttArtists.FieldByName('ID').AsGuid);
 end;
 
@@ -701,7 +703,7 @@ end;
 procedure TMandatorForm.dbgClientsDblClick(Sender: TObject);
 begin
   if ttClients.State in [dsEdit,dsInsert] then ttClients.Post;
-  if ttClients.FieldByName('ID').IsNull then exit;
+  if ttClients.FieldByName('ID').IsNull then begin Beep; Exit; end;
   MainForm.OpenDbObject('ARTIST', ttClients.FieldByName('ID').AsGuid);
 end;
 
@@ -751,7 +753,7 @@ end;
 procedure TMandatorForm.dbgCommissionsDblClick(Sender: TObject);
 begin
   if ttCommission.State in [dsEdit,dsInsert] then ttCommission.Post;
-  if ttCommission.FieldByName('ID').IsNull then exit;
+  if ttCommission.FieldByName('ID').IsNull then begin Beep; Exit; end;
   MainForm.OpenDbObject('COMMISSION', ttCommission.FieldByName('ID').AsGuid);
 end;
 
@@ -836,7 +838,7 @@ var
   resp: TCmDbPluginClickResponse;
 begin
   if ttStatistics.State in [dsEdit,dsInsert] then ttStatistics.Post;
-  if ttStatistics.FieldByName('ID').IsNull then exit;
+  if ttStatistics.FieldByName('ID').IsNull then begin Beep; Exit; end;
 
   Screen.Cursor := crHourGlass;
   try
@@ -1161,6 +1163,16 @@ begin
   begin
     dbgStatistics.HandleOtherControlKeyDown(Key, Shift);
   end;
+  if Key = 0 then SearchEdit.Tag := 1; // avoid "Ding" sound
+end;
+
+procedure TMandatorForm.SearchEditKeyPress(Sender: TObject; var Key: Char);
+begin
+  if SearchEdit.Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+    SearchEdit.Tag := 0;
+  end;
 end;
 
 procedure TMandatorForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1199,7 +1211,7 @@ begin
   // We must use FormKeyDown AND FormKeyUp. Why?
   // If we only use FormKeyDown only, then ESC will not only close this window, but also windows below (even if Key:=0 will be performed)
   // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
-  if (Key = VK_ESCAPE) and
+  if (Key = VK_ESCAPE) and (Shift = []) and
     not (ttArtists.State in [dsEdit,dsInsert]) and
     not (ttClients.State in [dsEdit,dsInsert]) and
     not (ttCommission.State in [dsEdit,dsInsert]) and
@@ -1211,13 +1223,25 @@ begin
   end;
 end;
 
+procedure TMandatorForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+  end;
+end;
+
 procedure TMandatorForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key = VK_ESCAPE) and (Tag = 1) then
+  if (Key = VK_ESCAPE) and (Shift = []) and (Tag = 1) then
   begin
     Key := 0;
     Close;
+  end;
+  if (Key = VK_F1) and (Shift = []) then
+  begin
+    HelpBtn.Click;
   end;
 end;
 

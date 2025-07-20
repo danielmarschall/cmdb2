@@ -1,0 +1,14 @@
+procedure TMainForm.Button1Click(Sender: TObject);
+var
+  q: TAdoDataSet;
+begin
+  q := ADOConnection1.GetTable('select FOLDER from COMMISSION where isnull(FOLDER,'''')<>'''';');
+  while not q.EOF do
+  begin
+    q.Edit;
+    q.Fields[0].AsString := StringReplace(q.Fields[0].AsString, 'D:\OneDrive\Commissions\', 'c:\Users\danie\Tresorit\Ex-OneDrive\Commissions\', [rfIgnoreCase]);
+    q.Post;
+    q.Next;
+  end;
+  showmessage('done');
+end;

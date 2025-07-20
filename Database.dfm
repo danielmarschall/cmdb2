@@ -19,6 +19,7 @@ object DatabaseForm: TDatabaseForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
   OnKeyUp = FormKeyUp
   TextHeight = 15
   object PageControl1: TPageControl
@@ -316,6 +317,7 @@ object DatabaseForm: TDatabaseForm
       TabOrder = 0
       OnChange = SearchEditChange
       OnKeyDown = SearchEditKeyDown
+      OnKeyPress = SearchEditKeyPress
     end
     object SearchBtn: TButton
       Left = 596

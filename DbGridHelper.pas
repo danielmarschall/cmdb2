@@ -96,7 +96,7 @@ begin
   end
   else if Shift = [] then
   begin
-    if (Key = VK_ESCAPE) and (Self.DataSource.DataSet.State in [dsEdit,dsInsert]) then
+    if (Key = VK_ESCAPE) and (Shift = []) and (Self.DataSource.DataSet.State in [dsEdit,dsInsert]) then
     begin
       Key := 0;
       Self.DataSource.DataSet.Cancel;

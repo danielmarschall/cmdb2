@@ -13,6 +13,9 @@ type
       const pDisp: IDispatch; const URL, Flags, TargetFrameName, PostData,
       Headers: OleVariant; var Cancel: WordBool);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     FDirectory: string;
   public
@@ -34,6 +37,31 @@ procedure THelpForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   HelpForm := nil;
   Action := caFree;
+end;
+
+procedure THelpForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  Key := 0;
+  Tag := 1; // tell FormKeyUp that we may close
+end;
+
+procedure THelpForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+  end;
+end;
+
+procedure THelpForm.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_ESCAPE) and (Shift = []) and (Tag = 1) then
+  begin
+    Key := 0;
+    Close;
+  end;
 end;
 
 procedure THelpForm.ShowHTMLHelp(AHTML: string);

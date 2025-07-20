@@ -111,6 +111,7 @@ type
     procedure navEventsClick(Sender: TObject; Button: TNavigateBtn);
     procedure navUploadsClick(Sender: TObject; Button: TNavigateBtn);
     procedure navQuotesClick(Sender: TObject; Button: TNavigateBtn);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     SqlQueryCommissionEvent_Init: boolean;
     SqlQueryCommissionEvent_Order: string;
@@ -950,7 +951,8 @@ begin
   // We must use FormKeyDown AND FormKeyUp. Why?
   // If we only use FormKeyDown only, then ESC will not only close this window, but also windows below (even if Key:=0 will be performed)
   // If we only use FormKeyUp, we don't get the correct dataset state (since dsEdit,dsInsert got reverted during KeyDown)
-  if (Key = VK_ESCAPE) and not (ttEvents.State in [dsEdit,dsInsert])
+  if (Key = VK_ESCAPE) and (Shift = [])
+                       and not (ttEvents.State in [dsEdit,dsInsert])
                        and not (ttQuotes.State in [dsEdit,dsInsert])
                        and not (ttUploads.State in [dsEdit,dsInsert]) then
   begin
@@ -959,13 +961,25 @@ begin
   end;
 end;
 
+procedure TCommissionForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Tag = 1 then
+  begin
+    Key := #0; // avoid "Ding" sound
+  end;
+end;
+
 procedure TCommissionForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key = VK_ESCAPE) and (Tag = 1) then
+  if (Key = VK_ESCAPE) and (Shift = []) and (Tag = 1) then
   begin
     Key := 0;
     Close;
+  end;
+  if (Key = VK_F1) and (Shift = []) then
+  begin
+    HelpBtn.Click;
   end;
 end;
 

@@ -10,11 +10,13 @@ object MainForm: TMainForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   FormStyle = fsMDIForm
+  KeyPreview = True
   Menu = MainMenu1
   WindowState = wsMaximized
   WindowMenu = Window1
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
   OnPaint = FormPaint
   TextHeight = 15
   object WaitLabel: TLabel

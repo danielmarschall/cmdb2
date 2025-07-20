@@ -17,6 +17,7 @@ object CommissionForm: TCommissionForm
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
   OnKeyUp = FormKeyUp
   TextHeight = 15
   object PageControl1: TPageControl
