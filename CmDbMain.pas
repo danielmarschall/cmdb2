@@ -141,12 +141,14 @@ var
   CopyRightYear: string;
   InstallId: string;
 resourcestring
-  S_Version = '%s (%d Bit), Version %s'+#13#10+'(C) %s Daniel Marschall, ViaThinkSoft'+#13#10+'License: Apache 2.0';
+  S_Version = '%s (%d Bit), Version %s'+#13#10+'(C) %s %s'+#13#10+'License: %s';
   S_InstallId = 'Installation ID: %s';
   S_InstalledPlugins = 'Installed plugins:';
 const
-  DevelopmentStartYear = 2024; // do not change
-  GitHubVersion = '1.7.0';
+  Author = 'Daniel Marschall, ViaThinkSoft';
+  License = 'Apache 2.0';
+  DevelopmentStartYear = 2024; // DO NOT CHANGE; this is the start year, not the current year
+  GitHubVersion = '1.8.0'; // Change this once you release something new
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   InstallId := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
@@ -171,7 +173,7 @@ begin
     slPlugins.Insert(0, '');
     slPlugins.Insert(0, Format(S_InstallId, [InstallId]));
     slPlugins.Insert(0, '');
-    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, GitHubVersion + ' / ' + FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear])); // do not localize
+    slPlugins.Insert(0, Format(S_Version, [Application.Title, bits, GitHubVersion + ' / ' + FormatDateTime('YYYY-mm-dd', dateidatum), CopyRightYear, Author, License])); // do not localize
 
     MessageBox(Application.Handle, PChar(slPlugins.Text), PChar(Application.Title), MB_OK or MB_ICONINFORMATION or MB_TASKMODAL);
   finally
