@@ -386,6 +386,7 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
+  CmDb_Make_CmDbFolderWithIcon;
 end;
 
 procedure TMainForm.FormKeyUp(Sender: TObject; var Key: Word;

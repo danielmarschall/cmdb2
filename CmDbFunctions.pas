@@ -14,6 +14,7 @@ function ShellExecuteWait(aWnd: HWND; Operation: string; ExeName: string; Params
 function CmDb_GetDefaultDataPath: string;
 function CmDb_GetDefaultBackupPath: string;
 function CmDb_GetTempPath: string;
+function CmDb_Make_CmDbFolderWithIcon: string;
 procedure CmDb_RestoreDatabase(AdoConnection1: TAdoConnection; const BakFilename: string);
 procedure CmDb_ConnectViaLocalDb(AdoConnection1: TAdoConnection; const DataBaseName: string);
 procedure CmDb_InstallOrUpdateSchema(AdoConnection1: TAdoConnection);
@@ -45,7 +46,7 @@ function BuildSearchCondition(const search: string; dbg: TDBGrid): string;
 implementation
 
 uses
-  ShlObj, ShellApi, System.Hash, Dialogs, WinInet,
+  ShlObj, ShellApi, System.Hash, Dialogs, WinInet, System.IOUtils, ComObj, ActiveX,
   CmDbMain, Artist, Commission, Mandator, Statistics, Registry, CmDbPluginShare;
 
 const
@@ -308,20 +309,98 @@ end;
 
 function CmDb_GetDefaultDataPath: string;
 begin
-  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2\Data';
+  result := IncludeTrailingPathDelimiter(CmDb_Make_CmDbFolderWithIcon) + 'Data';
   ForceDirectories(result);
 end;
 
 function CmDb_GetDefaultBackupPath: string;
 begin
-  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2\Backup';
+  result := IncludeTrailingPathDelimiter(CmDb_Make_CmDbFolderWithIcon) + 'Backup';
   ForceDirectories(result);
 end;
 
 function CmDb_GetTempPath: string;
 begin
-  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2\Temp';
+  result := IncludeTrailingPathDelimiter(CmDb_Make_CmDbFolderWithIcon) + 'Temp';
   ForceDirectories(result);
+end;
+
+function CmDb_Make_CmDbFolderWithIcon: string;
+var
+  sl: TStringList;
+  filename: string;
+  IObject: IUnknown;
+  ISLink: IShellLink;
+  IPFile: IPersistFile;
+resourcestring
+  SDownloadLatestVersion = 'Download latest version';
+  SRunApplication = 'Run CMDB2';
+begin
+  result := IncludeTrailingPathDelimiter(_GetUserDirectory) + 'CMDB2';
+  ForceDirectories(result);
+
+  {$WARN SYMBOL_PLATFORM OFF}
+
+  try
+    {$REGION 'Create desktop.ini (for having an icon)'}
+    filename := IncludeTrailingPathDelimiter(result) + 'desktop.ini';
+    if TFile.Exists(filename) then TFile.SetAttributes(filename, [TFileAttribute.faArchive]); // Remove system attributes, otherwise we cannot write to that file using SaveToFile
+    sl := TStringList.Create;
+    try
+      sl.Add('');
+      sl.Add('[.ShellClassInfo]');
+      sl.Add('IconResource=' + TPath.GetFullPath(ParamStr(0)) + ',0');
+      sl.SaveToFile(filename, TEncoding.UTF8);
+    finally
+      FreeAndNil(sl);
+    end;
+    TFile.SetAttributes(filename, [TFileAttribute.faArchive, TFileAttribute.faHidden, TFileAttribute.faSystem]);
+    {$ENDREGION}
+  except
+    // Don't crash the program, since this is purely nice-to-have
+  end;
+
+  try
+    {$REGION 'Create "Download latest version" icon'}
+    filename := IncludeTrailingPathDelimiter(result) + SDownloadLatestVersion + '.url';
+    if TFile.Exists(filename) then TFile.SetAttributes(filename, [TFileAttribute.faArchive]);
+    sl := TStringList.Create;
+    try
+      sl.Add('');
+      sl.Add('[{000214A0-0000-0000-C000-000000000046}]');
+      sl.Add('Prop3=19,11');
+      sl.Add('[InternetShortcut]');
+      sl.Add('IDList=');
+      sl.Add('URL=https://github.com/danielmarschall/cmdb2/releases/');
+      sl.SaveToFile(filename, TEncoding.UTF8);
+    finally
+      FreeAndNil(sl);
+    end;
+    {$ENDREGION}
+  except
+    // Don't crash the program, since this is purely nice-to-have
+  end;
+
+  try
+    {$REGION 'Create shortcut to the application'}
+    filename := IncludeTrailingPathDelimiter(result) + SRunApplication + '.lnk';
+
+    if TFile.Exists(filename) then TFile.SetAttributes(filename, [TFileAttribute.faArchive]);
+
+    IObject := CreateComObject(CLSID_ShellLink);
+    ISLink := IObject as IShellLink;
+    IPFile := IObject as IPersistFile;
+
+    ISLink.SetPath(pChar(ParamStr(0)));
+    ISLink.SetWorkingDirectory(pChar(ExtractFilePath(ParamStr(0))));
+
+    IPFile.Save(PWChar(filename), false);
+    {$ENDREGION}
+  except
+    // Don't crash the program, since this is purely nice-to-have
+  end;
+
+  {$WARN SYMBOL_PLATFORM ON}
 end;
 
 const
@@ -1697,8 +1776,10 @@ end;
 
 initialization
   DeletedList := TStringList.Create;
+  CoInitialize(nil);  // Initialize OLE
 
 finalization
   FreeAndNil(DeletedList);
+  CoUninitialize;  // Clean up OLE
 
 end.
