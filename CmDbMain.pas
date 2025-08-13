@@ -54,8 +54,8 @@ type
     CmDbZipPassword: string;
     DatabaseOpenedOnce: boolean;
     procedure RestoreMdiChild(frm: TForm);
-    procedure OpenDbObject(const ATableName: string; DsGuid: TGUID);
-    procedure OpenDatabaseForm;
+    function OpenDbObject(const ATableName: string; DsGuid: TGUID): TForm;
+    function OpenDatabaseForm: TForm;
     function FindForm(guid: TGuid; addinfo1: string=''): TForm;
     procedure ShowHelpWindow(const MDFile: string);
   end;
@@ -76,12 +76,13 @@ uses
 const
   CmDbDefaultDatabaseName = 'cmdb2';
 
-procedure TMainForm.OpenDbObject(const ATableName: string; DsGuid: TGUID);
+function TMainForm.OpenDbObject(const ATableName: string; DsGuid: TGUID): TForm;
 var
   MandatorForm: TMandatorForm;
   Artistform: TArtistForm;
   CommissionForm: TCommissionForm;
 begin
+  result := nil;
   if VarIsNull(ADOConnection1.GetScalar('select top 1 ID from ' + ATableName + ' where ID = ' + AdoConnection1.SQLStringEscape(DsGuid.ToString))) then Exit;
   if ATableName = 'MANDATOR' then // do not localize
   begin
@@ -98,6 +99,7 @@ begin
       MandatorForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
       MandatorForm.Init;
     end;
+    result := MandatorForm;
   end
   else if ATableName = 'ARTIST' then // do not localize
   begin
@@ -114,6 +116,7 @@ begin
       ArtistForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
       ArtistForm.Init;
     end;
+    result := ArtistForm;
   end
   else if ATableName = 'COMMISSION' then // do not localize
   begin
@@ -130,6 +133,7 @@ begin
       CommissionForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
       CommissionForm.Init;
     end;
+    result := CommissionForm;
   end;
 end;
 
@@ -450,7 +454,7 @@ begin
   ShowHelpWindow('README.md');
 end;
 
-procedure TMainForm.OpenDatabaseForm;
+function TMainForm.OpenDatabaseForm: TForm;
 var
   DatabaseForm: TDatabaseForm;
   i: integer;
@@ -461,7 +465,8 @@ begin
   begin
     if MDIChildren[i] is TDatabaseForm then
     begin
-      RestoreMdiChild(MdiChildren[i]);
+      result := MdiChildren[i]; // must be before RestoreMdiChild();
+      RestoreMdiChild(result);
       exit;
     end;
   end;
@@ -471,6 +476,7 @@ begin
   DatabaseForm.ADOConnection1.Connected := false;
   DatabaseForm.ADOConnection1.ConnectionString := ADOConnection1.ConnectionString;
   DatabaseForm.Init;
+  result := DatabaseForm;
 end;
 
 procedure TMainForm.OpenDatabase1Click(Sender: TObject);

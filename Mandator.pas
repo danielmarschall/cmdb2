@@ -284,7 +284,7 @@ implementation
 uses
   CmDbMain, Artist, Statistics, DbGridHelper, Commission, AdoConnHelper,
   CmDbFunctions, VtsCurConvDLLHeader, CmDbPluginClient, CmDbPluginShare,
-  Math;
+  Math, Database;
 
 procedure TMandatorForm.ttArtistsAfterScroll(DataSet: TDataSet);
 begin
@@ -1246,8 +1246,15 @@ begin
 end;
 
 procedure TMandatorForm.GoBackBtnClick(Sender: TObject);
+var
+  DatabaseForm: TDatabaseForm;
 begin
-  MainForm.OpenDatabaseForm;
+  DatabaseForm := MainForm.OpenDatabaseForm as TDatabaseForm;
+  if Assigned(DatabaseForm) then
+  begin
+    DatabaseForm.PageControl1.ActivePage := DatabaseForm.tsMandator;
+    DatabaseForm.ttMandator.Locate('ID', MandatorId.ToString, []);
+  end;
 end;
 
 procedure TMandatorForm.Init;

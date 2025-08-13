@@ -189,6 +189,7 @@ type
     procedure DoRefresh(dbg: TDbGrid; const ALocateField: string);
   protected
     ArtistName: string;
+    IsArtist: boolean;
   public
     ArtistId: TGUID;
     procedure Init;
@@ -200,7 +201,7 @@ implementation
 
 uses
   CmDbMain, Commission, DbGridHelper, AdoConnHelper, CmDbFunctions,
-  VtsCurConvDLLHeader, StrUtils, ShellAPI, Math;
+  VtsCurConvDLLHeader, StrUtils, ShellAPI, Math, Mandator;
 
 procedure TArtistForm.ttArtistEventAfterScroll(DataSet: TDataSet);
 begin
@@ -949,9 +950,23 @@ end;
 procedure TArtistForm.GoBackBtnClick(Sender: TObject);
 var
   parentId: string;
+  MandatorForm: TMandatorForm;
 begin
   parentId := VarToStr(ADOConnection1.GetScalar('select MANDATOR_ID from ARTIST where ID = ''' + ArtistId.ToString + ''''));
-  MainForm.OpenDbObject('MANDATOR', StringToGuid(parentId));
+  MandatorForm := MainForm.OpenDbObject('MANDATOR', StringToGuid(parentId)) as TMandatorForm;
+  if Assigned(MandatorForm) then
+  begin
+    if IsArtist then
+    begin
+      MandatorForm.PageControl1.ActivePage := MandatorForm.tsArtists;
+      MandatorForm.ttArtists.Locate('ID', ArtistId.ToString, []);
+    end
+    else
+    begin
+      MandatorForm.PageControl1.ActivePage := MandatorForm.tsClients;
+      MandatorForm.ttClients.Locate('ID', ArtistId.ToString, []);
+    end;
+  end;
 end;
 
 procedure TArtistForm.Init;
@@ -965,7 +980,8 @@ begin
   ttArtist := ADOConnection1.GetTable('select art.NAME, art.IS_ARTIST, man.NAME as MANDATOR_NAME from ARTIST art left join MANDATOR man on man.ID = art.MANDATOR_ID where art.ID = ''' + ArtistId.ToString + '''');
   try
     ArtistName := ttArtist.FieldByName('NAME').AsWideString;
-    if ttArtist.FieldByName('IS_ARTIST').AsBoolean then
+    IsArtist := ttArtist.FieldByName('IS_ARTIST').AsBoolean;
+    if IsArtist then
       Caption := Format(SArtistSforS, [ttArtist.FieldByName('NAME').AsWideString, ttArtist.FieldByName('MANDATOR_NAME').AsWideString])
     else
       Caption := Format(SClientSforS, [ttArtist.FieldByName('NAME').AsWideString, ttArtist.FieldByName('MANDATOR_NAME').AsWideString]);

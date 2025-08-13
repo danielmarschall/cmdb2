@@ -145,7 +145,7 @@ implementation
 
 uses
   AdoConnHelper, DbGridHelper, VtsCurConvDLLHeader, Math, CmDbFunctions,
-  ShellAPI, StrUtils, CmDbMain;
+  ShellAPI, StrUtils, CmDbMain, Artist;
 
 procedure TCommissionForm.RegnerateQuoteAnnotation;
 begin
@@ -986,9 +986,15 @@ end;
 procedure TCommissionForm.GoBackBtnClick(Sender: TObject);
 var
   parentId: string;
+  Artistform: TArtistForm;
 begin
   parentId := VarToStr(ADOConnection1.GetScalar('select ARTIST_ID from COMMISSION where ID = ''' + CommissionId.ToString + ''''));
-  MainForm.OpenDbObject('ARTIST', StringToGuid(parentId));
+  Artistform := MainForm.OpenDbObject('ARTIST', StringToGuid(parentId)) as TArtistForm;
+  if Assigned(ArtistForm) then
+  begin
+    Artistform.PageControl1.ActivePage := Artistform.tsCommissions;
+    Artistform.ttCommission.Locate('ID', CommissionId.ToString, []);
+  end;
 end;
 
 procedure TCommissionForm.Init;

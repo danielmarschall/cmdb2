@@ -87,7 +87,8 @@ implementation
 {$R *.dfm}
 
 uses
-  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbMain, Generics.Collections;
+  DbGridHelper, CmDbFunctions, CmDbPluginClient, CmDbMain, Generics.Collections,
+  Mandator;
 
 procedure TStatisticsForm.SearchBtnClick(Sender: TObject);
 begin
@@ -423,8 +424,15 @@ begin
 end;
 
 procedure TStatisticsForm.GoBackBtnClick(Sender: TObject);
+var
+  MandatorForm: TMandatorForm;
 begin
-  MainForm.OpenDbObject('MANDATOR', MandatorId);
+  MandatorForm := MainForm.OpenDbObject('MANDATOR', MandatorId) as TMandatorForm;
+  if Assigned(MandatorForm) then
+  begin
+    MandatorForm.PageControl1.ActivePage := MandatorForm.tsStatistics;
+    MandatorForm.ttStatistics.Locate('ID', StatisticsId.ToString, []);
+  end;
 end;
 
 procedure TStatisticsForm.HelpBtnClick(Sender: TObject);
