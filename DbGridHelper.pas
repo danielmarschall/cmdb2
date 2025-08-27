@@ -146,7 +146,10 @@ begin
         Exit; // only for CMDB2, because Insert is always at the end (SVN Rev 193)
       Self.DataSource.Dataset.Next;
       if Self.DataSource.DataSet.Eof then
+      begin
         Self.DataSource.DataSet.Append;
+        if Self.CanFocus then Self.SetFocus; // Focus the DB grid now, so we can enter stuff and move right to the next grid (instead to the next tab)
+      end;
     end
     else if Key = VK_RETURN then
     begin
