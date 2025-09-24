@@ -1,14 +1,14 @@
 ﻿# Shell Controls Packages and Utils [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Latest Version 1.1.2 - 22 Sep 2024**
+**Latest Version 1.1.3 - 29 Aug 2025**
 
 ** Packages, demo and Utility of Delphi ShellControl Components (missing by Embarcadero)
 
-Delphi version supported: XE6, XE8, XE10, D10.1, D10.2, D10.3, D10.4, D11, D12
+Delphi version supported: XE6, XE8, XE10, D10.1, D10.2, D10.3, D10.4, D11, D12 and D13.
 
 For other versions, please add a request in the [Issue section](https://github.com/EtheaDev/DelphiShellControlsPackages/issues) of the project.
 
-![Supporting Delphi 12](./Images/SupportingDelphi.jpg)
+![Supporting Delphi](./Images/SupportingDelphi.jpg)
 
 ## Components
 Vcl.Shell.ShellCtrls.pas and Vcl.Shell.ShellConsts.pas are not distributed here, because they are distributed by Embarcadero inside Delphi!
@@ -36,9 +36,12 @@ A simple demo that explain the use of those components is located under:
 
 
 ## Release Notes
+29 Aug 2025: ver. 1.1.3
+- Fixed Demo
+- Added support for Delphi 13
 
 22 Sep 2024: ver. 1.1.2
-- Fixed option list for ListView in Demo.
+- Fixed option list for ListView in Demo
 
 08 Jun 2024: ver. 1.1.1
 - Updated packages of ShellControls for Delphi 12.1

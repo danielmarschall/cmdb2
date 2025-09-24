@@ -9,10 +9,9 @@
 // and is subject to that software license agreement.
 
 //---------------------------------------------------------------------------
-package dclshlctrls;
+package vclshlctrls;
 
 {$R *.res}
-{$R '..\..\Source\dclshlctrls.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -37,17 +36,17 @@ package dclshlctrls;
 {$IMAGEBASE $400000}
 {$DEFINE RELEASE}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Shell Control Property and Component Editors'}
-{$LIBSUFFIX '260'}
-{$DESIGNONLY}
+{$DESCRIPTION 'VCL Shell Controls'}
+{$LIBSUFFIX AUTO}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
-  designide,
-  vclshlctrls;
+  rtl,
+  Vcl;
 
 contains
-  RootEdit in '..\..\Source\RootEdit.pas' {RootPathEditDlg},
-  ShellReg in '..\ShellReg.pas';
+  Vcl.Shell.ShellCtrls in 'Vcl.Shell.ShellCtrls.pas',
+  Vcl.Shell.ShellConsts in 'Vcl.Shell.ShellConsts.pas';
 
 end.

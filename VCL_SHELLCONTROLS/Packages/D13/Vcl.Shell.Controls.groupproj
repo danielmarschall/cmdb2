@@ -1,6 +1,6 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{1DA1F5D8-040A-429A-B841-588AB88C0AE5}</ProjectGuid>
+        <ProjectGuid>{24838E71-DF15-4E4D-B43F-1548A01C2B4E}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <Projects Include="vclshlctrls.dproj">

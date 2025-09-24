@@ -43,10 +43,7 @@ package dclshlctrls;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
-  Vcl,
   designide,
-  Vclx,
   vclshlctrls;
 
 contains
