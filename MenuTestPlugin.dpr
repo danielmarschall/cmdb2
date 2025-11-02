@@ -128,7 +128,7 @@ begin
                             '__ID uniqueidentifier NOT NULL, ' + #13#10 +
                             'NAME varchar(200) NOT NULL );');
           end;
-          AdoConn.ExecSQL('delete from '+TempTableName(GUID_1, 'TEST'));
+          AdoConn.ExecSQL('delete from '+TempTableName(GUID_1, 'TEST')); // TODO: might this cause problems with already open windows of that statistics plugin? But if we don't delete them, we might have duplicates in the output
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1A.ToString+''', ''View Source Code'';');
           AdoConn.ExecSQL('insert into '+TempTableName(GUID_1, 'TEST')+' select '''+GUID_1B.ToString+''', ''Download latest version'';');
           Randomize;

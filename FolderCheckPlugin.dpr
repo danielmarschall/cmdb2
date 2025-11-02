@@ -163,7 +163,7 @@ function ClickEventW(DBConnStr: PChar; MandatorGuid, StatGuid,
 
     if not InputQuery(DESC_3, SEnterBasePath, Path) then Exit(False);
 
-    AdoConn.ExecSQL('delete from '+TempTableName(GUID_3, 'FOLDER_COMPARE'));
+    AdoConn.ExecSQL('delete from '+TempTableName(GUID_3, 'FOLDER_COMPARE')); // TODO: might this cause problems with already open windows of that statistics plugin? But if we don't delete them, we might have duplicates in the output
 
     // Liste der Verzeichnisse im Dateisystem
     FSFolders := TStringList.Create;
@@ -321,6 +321,7 @@ begin
                             'ART_STATUS nvarchar(20), ' + #13#10 +
                             'FOLDER nvarchar(200) );');
           end;
+          AdoConn.ExecSQL('delete from '+TempTableName(GUID_2, 'FOLDER_NOT_EXISTING')); // TODO: might this cause problems with already open windows of that statistics plugin? But if we don't delete them, we might have duplicates in the output
           q := AdoConn.GetTable(
                           'select ' + #13#10 +
                           '    man.ID as __MANDATOR_ID, ' + #13#10 +
@@ -399,6 +400,7 @@ begin
                             'COMMISSION nvarchar(200), ' + #13#10 +
                             'FOLDER nvarchar(250) );');
           end;
+          AdoConn.ExecSQL('delete from '+TempTableName(GUID_3, 'FOLDER_COMPARE')); // TODO: might this cause problems with already open windows of that statistics plugin? But if we don't delete them, we might have duplicates in the output
           if not _Stat3_CompareFolders(AdoConn) then
           begin
             Response.Handled := true;

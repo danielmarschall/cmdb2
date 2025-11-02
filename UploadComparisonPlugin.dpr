@@ -263,6 +263,7 @@ begin
                            'URL nvarchar(250), ' + #13#10 +
                            'TITLE nvarchar(250) );');
   end;
+  AdoConnection1.ExecSQL('delete from '+TempTableName(GUID_1, 'UPLOAD_MISSING_IN_CMDB')); // TODO: might this cause problems with already open windows of that statistics plugin? But if we don't delete them, we might have duplicates in the output
 
   if not AdoConnection1.TableExists(TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB')) then
   begin
@@ -273,6 +274,7 @@ begin
                            'ARTIST_OR_CLIENT nvarchar(250), ' + #13#10 +
                            'COMMISSION nvarchar(250) );');
   end;
+  AdoConnection1.ExecSQL('delete from '+TempTableName(GUID_2, 'UPLOAD_MISSING_IN_WEB')); // TODO: might this cause problems with already open windows of that statistics plugin? But if we don't delete them, we might have duplicates in the output
 
   // Initialisierung der Komponenten
   GalleryListWeb := TStringList.Create;
@@ -301,8 +303,8 @@ begin
                                      'left join COMMISSION cm on cm.ID = ev.COMMISSION_ID ' +
                                      'left join ARTIST art on art.ID = cm.ARTIST_ID '+
                                      'left join MANDATOR man on man.ID = art.MANDATOR_ID ' +
-                                     'where ev.STATE = iif(art.IS_ARTIST=1,N''upload c'',N''upload a'') and ' +
-                                     '      URL like (select isnull(VALUE,N''%'') from CONFIG where NAME = N''DMX_UPLOADCHECK_URLPART'') and ' +
+                                     'where ev.STATE = iif(art.IS_ARTIST=1,N''upload c'',N''upload a'') and ' + // TODO: wenn ich die person bin, dann ist upload a == upload c
+                                     '      up.URL like (select isnull(VALUE,N''%'') from CONFIG where NAME = N''DMX_UPLOADCHECK_URLPART'') and ' +
                                      '      man.ID = '''+qMandator.FieldByName('ID').AsWideString+''';');
         try
           // URL-Liste aus der Datenbank in URLListDB speichern
