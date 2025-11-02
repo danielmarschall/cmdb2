@@ -268,8 +268,9 @@ class function TCmDbPluginClient.ClickEvent(AdoConn: TAdoConnection; MandatorGui
 var
   SearchRec: TSearchRec;
   p: TCmDbPlugin;
+  SomethingHandled: boolean;
 begin
-  Result.Handled := false;
+  SomethingHandled := false;
   if FindFirst(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'*.spl', faAnyFile, SearchRec) = 0 then
   begin
     try
@@ -277,15 +278,13 @@ begin
         try
           p := TCmDbPlugin.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+SearchRec.Name);
           try
+            Result.Handled := false;
             result := p.ClickEvent(AdoConn.ConnectionString, MandatorGuid, StatGuid, ItemGuid);
             if Result.Handled then
             begin
+              SomethingHandled := true;
               if Result.Action = craAbort then Abort; // can cancel clicking "Refresh" button
               Exit;
-            end
-            else
-            begin
-              Beep;
             end;
           finally
             FreeAndNil(p);
@@ -305,6 +304,8 @@ begin
       SysUtils.FindClose(SearchRec);
     end;
   end;
+  if not SomethingHandled then
+    Beep;
 end;
 
 initialization
