@@ -71,6 +71,11 @@ It is important to understand how to handle a database grid. Here are some notes
 - Insert a row by going past the last line using the arrow keys, or click the "blue plus" in the navigator, or press the "Insert" key.
 - Cancel an edit/insert operation by pressing "Esc". Note that if you are not in the edit/insert mode, then "Esc" will close the window.
 - Some fields are "boolean" which means that they only accept a yes or a no. In this case, you have to type "True" (for yes) or "False" (for no). Depending on your system locale, the names might be different, such as "Wahr" and "Falsch" for German systems.
+- At each window, in the top-right corner you can search through the contents of all columns in the database grid. A few hints about the search terms:
+	- Search is handled case-insensitive
+	- Start with the character `^` if you want that these characters stand at the beginning (otherwise they might be also in the middle or at the ending of a column). For example, `^OR` will find `ORANGE` but not `MORE`.
+	- End with the character `$` if you want that these characters stand at the ending (otherwise they might be also in the middle or at the start of a column). For example, `OR$` will find `MOTOR` but not `MORE`.
+	- You can add multiple word fragments that are handled separately. For example, `^Coc Cher Light$` will find `Coca Cola Cherry Light`.	
 
 ### Common error messages
 

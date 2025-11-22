@@ -47,7 +47,8 @@ implementation
 
 uses
   ShlObj, ShellApi, System.Hash, Dialogs, WinInet, System.IOUtils, ComObj, ActiveX,
-  CmDbMain, Artist, Commission, Mandator, Statistics, Registry, CmDbPluginShare;
+  CmDbMain, Artist, Commission, Mandator, Statistics, Registry, CmDbPluginShare,
+  StrUtils;
 
 const
   LOCALDB_PSEUDO_HOST = '(localdb)';
@@ -1705,11 +1706,34 @@ begin
   {$ENDIF}
 end;
 
+function _EscapeLike(const S: string; EscapeChar: Char = '\'): string;
+var
+  I: Integer;
+begin
+  Assert(Escapechar <> '%');
+  Assert(Escapechar <> '_');
+  Assert(Escapechar <> '[');
+  Assert(Escapechar <> '''');
+  Result := '';
+  for I := 1 to Length(S) do
+  begin
+    if S[I] = '''' then
+      Result := Result + '''''' // ' becomes ''
+    else if (S[I]='%') or (S[I]='_') or (S[I]='[') or (S[I]=EscapeChar) then
+      Result := Result + EscapeChar + S[I]
+    else
+      Result := Result + S[I];
+  end;
+end;
+
 function _BuildSearchCondition(const search, columns: string): string;
 var
   words, columnList: TStringList;
   i, j: Integer;
   conditions, columnCondition: string;
+  likeExpression1, likeExpression2, likeExpression3: string;
+const
+  EscapeChar = '\';
 begin
   if Trim(search) = '' then Exit('1=1');
   if columns = '' then Exit('1=0');
@@ -1729,6 +1753,20 @@ begin
 
     for i := 0 to words.Count - 1 do
     begin
+      likeExpression1 := '';
+      if StartsText('^', words[i]) then
+        words[i] := Copy(words[i], 2, Length(words[i])-1)
+      else
+        likeExpression1 := '%';
+
+      likeExpression3 := '';
+      if EndsText('$', words[i]) then
+        words[i] := Copy(words[i], 1, Length(words[i])-1)
+      else
+        likeExpression3 := '%';
+
+      likeExpression2 := _EscapeLike(words[i], EscapeChar);
+
       if conditions <> '' then
         conditions := conditions + ' AND ';
 
@@ -1739,8 +1777,9 @@ begin
           columnCondition := columnCondition + ' OR ';
 
         columnCondition := columnCondition +
-          'lower(' + columnList[j] + ') LIKE ''%' +
-          StringReplace(AnsiLowerCase(words[i]), '''', '`', [rfReplaceAll]) + '%''';
+          'lower(' + columnList[j] + ') LIKE lower(''' +
+          likeExpression1 + likeExpression2 + likeExpression3
+          + ''') ESCAPE '''+EscapeChar+''' ';
       end;
       columnCondition := columnCondition + ')';
 
