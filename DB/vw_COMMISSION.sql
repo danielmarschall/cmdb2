@@ -86,8 +86,8 @@ QuoteNotPaid as (
 			when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0)) -- Partial refunded
 		end as NotPaid
 	from QuoteSums qs
-	left join PaymentSums ps ON qs.ARTIST_ID = ps.ARTIST_ID and qs.CURRENCY = ps.CURRENCY
-	left join RefundSums rs ON qs.ARTIST_ID = ps.ARTIST_ID and qs.CURRENCY = ps.CURRENCY
+	left join PaymentSums ps ON ps.ARTIST_ID = qs.ARTIST_ID and ps.CURRENCY = qs.CURRENCY
+	left join RefundSums  rs ON rs.ARTIST_ID = qs.ARTIST_ID and rs.CURRENCY = qs.CURRENCY
 	left join COMMISSION_EVENT cev on cev.ID = qs.EVENT_ID
 	left join COMMISSION cm on cm.ID = cev.COMMISSION_ID
 ),
