@@ -40,7 +40,7 @@ QuoteEvents AS (
 		SUM(q.AMOUNT_LOCAL) as AMOUNT_LOCAL,
 		q.IS_FREE
 	from QUOTE q
-	group by q.EVENT_ID, q.CURRENCY, q.IS_FREE
+	group by q.EVENT_ID, q.CURRENCY, q.IS_FREE, case when q.AMOUNT < 0 then 1 else 2 end
 ),
 QuoteSums AS (
 	select
