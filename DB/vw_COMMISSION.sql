@@ -40,7 +40,7 @@ QuoteEvents AS (
 		SUM(q.AMOUNT_LOCAL) as AMOUNT_LOCAL,
 		q.IS_FREE
 	from QUOTE q
-	group by q.EVENT_ID, q.CURRENCY, q.IS_FREE, case when q.AMOUNT < 0 then 1 else 2 end
+	group by q.EVENT_ID, q.CURRENCY, q.IS_FREE/*, case when q.AMOUNT < 0 then 1 else 2 end*/
 ),
 QuoteSums AS (
 	select
@@ -80,10 +80,10 @@ QuoteNotPaid as (
 		case
 			when qs.AMOUNT >= 0 and    qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) >= qs.AMOUNT then qs.AMOUNT -- Not paid
 			when qs.AMOUNT >= 0 and    qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) < 0.01 then 0.00 -- Paid
-			when qs.AMOUNT >= 0 then   qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) -- Partial paid
-			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then qs.AMOUNT -- Not refunded
+			when qs.AMOUNT >= 0 then   qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment-(isnull(rs.TotalRefund,0.00)-isnull(qs.RunningQuoteSum_Negative,0.00)), 0) -- Partial paid
+			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then 0.00/*qs.AMOUNT*/ -- Not refunded [TODO: Changed qs.AMOUNT to 0.00, otherwise a discount-event inside a non-refunded commission shows up as non-refunded]
 			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) > -0.01 then 0.00 -- Refunded
-			when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0)) -- Partial refunded
+			when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund-(isnull(ps.TotalPayment,0.00)-isnull(qs.RunningQuoteSum_Positive,0.00)), 0)) -- Partial refunded
 		end as NotPaid
 	from QuoteSums qs
 	left join PaymentSums ps ON ps.ARTIST_ID = qs.ARTIST_ID and ps.CURRENCY = qs.CURRENCY
