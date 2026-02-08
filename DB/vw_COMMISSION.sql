@@ -87,9 +87,10 @@ QuoteNotPaid as (
 			when qs.AMOUNT >= 0 and    qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) >= qs.AMOUNT then qs.AMOUNT -- Not paid
 			when qs.AMOUNT >= 0 and    qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) < 0.01 then 0.00 -- Paid
 			when qs.AMOUNT >= 0 then   qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) + isnull(rs.TotalRefund, 0) -- Partial paid
-			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then 0.00 -- Not refunded
-			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) > -0.01 then 0.00 -- Refunded
-			when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) + isnull(ps.TotalPayment, 0)) -- Partial refunded
+			when qs.AMOUNT <  0 then 0.00 -- Nothing TO PAY
+			--when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then qs.AMOUNT -- Not refunded
+			--when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) > -0.01 then 0.00 -- Refunded
+			--when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) + isnull(ps.TotalPayment, 0)) -- Partial refunded
 		end as NotPaid_
     from QuoteSums qs
 	left join PaymentSums ps ON ps.ARTIST_ID = qs.ARTIST_ID and ps.CURRENCY = qs.CURRENCY
@@ -253,5 +254,5 @@ left join ARTIST art on art.ID = cm.ARTIST_ID
 left join QuotePayStatusAggr on QuotePayStatusAggr.COMMISSION_ID = cm.ID
 
 
--- go
--- select ARTIST_NAME, PAY_STATUS from vw_COMMISSION where PAY_STATUS like '%!!!%'
+--go
+--select ARTIST_NAME, PAY_STATUS from vw_COMMISSION where PAY_STATUS like '%!!!%'
