@@ -38,9 +38,9 @@ QuoteEvents AS (
 		SUM(q.AMOUNT) as AMOUNT,
 		q.CURRENCY,
 		SUM(q.AMOUNT_LOCAL) as AMOUNT_LOCAL,
-		q.IS_FREE
+		isnull(q.IS_FREE,0) as IS_FREE
 	from QUOTE q
-	group by q.EVENT_ID, q.CURRENCY, q.IS_FREE/*, case when q.AMOUNT < 0 then 1 else 2 end*/
+	group by q.EVENT_ID, q.CURRENCY, isnull(q.IS_FREE,0)
 ),
 QuoteSums AS (
 	select
@@ -71,25 +71,78 @@ QuoteSums AS (
 ),
 QuoteNotPaid as (
 	select 
+	    qs.EVENT_ID,
+		cev.DATE as EVENT_DATE,
 		qs.ARTIST_ID,
 		cm.ID as COMMISSION_ID,
 		qs.IS_FREE,
 		qs.AMOUNT as Amount,
 		qs.CURRENCY,
+		qs.RunningQuoteSum_Positive,
 		qs.AMOUNT_LOCAL as AmountLocal,
+		ps.TotalPayment,
+		rs.TotalRefund,
 		case
+		    when isnull(qs.IS_FREE,0) = 1 then 0.00
 			when qs.AMOUNT >= 0 and    qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) >= qs.AMOUNT then qs.AMOUNT -- Not paid
 			when qs.AMOUNT >= 0 and    qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) < 0.01 then 0.00 -- Paid
-			when qs.AMOUNT >= 0 then   qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment-(isnull(rs.TotalRefund,0.00)-isnull(qs.RunningQuoteSum_Negative,0.00)), 0) -- Partial paid
-			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then 0.00/*qs.AMOUNT*/ -- Not refunded [TODO: Changed qs.AMOUNT to 0.00, otherwise a discount-event inside a non-refunded commission shows up as non-refunded]
+			when qs.AMOUNT >= 0 then   qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) + isnull(rs.TotalRefund, 0) -- Partial paid
+			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then 0.00 -- Not refunded
 			when qs.AMOUNT <  0 and    qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) > -0.01 then 0.00 -- Refunded
-			when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund-(isnull(ps.TotalPayment,0.00)-isnull(qs.RunningQuoteSum_Positive,0.00)), 0)) -- Partial refunded
-		end as NotPaid
-	from QuoteSums qs
+			when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) + isnull(ps.TotalPayment, 0)) -- Partial refunded
+		end as NotPaid_
+    from QuoteSums qs
 	left join PaymentSums ps ON ps.ARTIST_ID = qs.ARTIST_ID and ps.CURRENCY = qs.CURRENCY
 	left join RefundSums  rs ON rs.ARTIST_ID = qs.ARTIST_ID and rs.CURRENCY = qs.CURRENCY
 	left join COMMISSION_EVENT cev on cev.ID = qs.EVENT_ID
 	left join COMMISSION cm on cm.ID = cev.COMMISSION_ID
+),
+QuoteSums2 AS (
+    select
+        qnp.*,
+        SUM(
+            iif(isnull(qnp.IS_FREE,0)=0 and qnp.AMOUNT < 0, -qnp.AMOUNT, 0)
+        ) OVER (
+            PARTITION BY qnp.ARTIST_ID, qnp.CURRENCY
+            ORDER BY qnp.EVENT_DATE, qnp.EVENT_ID
+            ROWS UNBOUNDED PRECEDING
+        ) AS RunningDiscount
+    from QuoteNotPaid qnp
+),
+QuoteSums3 AS (
+    select
+        qs2.*,
+        SUM(
+            iif(qs2.NotPaid_ > 0, qs2.NotPaid_, 0)
+        ) OVER (
+            PARTITION BY qs2.ARTIST_ID, qs2.CURRENCY
+            ORDER BY qs2.EVENT_DATE, qs2.EVENT_ID
+            ROWS UNBOUNDED PRECEDING
+        ) AS RunningNotPaid
+    from QuoteSums2 qs2
+),
+QuoteSums4 AS (
+    select
+        qs3.*,
+        case when qs3.RunningDiscount < qs3.RunningNotPaid then qs3.RunningDiscount else qs3.RunningNotPaid end as DiscountAppliedTotal,
+        case when qs3.RunningDiscount < qs3.RunningNotPaid then qs3.RunningDiscount else qs3.RunningNotPaid end
+        - LAG(
+            case when qs3.RunningDiscount < qs3.RunningNotPaid then qs3.RunningDiscount else qs3.RunningNotPaid end,
+            1, 0
+          ) OVER (
+            PARTITION BY qs3.ARTIST_ID, qs3.CURRENCY
+            ORDER BY qs3.EVENT_DATE, qs3.EVENT_ID
+          ) as DiscountAppliedHere
+    from QuoteSums3 qs3
+),
+QuoteNotPaidWithOutDiscounts as (
+    select qs4.*,
+	case
+		when qs4.RunningQuoteSum_Positive > qs4.TotalPayment and qs4.Amount < 0 then qs4.Amount
+        when NotPaid_ <= 0 then 0*NotPaid_
+        else NotPaid_ - DiscountAppliedHere
+    end as NotPaid
+    from QuoteSums4 qs4
 ),
 QuotePayStatus as (
 	select
@@ -117,7 +170,7 @@ QuotePayStatus as (
 		end as PAY_STATUS_ORDER
 	from COMMISSION cm
 	left join ARTIST art on art.ID = cm.ARTIST_ID
-	left join QuoteNotPaid qnp on qnp.ARTIST_ID = art.ID and qnp.COMMISSION_ID = cm.ID
+	left join QuoteNotPaidWithOutDiscounts qnp on qnp.ARTIST_ID = art.ID and qnp.COMMISSION_ID = cm.ID
 	where isnull(qnp.IS_FREE,0) = 0
 	group by art.ID, cm.ID, qnp.CURRENCY, isnull(qnp.IS_FREE,0)
 
@@ -132,7 +185,7 @@ QuotePayStatus as (
 		4 as PAY_STATUS_ORDER
 	from COMMISSION cm
 	left join ARTIST art on art.ID = cm.ARTIST_ID
-	left join QuoteNotPaid qnp on qnp.ARTIST_ID = art.ID and qnp.COMMISSION_ID = cm.ID
+	left join QuoteNotPaidWithOutDiscounts qnp on qnp.ARTIST_ID = art.ID and qnp.COMMISSION_ID = cm.ID
 	where ISNULL(qnp.IS_FREE,0) = 1
 	group by art.ID, cm.ID, qnp.CURRENCY, isnull(qnp.IS_FREE,0)
 ),
@@ -198,3 +251,7 @@ cast((
 from COMMISSION cm
 left join ARTIST art on art.ID = cm.ARTIST_ID
 left join QuotePayStatusAggr on QuotePayStatusAggr.COMMISSION_ID = cm.ID
+
+
+-- go
+-- select ARTIST_NAME, PAY_STATUS from vw_COMMISSION where PAY_STATUS like '%!!!%'
