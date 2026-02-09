@@ -56,14 +56,14 @@ QuoteSums AS (
 			PARTITION BY art.ID, qev.CURRENCY
 			ORDER BY cev.DATE, qev.EVENT_ID
 			ROWS UNBOUNDED PRECEDING
-		) AS RunningQuoteSum_Positive,
-		SUM (
-			iif(isnull(qev.IS_FREE,0)=0 and qev.AMOUNT<0,-qev.AMOUNT,0)
-		) OVER (
-			PARTITION BY art.ID, qev.CURRENCY
-			ORDER BY cev.DATE, qev.EVENT_ID
-			ROWS UNBOUNDED PRECEDING
-		) AS RunningQuoteSum_Negative
+		) AS RunningQuoteSum_Positive
+		--,SUM (
+		--	iif(isnull(qev.IS_FREE,0)=0 and qev.AMOUNT<0,-qev.AMOUNT,0)
+		--) OVER (
+		--	PARTITION BY art.ID, qev.CURRENCY
+		--	ORDER BY cev.DATE, qev.EVENT_ID
+		--	ROWS UNBOUNDED PRECEDING
+		--) AS RunningQuoteSum_Negative
 	from QuoteEvents qev
 	left join COMMISSION_EVENT cev ON cev.ID = qev.EVENT_ID and cev.STATE = 'quote'
 	left join COMMISSION cm ON cm.ID = cev.COMMISSION_ID
@@ -88,8 +88,8 @@ QuoteNotPaid as (
 			when qs.AMOUNT >= 0 and	 qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) < 0.01       then 0.00      -- Paid
 			when qs.AMOUNT >= 0 then qs.RunningQuoteSum_Positive - ISNULL(ps.TotalPayment, 0) + isnull(rs.TotalRefund, 0) -- Partial paid
 			when qs.AMOUNT <  0 then 0.00 -- Nothing TO PAY
-			--when qs.AMOUNT <  0 and	qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then qs.AMOUNT   -- Not refunded
-			--when qs.AMOUNT <  0 and	qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) > -0.01       then 0.00        -- Refunded
+			--when qs.AMOUNT <  0 and	 qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) >= -qs.AMOUNT then qs.AMOUNT  -- Not refunded
+			--when qs.AMOUNT <  0 and	 qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) > -0.01       then 0.00       -- Refunded
 			--when qs.AMOUNT <  0 then -(qs.RunningQuoteSum_Negative - ISNULL(rs.TotalRefund, 0) + isnull(ps.TotalPayment, 0)) -- Partial refunded
 		end as NotPaid
 	from QuoteSums qs
@@ -254,5 +254,5 @@ left join ARTIST art on art.ID = cm.ARTIST_ID
 left join QuotePayStatusAggr on QuotePayStatusAggr.COMMISSION_ID = cm.ID
 
 
-go
-select ARTIST_NAME, PAY_STATUS from vw_COMMISSION where PAY_STATUS like '%!!!%'
+--go
+--select ARTIST_NAME, PAY_STATUS from vw_COMMISSION where PAY_STATUS like '%!!!%'
