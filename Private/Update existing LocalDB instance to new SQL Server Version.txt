@@ -1,0 +1,10 @@
+
+Update existing LocalDB instance to new SQL Server Version
+==========================================================
+
+NOTE: All data must be saved in a backup and the backup needs to be restored afterwards!!!
+
+sqllocaldb stop MSSQLLocalDB
+sqllocaldb delete MSSQLLocalDB
+sqllocaldb create MSSQLLocalDB
+sqllocaldb start MSSQLLocalDB
