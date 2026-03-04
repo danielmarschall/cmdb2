@@ -746,9 +746,141 @@ procedure TMainForm.Timer1Timer(Sender: TObject);
     if f.isTemp and FileExists(f.filename) then DeleteFile(f.filename);
   end;
 
+  function SQL4KBSektor_AutoAdjust: boolean;
+
+    function Max(a,b: DWORD): DWORD;
+    begin
+      if a > b then exit(a) else exit(b);
+    end;
+
+    function SQL4KBSektor_GetPhysicalSectorSize(const Drive: string): DWORD;
+    var
+      SA: TSecurityAttributes;
+      ReadPipe, WritePipe: THandle;
+      StartupInfo: TStartupInfo;
+      ProcessInfo: TProcessInformation;
+      Buffer: array[0..4095] of AnsiChar;
+      BytesRead: DWORD;
+      Output: string;
+      Line: string;
+      SL: TStringList;
+      I: Integer;
+    begin
+      // TODO: Better would be to query the value from the WinAPI, but I am not sure
+      //       how to do this.
+
+      Result := 0;
+      Output := '';
+
+      ZeroMemory(@SA, SizeOf(SA));
+      SA.nLength := SizeOf(SA);
+      SA.bInheritHandle := True;
+
+      CreatePipe(ReadPipe, WritePipe, @SA, 0);
+
+      ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
+      StartupInfo.cb := SizeOf(StartupInfo);
+      StartupInfo.dwFlags := STARTF_USESTDHANDLES;
+      StartupInfo.hStdOutput := WritePipe;
+      StartupInfo.hStdError := WritePipe;
+
+      ZeroMemory(@ProcessInfo, SizeOf(ProcessInfo));
+
+      if not CreateProcess(
+        nil,
+        PChar('cmd.exe /C fsutil fsinfo sectorinfo ' + Drive),
+        nil,
+        nil,
+        True,
+        CREATE_NO_WINDOW,
+        nil,
+        nil,
+        StartupInfo,
+        ProcessInfo) then
+        RaiseLastOSError;
+
+      CloseHandle(WritePipe);
+
+      while ReadFile(ReadPipe, Buffer, SizeOf(Buffer), BytesRead, nil) and (BytesRead > 0) do
+        Output := Output + string(Copy(Buffer, 1, BytesRead));
+
+      CloseHandle(ReadPipe);
+
+      WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
+      CloseHandle(ProcessInfo.hProcess);
+      CloseHandle(ProcessInfo.hThread);
+
+      SL := TStringList.Create;
+      try
+        SL.Text := Output;
+
+        for I := 0 to SL.Count - 1 do
+        begin
+          Line := Trim(SL[I]);
+          if Line.StartsWith('PhysicalBytesPerSector') or
+             Line.StartsWith('Physische Bytes pro Sektor') then
+          begin
+            Result := Max(Result, StrToInt(Trim(Copy(Line, Pos(':', Line) + 1, MaxInt))));
+            Break;
+          end;
+        end;
+      finally
+        SL.Free;
+      end;
+    end;
+
+    function SQL4KBSektor_GetRegistryHack: boolean;
+    var
+      reg: TRegistry;
+    begin
+      result := false;
+      reg := TRegistry.Create;
+      try
+        reg.RootKey := HKEY_LOCAL_MACHINE;
+        if reg.OpenKey('SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device', false) then
+        begin
+          result := reg.ValueExists('ForcedPhysicalSectorSizeInBytes') and
+               (reg.ReadMultiString('ForcedPhysicalSectorSizeInBytes')[0] = '* 4095');
+          reg.CloseKey;
+        end;
+      finally
+        FreeAndNil(reg);
+      end;
+    end;
+
+    procedure SQL4KBSektor_SetRegistryHack(AEnable: boolean);
+    var
+      reg: TRegistry;
+    begin
+      reg := TRegistry.Create;
+      try
+        reg.RootKey := HKEY_LOCAL_MACHINE;
+        if reg.OpenKey('SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device', true) then
+        begin
+          if AEnable then
+            reg.WriteMultiString('ForcedPhysicalSectorSizeInBytes', ['* 4095'])
+          else if reg.ValueExists('ForcedPhysicalSectorSizeInBytes') then
+            reg.DeleteValue('ForcedPhysicalSectorSizeInBytes');
+          reg.CloseKey;
+        end;
+      finally
+        FreeAndNil(reg);
+      end;
+    end;
+
+  begin
+    result := false;
+    if (SQL4KBSektor_GetPhysicalSectorSize('C:') > 4096) and not SQL4KBSektor_GetRegistryHack then
+    begin
+      SQL4KBSektor_SetRegistryHack(true);
+      result := true;
+    end;
+  end;
+
 resourcestring
   SRequireComponents = 'CMDB2 requires some Microsoft SQL Server components to be installed. Install them now?';
   SPleaseAcceptUac = 'Please accept the permission dialog (blinking in the task bar?)';
+  SSectorSizeChangedPleaseReboot = 'Physical Sector Size changed. Please reboot Windows.';
 var
   _IsLocalDbInstalled: boolean;
   _SqlServerClientDriverInstalled: boolean;
@@ -793,6 +925,12 @@ begin
         // 2. LocalDB
         if not _IsLocalDbInstalled then
         begin
+          if SQL4KBSektor_AutoAdjust then
+          begin
+            MessageBox(Application.Handle, PChar(SSectorSizeChangedPleaseReboot), PChar(Application.Title), MB_OK or MB_ICONWARNING or MB_TASKMODAL);
+            Application.Terminate;
+            Exit;
+          end;
           if WindowsBits = 64 then
           begin
             tmpDF := _GetLocalOrDownloadedExe('SqlLocalDB.x64.msi', 'SQL Server LocalDB (64 Bit)');
