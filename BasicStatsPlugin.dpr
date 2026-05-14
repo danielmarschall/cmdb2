@@ -157,6 +157,7 @@ begin
                           '        when cm.ART_STATUS = ''c aw hires'' then 5 ' + #13#10 +
                           '        else 6 ' + #13#10 +
                           '    end as __STATUS_ORDER, ' + #13#10 +
+                          '    cm.START_DATE, ' + #13#10 +
                           '    cm.ART_STATUS, ' + #13#10 +
                           '    cm.PAY_STATUS, ' + #13#10 +
                           '    art.NAME as ARTIST, ' + #13#10 +
@@ -448,10 +449,12 @@ begin
                           '    PROJECT_NAME as SUBJECT ' + #13#10 +
                           'from vw_COMMISSION ' + #13#10 +
                           'where ' + #13#10 +
+                          'ART_STATUS = ''fin'' and (' + #13#10 +
                           '-- I am the customer and wait for the artist to upload the artwork ' + #13#10 +
                           '(IS_ARTIST = 1 and UPLOAD_A = ''No'') or ' + #13#10 +
                           '-- I am the artist and wait for the cutomer to upload the artwork ' + #13#10 +
-                          '(IS_ARTIST = 0 and UPLOAD_C = ''No'')');
+                          '(IS_ARTIST = 0 and UPLOAD_C = ''No'') ' + #13#10 +
+                          ')');
                           {$ENDREGION}
         finally
           FreeAndNil(AdoConn);
@@ -564,10 +567,12 @@ begin
                           '    PROJECT_NAME as SUBJECT ' + #13#10 +
                           'from vw_COMMISSION ' + #13#10 +
                           'where ' + #13#10 +
+                          'ART_STATUS = ''fin'' and (' + #13#10 +
                           '-- I am the customer and need to upload the art ' + #13#10 +
                           '(IS_ARTIST = 1 and UPLOAD_C = ''No'') or ' + #13#10 +
                           '-- I am the artist and need to upload the art ' + #13#10 +
-                          '(IS_ARTIST = 0 and UPLOAD_A = ''No'')');
+                          '(IS_ARTIST = 0 and UPLOAD_A = ''No'') ' + #13#10 +
+                          ')');
                           {$ENDREGION}
         finally
           FreeAndNil(AdoConn);
