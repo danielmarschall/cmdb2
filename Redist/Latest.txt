@@ -1,6 +1,8 @@
 
 MSOLEDBSQL19 Provider download:
 https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server?view=sql-server-ver17
+Release number: 19.4.1
+Released: May 09, 2025
 
 
 SQL Local DB source:
