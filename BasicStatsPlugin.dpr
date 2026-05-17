@@ -47,8 +47,8 @@ var
 resourcestring
   S_Info_PluginName = 'Basic Stats Plugin';
   S_Info_PluginAuthor = 'Daniel Marschall, ViaThinkSoft';
-  S_Info_PluginVersion = '1.0';
-  S_Info_PluginCopyright = '(C) 2024 Daniel Marschall, ViaThinkSoft';
+  S_Info_PluginVersion = '1.1';
+  S_Info_PluginCopyright = '(C) 2024-2026 Daniel Marschall, ViaThinkSoft';
   S_Info_PluginLicense = 'Apache 2.0';
   S_Info_PluginMoreInfo = '';
 begin

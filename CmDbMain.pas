@@ -151,8 +151,8 @@ resourcestring
 const
   Author = 'Daniel Marschall, ViaThinkSoft';
   License = 'Apache 2.0';
-  DevelopmentStartYear = 2024; // DO NOT CHANGE; this is the start year, not the current year
-  GitHubVersion = '1.8.0'; // Change this once you release something new
+  DevelopmentStartYear = 2024; // DO NOT CHANGE; this is the START year, not the current year
+  GitHubVersion = '1.9.0'; // Change this once you release something new
 begin
   dateidatum := GetBuildTimestamp(ParamStr(0));
   InstallId := VariantToString(AdoConnection1.GetScalar('select VALUE from CONFIG where NAME = ''INSTALL_ID'';'));
